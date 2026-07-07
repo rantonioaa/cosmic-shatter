@@ -69,6 +69,13 @@
 - "LEVEL X" displayed prominently
 - Ship visible during transition
 
+### Delta Time Normalization
+- All game logic runs at consistent speed regardless of frame rate
+- Delta time (dt) calculated per frame, normalized to 60fps
+- Capped at 3x to prevent spiral of death
+- Movement, timers, and animations scaled by dt
+- Same game speed on 30fps mobile and 60fps PC
+
 ---
 
 ## Power-ups
@@ -101,7 +108,7 @@
 - **Star Magnet:** Full screen pull for 5 seconds (5% drop chance)
 - **Back Shot:** Fires bullets both forward and backward for 10 seconds
 - Resets to base radius on death
-- **Shop upgrade (Phase 2):** +15px per level
+- **Shop upgrade:** +20px per level
 
 ---
 
@@ -142,11 +149,13 @@
 - Guest mode (no saving)
 - Per-profile data:
   - Star Bits currency
-  - Upgrades (7 types, 5 levels each)
+  - Upgrades (8 types, 5 levels each)
   - Stats (games played, total score, etc.)
   - High scores (top 8)
   - Last modifier preference
   - Unlocked modifiers (sequential progression)
+  - Orientation preference (portrait/landscape)
+  - Resolution preference
 
 ### Export/Import
 - Export as encrypted `.sav` file
@@ -166,7 +175,7 @@
 
 ### Profile Select
 - List all profiles with stats
-- Arrow key navigation
+- Arrow key navigation (keyboard) or tap to select (mobile)
 - Create new profile option
 - Guest mode option
 
@@ -178,40 +187,54 @@
 
 ### Modifier Select
 - 6 modifiers with descriptions
-- Arrow key navigation
+- Arrow key navigation or tap to select
 - Score multiplier shown
 - Locked modifiers show unlock condition
 
 ### Graphics Menu
-- Resolution options (all 16:9):
-  - 640x360 (360p)
-  - 1280x720 (720p) — default
-  - 1920x1080 (1080p)
-- Arrow key navigation
+- Orientation toggle: Landscape / Portrait
+- Landscape resolutions:
+  - 640x360
+  - 1280x720 — default
+  - 1920x1080
+- Portrait resolutions:
+  - 360x640
+  - 720x1280
+  - 1080x1920
+- Arrow key navigation or tap to select
 - Shows current resolution
-- Saves preference per profile
+- Saves orientation and resolution per profile
 
 ### Pause Menu
-- Arrow key navigation
+- Arrow key navigation or tap to select
 - Resume or Quit to Menu
 - Dim overlay on frozen game
 
 ### Game Over
 - Score and modifier displayed
-- Arrow-selectable menu:
+- Arrow-selectable menu or tap:
   - Restart → modifier select
   - Shop → upgrade shop
   - Quit to Menu
 - High scores list shown
 
-### Upgrade Shop
-- 8 upgrades with 5 levels each
-- Arrow key navigation
-- Shows current level, cost, and description
-- Color-coded: white (can buy), yellow (in progress), green (maxed), red (can't afford)
-- Buy with ENTER
+### Upgrade Shop (Card Grid)
+- 2x4 card grid layout
+- SVG wireframe icons per upgrade:
+  - Extra Life: red heart
+  - Thrust Power: cyan flame
+  - Fire Rate: yellow lightning
+  - Start Shield: blue shield
+  - Powerup Luck: green star
+  - Bullet Speed: white arrow
+  - Magnet Range: pink magnet
+  - Cooling System: ice blue snowflake
+- 5-segment progress bars for upgrade levels
+- Star bit diamond icon on cost badges
+- Color-coded: gold selected, green maxed
+- Arrow keys/WASD for grid navigation (desktop)
+- Tap to select (mobile)
 - Accessible from main menu (S) and gameover screen
-- Star Bits balance displayed
 
 ---
 
@@ -269,6 +292,7 @@
 
 ## Controls
 
+### Desktop (Keyboard)
 | Key | Action |
 |---|---|
 | Arrow keys / WASD | Rotate / Thrust |
@@ -281,6 +305,45 @@
 | P | Change profile |
 | G | Graphics settings |
 | N | New profile |
+
+### Mobile (Touch)
+| Button | Action |
+|---|---|
+| ◀ ▶ | Rotate left / right |
+| ▲ | Thrust forward |
+| FIRE | Shoot |
+| \| \| (top-right) | Pause |
+| Tap | Select menu items |
+
+---
+
+## Mobile Support
+
+### Touch Controls
+- Virtual buttons at bottom of screen
+- Left side: rotate buttons (◀ ▶)
+- Right side: thrust (▲) and shoot (FIRE) stacked vertically
+- Pause button (top-right) during gameplay only
+- Semi-transparent, thumb-friendly sizing (68-74px)
+
+### Menu Navigation
+- Tap-to-select on all menu items
+- Touch-friendly hints replace keyboard hints
+- GO button for profile name input
+- All menus fully functional via touch
+
+### Orientation Support
+- Portrait mode (default on mobile)
+- Landscape mode
+- Toggle in graphics menu
+- Auto-detect on first load
+- Saved per profile
+
+### Performance
+- Auto-selects 360p resolution on mobile for performance
+- Delta time normalization for consistent speed
+- `user-scalable=no` to prevent zoom issues
+- Prevents pull-to-refresh and bounce
 
 ---
 

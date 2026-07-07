@@ -69,11 +69,13 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 ## Phase 2: Meta-progression + Ability Shop ✅
 
 ### 2A. Ability Shop ✅
-- [x] Shop UI with upgrade cards
+- [x] 2x4 card grid layout with SVG wireframe icons
 - [x] 8 upgrades (Extra Life, Thrust Power, Fire Rate, Start Shield, Powerup Luck, Bullet Speed, Magnet Range, Cooling System)
 - [x] 5 levels per upgrade with increasing costs
-- [x] Star Bits balance display
+- [x] Star Bits balance display with star icon
 - [x] Buy with ENTER on selected upgrade
+- [x] Visual progress bars for upgrade levels
+- [x] Color-coded cards (gold selected, green maxed, dimmed can't-afford)
 
 ### 2B. Upgrade Effects ✅
 - [x] Extra Life: +1 starting life per level
@@ -155,7 +157,8 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Pause menu with arrow navigation
 - [x] High scores display (per-profile)
 - [x] Export/Import profiles
-- [x] Graphics menu with resolution options (360p, 720p, 1080p)
+- [x] Graphics menu with resolution options
+- [x] Portrait/Landscape orientation toggle in graphics menu
 
 ### Gameplay ✅
 - [x] Ship movement (arrows/WASD)
@@ -167,6 +170,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Colored asteroids with unique properties
 - [x] Multi-hit asteroids (Blue: 2, Green: 3)
 - [x] Erratic asteroid movement (Purple)
+- [x] Delta time normalization (consistent speed at any frame rate)
 
 ### Scoring ✅
 - [x] Large asteroid: 20 pts
@@ -193,7 +197,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Burst fire barely builds heat, cools quickly
 - [x] Overheat penalty: 2 seconds cooldown
 - [x] Color-coded feedback (green → yellow → red → flashing)
-- [x] Cooling System upgrade planned for shop
+- [x] Cooling System upgrade in shop
 
 ### Magnet System ✅
 - [x] Always-on 100px base radius
@@ -217,6 +221,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Export profile as encrypted .sav file
 - [x] Import profile from .sav file
 - [x] Migration from old high score format
+- [x] Per-profile orientation and resolution settings
 
 ### UI/UX ✅
 - [x] Clean menu screens with selective element visibility
@@ -226,6 +231,18 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Power-up HUD during gameplay
 - [x] Shield rings visual indicator
 - [x] Star bits counter in HUD
+- [x] SVG wireframe icons in upgrade shop
+
+### Mobile Support ✅
+- [x] Touch controls (rotate left/right, thrust, shoot, pause)
+- [x] Tap-to-select on all menus
+- [x] Virtual keyboard GO button for profile creation
+- [x] Touch-friendly hints (hide keyboard hints on mobile)
+- [x] Pause button (top-right) during gameplay
+- [x] Portrait/Landscape orientation support
+- [x] Auto-detect portrait on mobile first load
+- [x] Viewport meta tag (user-scalable=no)
+- [x] Prevent pull-to-refresh and bounce
 
 ### Anti-Tamper ✅
 - [x] XOR encryption for exports
