@@ -677,14 +677,25 @@
         const shopGridEl = document.getElementById('shopGrid');
         const shopBalanceEl = document.getElementById('shopBalance');
 
-        // Resolution options (16:9)
-        const RESOLUTIONS = [
-            { label: '640x360 (360p)',  width: 640,  height: 360 },
-            { label: '1280x720 (720p)', width: 1280, height: 720 },
-            { label: '1920x1080 (1080p)', width: 1920, height: 1080 }
+        // Resolution options
+        const LANDSCAPE_RESOLUTIONS = [
+            { label: '640x360',   width: 640,  height: 360 },
+            { label: '1280x720',  width: 1280, height: 720 },
+            { label: '1920x1080', width: 1920, height: 1080 }
         ];
-        let graphicsMenuIndex = 1; // default 720p
+        const PORTRAIT_RESOLUTIONS = [
+            { label: '360x640',   width: 360,  height: 640 },
+            { label: '720x1280',  width: 720,  height: 1280 },
+            { label: '1080x1920', width: 1080, height: 1920 }
+        ];
+        let currentOrientation = 'landscape';
+        let RESOLUTIONS = LANDSCAPE_RESOLUTIONS;
+        let graphicsMenuIndex = 1;
         let currentResolution = RESOLUTIONS[1];
+
+        function getResolutions() {
+            return currentOrientation === 'portrait' ? PORTRAIT_RESOLUTIONS : LANDSCAPE_RESOLUTIONS;
+        }
 
         // Shop state
         let shopMenuIndex = 0;
@@ -694,8 +705,8 @@
         canvas.width = currentResolution.width;
         canvas.height = currentResolution.height;
 
-        // Resolution scaling (reference: 1280x720)
-        let SCALE = canvas.width / 1280;
+        // Resolution scaling (reference: 720px min dimension)
+        let SCALE = Math.min(canvas.width, canvas.height) / 720;
         function sc(v) { return v * SCALE; }
         function applyScale() {
             document.documentElement.style.setProperty('--s', SCALE);
@@ -900,7 +911,8 @@
                 highScores: [],
                 lastModifier: 'none',
                 unlockedModifiers: ['none'],
-                resolution: 1 // index into RESOLUTIONS (1 = 720p)
+                resolution: 1, // index into RESOLUTIONS (1 = 720p)
+                orientation: 'landscape'
             };
         }
 
@@ -948,6 +960,10 @@
             }
             if (profile.resolution === undefined) {
                 profile.resolution = 1; // default 720p
+                changed = true;
+            }
+            if (profile.orientation === undefined) {
+                profile.orientation = 'landscape';
                 changed = true;
             }
             // Ensure all upgrade fields exist
@@ -1135,12 +1151,22 @@
         }
 
         function renderGraphicsList() {
+            const resList = getResolutions();
             let html = '';
-            RESOLUTIONS.forEach((res, i) => {
-                const isSelected = i === graphicsMenuIndex;
-                const current = activeProfile && activeProfile.resolution === i;
+            // Orientation toggle (index 0)
+            const oriLabel = currentOrientation === 'landscape' ? 'Landscape' : 'Portrait';
+            const oriSel = graphicsMenuIndex === 0 ? ' selected' : '';
+            html += `<div class="gfx-option${oriSel}" data-tap-action="graphics" data-tap-index="0">`
+                + `<span class="gfx-arrow">&#9654;</span>`
+                + `Orientation: ${oriLabel}`
+                + `</div>`;
+            // Resolution options (index 1+)
+            resList.forEach((res, i) => {
+                const idx = i + 1;
+                const isSelected = idx === graphicsMenuIndex;
+                const current = activeProfile && activeProfile.resolution === i && activeProfile.orientation === currentOrientation;
                 const mark = current ? ' (current)' : '';
-                html += `<div class="gfx-option${isSelected ? ' selected' : ''}" data-tap-action="graphics" data-tap-index="${i}">`
+                html += `<div class="gfx-option${isSelected ? ' selected' : ''}" data-tap-action="graphics" data-tap-index="${idx}">`
                     + `<span class="gfx-arrow">&#9654;</span>`
                     + `${res.label}${mark}`
                     + `</div>`;
@@ -1352,7 +1378,10 @@
                 } else if (e.key === 'g' || e.key === 'G') {
                     e.preventDefault();
                     gameState = 'graphics_menu';
-                    graphicsMenuIndex = activeProfile ? activeProfile.resolution : 1;
+                    currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                    RESOLUTIONS = getResolutions();
+                    const savedRes = activeProfile ? (activeProfile.resolution || 1) : 1;
+                    graphicsMenuIndex = savedRes + 1; // +1 because index 0 is orientation toggle
                     renderGraphicsList();
                     updateUI();
                 } else if (e.key === 's' || e.key === 'S') {
@@ -1402,28 +1431,41 @@
 
             // Graphics menu
             if (gameState === 'graphics_menu') {
+                const resList = getResolutions();
+                const totalItems = resList.length + 1; // +1 for orientation toggle
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
-                    graphicsMenuIndex = (graphicsMenuIndex - 1 + RESOLUTIONS.length) % RESOLUTIONS.length;
+                    graphicsMenuIndex = (graphicsMenuIndex - 1 + totalItems) % totalItems;
                     renderGraphicsList();
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
                     e.preventDefault();
-                    graphicsMenuIndex = (graphicsMenuIndex + 1) % RESOLUTIONS.length;
+                    graphicsMenuIndex = (graphicsMenuIndex + 1) % totalItems;
                     renderGraphicsList();
                 } else if (e.code === 'Enter' || e.code === 'Space') {
                     e.preventDefault();
-                    const res = RESOLUTIONS[graphicsMenuIndex];
-                    canvas.width = res.width;
-                    canvas.height = res.height;
-                    currentResolution = res;
-                    SCALE = canvas.width / 1280;
-                    applyScale();
-                    if (activeProfile) {
-                        activeProfile.resolution = graphicsMenuIndex;
-                        saveProfile(activeProfile);
+                    if (graphicsMenuIndex === 0) {
+                        // Toggle orientation
+                        currentOrientation = currentOrientation === 'landscape' ? 'portrait' : 'landscape';
+                        RESOLUTIONS = getResolutions();
+                        graphicsMenuIndex = 0;
+                        renderGraphicsList();
+                    } else {
+                        // Apply selected resolution
+                        const resIdx = graphicsMenuIndex - 1;
+                        const res = resList[resIdx];
+                        canvas.width = res.width;
+                        canvas.height = res.height;
+                        currentResolution = res;
+                        SCALE = Math.min(canvas.width, canvas.height) / 720;
+                        applyScale();
+                        if (activeProfile) {
+                            activeProfile.resolution = resIdx;
+                            activeProfile.orientation = currentOrientation;
+                            saveProfile(activeProfile);
+                        }
+                        gameState = 'menu';
+                        updateUI();
                     }
-                    gameState = 'menu';
-                    updateUI();
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
                     gameState = 'menu';
@@ -2534,6 +2576,31 @@
         const savedName = getActiveProfileName();
         if (savedName) {
             activeProfile = loadProfile(savedName);
+            // Apply saved orientation and resolution
+            if (activeProfile.orientation) {
+                currentOrientation = activeProfile.orientation;
+                RESOLUTIONS = getResolutions();
+            }
+            const resIdx = activeProfile.resolution || 1;
+            if (RESOLUTIONS[resIdx]) {
+                currentResolution = RESOLUTIONS[resIdx];
+                canvas.width = currentResolution.width;
+                canvas.height = currentResolution.height;
+                SCALE = Math.min(canvas.width, canvas.height) / 720;
+                applyScale();
+            }
+        } else {
+            // Auto-detect orientation on mobile for first-time users
+            const isMobileInit = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isMobileInit && window.innerHeight > window.innerWidth) {
+                currentOrientation = 'portrait';
+                RESOLUTIONS = getResolutions();
+                currentResolution = RESOLUTIONS[1]; // 720x1280
+                canvas.width = currentResolution.width;
+                canvas.height = currentResolution.height;
+                SCALE = Math.min(canvas.width, canvas.height) / 720;
+                applyScale();
+            }
         }
 
         // If no profiles exist, go to profile select
@@ -2657,7 +2724,10 @@
                         updateUI();
                     } else if (action === 'graphics') {
                         gameState = 'graphics_menu';
-                        graphicsMenuIndex = activeProfile ? (activeProfile.resolution || 1) : 1;
+                        currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                        RESOLUTIONS = getResolutions();
+                        const savedRes = activeProfile ? (activeProfile.resolution || 1) : 1;
+                        graphicsMenuIndex = currentOrientation === (activeProfile ? activeProfile.orientation : 'landscape') ? savedRes + 1 : 1;
                         updateUI();
                     }
                 } else if (gameState === 'modifier_select' && idx !== null) {
@@ -2670,19 +2740,31 @@
                     }
                     updateUI();
                 } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
-                    graphicsMenuIndex = parseInt(idx);
-                    const res = RESOLUTIONS[graphicsMenuIndex];
-                    canvas.width = res.width;
-                    canvas.height = res.height;
-                    currentResolution = res;
-                    SCALE = canvas.width / 1280;
-                    applyScale();
-                    if (activeProfile) {
-                        activeProfile.resolution = graphicsMenuIndex;
-                        saveProfile(activeProfile);
+                    const tapIdx = parseInt(idx);
+                    if (tapIdx === 0) {
+                        // Toggle orientation
+                        currentOrientation = currentOrientation === 'landscape' ? 'portrait' : 'landscape';
+                        RESOLUTIONS = getResolutions();
+                        graphicsMenuIndex = 0;
+                        renderGraphicsList();
+                    } else {
+                        // Apply selected resolution
+                        const resList = getResolutions();
+                        const resIdx = tapIdx - 1;
+                        const res = resList[resIdx];
+                        canvas.width = res.width;
+                        canvas.height = res.height;
+                        currentResolution = res;
+                        SCALE = Math.min(canvas.width, canvas.height) / 720;
+                        applyScale();
+                        if (activeProfile) {
+                            activeProfile.resolution = resIdx;
+                            activeProfile.orientation = currentOrientation;
+                            saveProfile(activeProfile);
+                        }
+                        gameState = 'menu';
+                        updateUI();
                     }
-                    gameState = 'menu';
-                    updateUI();
                 } else if (gameState === 'gameover' && idx !== null) {
                     gameoverMenuIndex = parseInt(idx);
                     const options = ['Restart', 'Shop', 'Quit to Menu'];
