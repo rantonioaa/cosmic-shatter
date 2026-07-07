@@ -2576,18 +2576,22 @@
         const savedName = getActiveProfileName();
         if (savedName) {
             activeProfile = loadProfile(savedName);
-            // Apply saved orientation and resolution
-            if (activeProfile.orientation) {
-                currentOrientation = activeProfile.orientation;
-                RESOLUTIONS = getResolutions();
-            }
-            const resIdx = activeProfile.resolution || 1;
-            if (RESOLUTIONS[resIdx]) {
-                currentResolution = RESOLUTIONS[resIdx];
-                canvas.width = currentResolution.width;
-                canvas.height = currentResolution.height;
-                SCALE = Math.min(canvas.width, canvas.height) / 720;
-                applyScale();
+            if (activeProfile) {
+                // Apply saved orientation and resolution
+                if (activeProfile.orientation) {
+                    currentOrientation = activeProfile.orientation;
+                    RESOLUTIONS = getResolutions();
+                }
+                const resIdx = activeProfile.resolution || 1;
+                if (RESOLUTIONS[resIdx]) {
+                    currentResolution = RESOLUTIONS[resIdx];
+                    canvas.width = currentResolution.width;
+                    canvas.height = currentResolution.height;
+                    SCALE = Math.min(canvas.width, canvas.height) / 720;
+                    applyScale();
+                }
+            } else {
+                setActiveProfileName(null);
             }
         } else {
             // Auto-detect orientation on mobile for first-time users
