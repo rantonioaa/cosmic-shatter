@@ -22,10 +22,11 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 
 ## CRITICAL RULES
 1. **ALWAYS update FEATURES.md and PLAN.md** when making changes to the game
-2. **Commit after each logical change** — don't batch unrelated changes
-3. **Never assume a library is available** — this is vanilla JS, no frameworks
-4. **All keyboard code stays untouched** — mobile/touch is additive only
-5. **Test mental model**: every menu state, every game state, both orientations, both desktop and mobile
+2. **ALWAYS update cosmicshatter_master_file.sav** when adding new features — keep it with everything unlocked for testing
+3. **Commit after each logical change** — don't batch unrelated changes
+4. **Never assume a library is available** — this is vanilla JS, no frameworks
+5. **All keyboard code stays untouched** — mobile/touch is additive only
+6. **Test mental model**: every menu state, every game state, both orientations, both desktop and mobile
 
 ## Architecture
 
