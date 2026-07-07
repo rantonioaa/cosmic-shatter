@@ -227,6 +227,27 @@
         #profileNameInput::placeholder {
             color: rgba(255, 255, 255, 0.4);
         }
+        #profileNameGo {
+            display: none;
+            margin-top: 12px;
+            margin-left: 8px;
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            background: #ffcc00;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            pointer-events: auto;
+            vertical-align: middle;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        #profileNameGo:active {
+            background: #ff9900;
+        }
         #menuActions {
             display: none;
             margin-top: 12px;
@@ -559,7 +580,7 @@
             <div class="ps-list" id="profileList"></div>
             <div class="ps-hint">UP/DOWN browse · ENTER select · N new · ESC guest</div>
         </div>
-        <input id="profileNameInput" type="text" maxlength="12" placeholder="Enter profile name...">
+        <input id="profileNameInput" type="text" maxlength="12" placeholder="Enter profile name..."><button id="profileNameGo">GO</button>
         <div id="pauseMenu">
             <div class="pause-title">PAUSED</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
@@ -608,6 +629,7 @@
         const profileSelectEl = document.getElementById('profileSelect');
         const profileListEl = document.getElementById('profileList');
         const profileNameInputEl = document.getElementById('profileNameInput');
+        const profileNameGoEl = document.getElementById('profileNameGo');
         const menuActionsEl = document.getElementById('menuActions');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
@@ -1129,6 +1151,24 @@
             return true;
         }
 
+        // GO button for profile creation
+        profileNameGoEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (gameState === 'profile_create') {
+                const name = profileNameInputEl.value.trim();
+                if (name.length > 0 && name.length <= 12) {
+                    const profiles = getAllProfiles();
+                    if (!profiles[name]) {
+                        activeProfile = createDefaultProfile(name);
+                        saveProfile(activeProfile);
+                        setActiveProfileName(name);
+                        gameState = 'menu';
+                        updateUI();
+                    }
+                }
+            }
+        });
+
         document.addEventListener('keydown', (e) => {
             keys[e.code] = true;
 
@@ -1174,7 +1214,7 @@
 
             // Profile create
             if (gameState === 'profile_create') {
-                if (e.code === 'Enter') {
+                if (e.code === 'Enter' || e.key === 'Enter') {
                     e.preventDefault();
                     const name = profileNameInputEl.value.trim();
                     if (name.length > 0 && name.length <= 12) {
@@ -1742,6 +1782,7 @@
             highscoresEl.style.display = 'none';
             profileSelectEl.style.display = 'none';
             profileNameInputEl.style.display = 'none';
+            profileNameGoEl.style.display = 'none';
             menuActionsEl.style.display = 'none';
             pauseMenuEl.style.display = 'none';
             graphicsMenuEl.style.display = 'none';
@@ -1767,6 +1808,7 @@
                 scoreEl.textContent = 'NEW PROFILE';
                 scoreEl.style.display = 'block';
                 profileNameInputEl.style.display = 'inline-block';
+                profileNameGoEl.style.display = 'inline-block';
                 profileNameInputEl.focus();
             } else if (gameState === 'modifier_select') {
                 scoreEl.textContent = 'SELECT MODIFIER';
