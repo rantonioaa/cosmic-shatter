@@ -523,6 +523,31 @@
             max-width: 100vw;
             max-height: calc(100vh - 180px);
         }
+        .touch-hint {
+            display: none;
+            font-size: 11px;
+            opacity: 0.4;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        #touchPause {
+            display: none;
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 100;
+        }
+        #touchPause .touch-btn {
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+            border-color: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.05);
+        }
+        #touchPause .touch-btn.pressed {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.7);
+        }
         @media (max-width: 600px) {
             #ui {
                 width: 92%;
@@ -558,6 +583,12 @@
             #powerupHud {
                 bottom: 180px !important;
             }
+            .ps-hint, .pause-hint, .mod-hint, .gfx-hint, .shop-hint, #menuActions {
+                display: none !important;
+            }
+            .touch-hint {
+                display: block !important;
+            }
         }
     </style>
 </head>
@@ -579,6 +610,7 @@
             <div class="ps-title">SELECT PROFILE</div>
             <div class="ps-list" id="profileList"></div>
             <div class="ps-hint">UP/DOWN browse · ENTER select · N new · ESC guest</div>
+            <div class="touch-hint">Tap to select</div>
         </div>
         <input id="profileNameInput" type="text" maxlength="12" placeholder="Enter profile name..."><button id="profileNameGo">GO</button>
         <div id="pauseMenu">
@@ -586,22 +618,26 @@
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="1"><span class="pause-arrow">&#9654;</span>Quit to Menu</div>
             <div class="pause-hint">UP/DOWN to browse · ENTER to select · ESC quit</div>
+            <div class="touch-hint">Tap to select</div>
         </div>
         <div id="modifierSelect">
             <div class="mod-title">SELECT MODIFIER</div>
             <div class="mod-list" id="modList"></div>
             <div class="mod-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
+            <div class="touch-hint">Tap a modifier to start</div>
         </div>
         <div id="graphicsMenu">
             <div class="gfx-title">GRAPHICS</div>
             <div class="gfx-list" id="gfxList"></div>
             <div class="gfx-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
+            <div class="touch-hint">Tap a resolution to apply</div>
         </div>
         <div id="shopMenu">
             <div class="shop-title">UPGRADE SHOP</div>
             <div class="shop-balance"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,0 8.8,5.2 14,5.2 9.8,8.4 11.4,14 7,10.6 2.6,14 4.2,8.4 0,5.2 5.2,5.2" fill="#ffd700"/></svg> Star Bits: <span id="shopBalance">0</span></div>
             <div class="shop-grid" id="shopGrid"></div>
             <div class="shop-hint">ARROWS browse · ENTER buy · ESC back</div>
+            <div class="touch-hint">Tap an upgrade to buy</div>
         </div>
     </div>
     <div id="powerupHud"></div>
@@ -615,6 +651,9 @@
             <div class="touch-btn" id="btnThrust">&#9650;</div>
             <div class="touch-btn shoot-btn" id="btnShoot">FIRE</div>
         </div>
+    </div>
+    <div id="touchPause">
+        <div class="touch-btn" id="btnPause">| |</div>
     </div>
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -1863,6 +1902,7 @@
                 });
                 highscoresEl.innerHTML = goHtml + highscoresEl.innerHTML;
             }
+            if (typeof updateTouchPause === 'function') updateTouchPause();
         }
 
         function renderHighScores() {
@@ -2510,6 +2550,31 @@
 
         if (isMobile) {
             touchControlsEl.classList.add('active');
+            const touchPauseEl = document.getElementById('touchPause');
+
+            // Show/hide pause button based on game state
+            function updateTouchPause() {
+                touchPauseEl.style.display = (gameState === 'playing') ? 'block' : 'none';
+            }
+
+            // Pause button handler
+            const btnPause = document.getElementById('btnPause');
+            btnPause.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (gameState === 'playing') {
+                    gameState = 'paused';
+                    pauseMenuIndex = 0;
+                    updateUI();
+                }
+                btnPause.classList.add('pressed');
+            }, { passive: false });
+            btnPause.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                btnPause.classList.remove('pressed');
+            }, { passive: false });
+            btnPause.addEventListener('touchcancel', () => {
+                btnPause.classList.remove('pressed');
+            });
 
             // Map touch buttons to keys object (same as keyboard)
             const touchMap = {
