@@ -583,7 +583,7 @@
             #powerupHud {
                 bottom: 180px !important;
             }
-            .ps-hint, .pause-hint, .mod-hint, .gfx-hint, .shop-hint, #menuActions {
+            .ps-hint, .pause-hint, .mod-hint, .gfx-hint, .shop-hint {
                 display: none !important;
             }
             .touch-hint {
@@ -1380,7 +1380,7 @@
                     gameState = 'graphics_menu';
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
-                    const savedRes = activeProfile ? (activeProfile.resolution || 1) : 1;
+                    const savedRes = activeProfile ? (activeProfile.resolution ?? 1) : 1;
                     graphicsMenuIndex = savedRes + 1; // +1 because index 0 is orientation toggle
                     renderGraphicsList();
                     updateUI();
@@ -1646,12 +1646,12 @@
         }
 
         // Update star bits
-        function updateStarBits() {
+        function updateStarBits(dt) {
             starBits = starBits.filter(sb => {
-                sb.x += sb.velocity.x;
-                sb.y += sb.velocity.y;
-                sb.pulse += 0.1;
-                sb.life--;
+                sb.x += sb.velocity.x * dt;
+                sb.y += sb.velocity.y * dt;
+                sb.pulse += 0.1 * dt;
+                sb.life -= dt;
                 if (sb.x < -sc(10)) sb.x = canvas.width + sc(10);
                 if (sb.x > canvas.width + sc(10)) sb.x = -sc(10);
                 if (sb.y < -sc(10)) sb.y = canvas.height + sc(10);
@@ -1701,7 +1701,7 @@
         }
 
         // Update magnet pull
-        function updateMagnet() {
+        function updateMagnet(dt) {
             const radius = getMagnetRadius();
             const items = [...powerups, ...starBits];
             items.forEach(item => {
@@ -1709,7 +1709,7 @@
                 const dy = ship.y - item.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < radius && dist > 5) {
-                    const pull = (1 - dist / radius) * MAGNET_PULL_STRENGTH;
+                    const pull = (1 - dist / radius) * MAGNET_PULL_STRENGTH * dt;
                     item.velocity.x += (dx / dist) * pull;
                     item.velocity.y += (dy / dist) * pull;
                 }
@@ -1717,12 +1717,12 @@
         }
 
         // Update powerups
-        function updatePowerups() {
+        function updatePowerups(dt) {
             powerups = powerups.filter(p => {
-                p.x += p.velocity.x;
-                p.y += p.velocity.y;
-                p.pulse += 0.08;
-                p.life--;
+                p.x += p.velocity.x * dt;
+                p.y += p.velocity.y * dt;
+                p.pulse += 0.08 * dt;
+                p.life -= dt;
                 // Wrap
                 if (p.x < -sc(20)) p.x = canvas.width + sc(20);
                 if (p.x > canvas.width + sc(20)) p.x = -sc(20);
@@ -1766,11 +1766,11 @@
         }
 
         // Update active powerup timers
-        function updateActivePowerups() {
+        function updateActivePowerups(dt) {
             for (const id in activePowerups) {
                 if (id === 'shield') continue; // shield persists until hit
                 if (activePowerups[id] > 0) {
-                    activePowerups[id]--;
+                    activePowerups[id] -= dt;
                     if (activePowerups[id] <= 0) {
                         activePowerups[id] = 0;
                     }
@@ -1965,17 +1965,17 @@
         }
 
         // Update ship
-        function updateShip() {
+        function updateShip(dt) {
             const thrustMult = activePowerups.speed > 0 ? 1.5 : 1;
             if (keys['ArrowLeft'] || keys['KeyA']) {
-                ship.angle -= ship.rotSpeed;
+                ship.angle -= ship.rotSpeed * dt;
             }
             if (keys['ArrowRight'] || keys['KeyD']) {
-                ship.angle += ship.rotSpeed;
+                ship.angle += ship.rotSpeed * dt;
             }
             if (keys['ArrowUp'] || keys['KeyW']) {
-                ship.velocity.x += Math.cos(ship.angle) * ship.thrust * thrustMult;
-                ship.velocity.y += Math.sin(ship.angle) * ship.thrust * thrustMult;
+                ship.velocity.x += Math.cos(ship.angle) * ship.thrust * thrustMult * dt;
+                ship.velocity.y += Math.sin(ship.angle) * ship.thrust * thrustMult * dt;
                 // Thrust particles
                 if (Math.random() > 0.5) {
                     particles.push(createParticle(
@@ -1987,10 +1987,11 @@
                 }
             }
 
-            ship.velocity.x *= ship.invulnerable ? 0.99 : ship.friction;
-            ship.velocity.y *= ship.invulnerable ? 0.99 : ship.friction;
-            ship.x += ship.velocity.x;
-            ship.y += ship.velocity.y;
+            const frictionPower = ship.invulnerable ? 0.99 : ship.friction;
+            ship.velocity.x *= Math.pow(frictionPower, dt);
+            ship.velocity.y *= Math.pow(frictionPower, dt);
+            ship.x += ship.velocity.x * dt;
+            ship.y += ship.velocity.y * dt;
 
             // Wrap around screen
             if (ship.x < 0) ship.x = canvas.width;
@@ -2000,9 +2001,9 @@
 
             // Invulnerability
             if (ship.invulnerable) {
-                ship.invulnerableTimer--;
-                ship.blinkTimer++;
-                if (ship.blinkTimer % 10 === 0) {
+                ship.invulnerableTimer -= dt;
+                ship.blinkTimer += dt;
+                if (Math.floor(ship.blinkTimer) % 10 === 0 && Math.floor(ship.blinkTimer - dt) % 10 !== 0) {
                     ship.blinkOn = !ship.blinkOn;
                 }
                 if (ship.invulnerableTimer <= 0) {
@@ -2053,18 +2054,18 @@
         }
 
         let shootCooldown = 0;
-        function updateBullets() {
+        function updateBullets(dt) {
             if (keys['Space'] && shootCooldown <= 0 && gameState === 'playing' && !overheating) {
                 shoot();
                 const fireRateBonus = activeProfile ? activeProfile.upgrades.fireRate : 0;
                 shootCooldown = Math.max(5, 15 - fireRateBonus);
             }
-            shootCooldown--;
+            shootCooldown -= dt;
 
             bullets = bullets.filter(b => {
-                b.x += b.velocity.x;
-                b.y += b.velocity.y;
-                b.life--;
+                b.x += b.velocity.x * dt;
+                b.y += b.velocity.y * dt;
+                b.life -= dt;
                 if (b.x < 0) b.x = canvas.width;
                 if (b.x > canvas.width) b.x = 0;
                 if (b.y < 0) b.y = canvas.height;
@@ -2078,10 +2079,10 @@
             return BASE_HEAT_LIMIT + coolingLevel * 10;
         }
 
-        function updateHeat() {
+        function updateHeat(dt) {
             if (overheating) {
-                overheatTimer--;
-                heat = Math.max(0, heat - 2);
+                overheatTimer -= dt;
+                heat = Math.max(0, heat - 2 * dt);
                 if (overheatTimer <= 0) {
                     overheating = false;
                 }
@@ -2090,7 +2091,7 @@
 
             // Decay heat when not shooting
             if (!keys['Space']) {
-                heat = Math.max(0, heat - HEAT_DECAY);
+                heat = Math.max(0, heat - HEAT_DECAY * dt);
             }
 
             // Check overheat
@@ -2103,20 +2104,20 @@
         }
 
         // Update asteroids
-        function updateAsteroids() {
+        function updateAsteroids(dt) {
             const speedMult = activePowerups.slowtime > 0 ? 0.5 : (currentModifier.id === 'speed_demon' ? 1.5 : 1);
             asteroids.forEach(a => {
                 // Erratic behavior for purple asteroids
                 if (a.color && a.color.behavior === 'erratic') {
-                    a.erraticTimer++;
-                    if (a.erraticTimer % 60 === 0) {
+                    a.erraticTimer += dt;
+                    if (Math.floor(a.erraticTimer) % 60 === 0 && Math.floor(a.erraticTimer - dt) % 60 !== 0) {
                         a.velocity.x = (Math.random() - 0.5) * 3;
                         a.velocity.y = (Math.random() - 0.5) * 3;
                     }
                 }
-                a.x += a.velocity.x * speedMult;
-                a.y += a.velocity.y * speedMult;
-                a.rotation += a.rotSpeed;
+                a.x += a.velocity.x * speedMult * dt;
+                a.y += a.velocity.y * speedMult * dt;
+                a.rotation += a.rotSpeed * dt;
                 if (a.x < -sc(50)) a.x = canvas.width + sc(50);
                 if (a.x > canvas.width + sc(50)) a.x = -sc(50);
                 if (a.y < -sc(50)) a.y = canvas.height + sc(50);
@@ -2125,11 +2126,11 @@
         }
 
         // Update particles
-        function updateParticles() {
+        function updateParticles(dt) {
             particles = particles.filter(p => {
-                p.x += p.velocity.x;
-                p.y += p.velocity.y;
-                p.life -= p.decay;
+                p.x += p.velocity.x * dt;
+                p.y += p.velocity.y * dt;
+                p.life -= p.decay * dt;
                 return p.life > 0;
             });
         }
@@ -2458,7 +2459,11 @@
         }
 
         // Main game loop
-        function gameLoop() {
+        let lastFrameTime = 0;
+        function gameLoop(timestamp) {
+            // Delta time (normalized to 60fps, capped to prevent spiral of death)
+            const dt = timestamp ? Math.min((timestamp - lastFrameTime) / (1000 / 60), 3) : 1;
+            lastFrameTime = timestamp || performance.now();
             // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2472,15 +2477,15 @@
             }
 
             if (gameState === 'playing') {
-                updateShip();
-                updateBullets();
-                updateHeat();
-                updateAsteroids();
-                updateParticles();
-                updatePowerups();
-                updateStarBits();
-                updateActivePowerups();
-                updateMagnet();
+                updateShip(dt);
+                updateBullets(dt);
+                updateHeat(dt);
+                updateAsteroids(dt);
+                updateParticles(dt);
+                updatePowerups(dt);
+                updateStarBits(dt);
+                updateActivePowerups(dt);
+                updateMagnet(dt);
                 checkCollisions();
 
                 drawShip();
@@ -2505,7 +2510,7 @@
                 renderPowerupHud();
             } else if (gameState === 'level_transition') {
                 // Level transition: countdown and spawn new level
-                levelTransitionTimer--;
+                levelTransitionTimer -= dt;
                 if (levelTransitionTimer <= 0) {
                     level++;
                     spawnAsteroids();
@@ -2526,15 +2531,15 @@
                         ));
                     }
                 }
-                updateAsteroids();
+                updateAsteroids(dt);
                 drawAsteroids();
                 powerupHudEl.style.display = 'none';
             } else if (gameState === 'modifier_select') {
-                updateAsteroids();
+                updateAsteroids(dt);
                 drawAsteroids();
                 powerupHudEl.style.display = 'none';
             } else if (gameState === 'gameover') {
-                updateParticles();
+                updateParticles(dt);
                 drawParticles();
                 drawAsteroids();
                 powerupHudEl.style.display = 'none';
@@ -2560,7 +2565,7 @@
                         ));
                     }
                 }
-                updateAsteroids();
+                updateAsteroids(dt);
                 drawAsteroids();
                 powerupHudEl.style.display = 'none';
             }
@@ -2582,7 +2587,7 @@
                     currentOrientation = activeProfile.orientation;
                     RESOLUTIONS = getResolutions();
                 }
-                const resIdx = activeProfile.resolution || 1;
+                const resIdx = activeProfile.resolution ?? 1;
                 if (RESOLUTIONS[resIdx]) {
                     currentResolution = RESOLUTIONS[resIdx];
                     canvas.width = currentResolution.width;
@@ -2730,7 +2735,7 @@
                         gameState = 'graphics_menu';
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
-                        const savedRes = activeProfile ? (activeProfile.resolution || 1) : 1;
+                    const savedRes = activeProfile ? (activeProfile.resolution ?? 1) : 1;
                         graphicsMenuIndex = currentOrientation === (activeProfile ? activeProfile.orientation : 'landscape') ? savedRes + 1 : 1;
                         updateUI();
                     }
