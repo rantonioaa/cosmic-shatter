@@ -1101,7 +1101,7 @@
                 const isSelected = i === graphicsMenuIndex;
                 const current = activeProfile && activeProfile.resolution === i;
                 const mark = current ? ' (current)' : '';
-                html += `<div class="gfx-option${isSelected ? ' selected' : ''}">`
+                html += `<div class="gfx-option${isSelected ? ' selected' : ''}" data-tap-action="graphics" data-tap-index="${i}">`
                     + `<span class="gfx-arrow">&#9654;</span>`
                     + `${res.label}${mark}`
                     + `</div>`;
@@ -1842,14 +1842,6 @@
                     messageEl.textContent = `Unlocked: ${unlockedMod.label}!`;
                     messageEl.style.display = 'block';
                 }
-                // Gameover menu options
-                const gameoverOptions = ['Restart', 'Shop', 'Quit to Menu'];
-                let goHtml = '';
-                gameoverOptions.forEach((opt, i) => {
-                    const sel = i === gameoverMenuIndex ? ' selected' : '';
-                    goHtml += `<div class="pause-option${sel}" data-tap-action="gameover" data-tap-index="${i}"><span class="pause-arrow">&#9654;</span>${opt}</div>`;
-                });
-                highscoresEl.innerHTML = goHtml + highscoresEl.innerHTML;
                 highscoresEl.style.display = 'block';
             } else if (gameState === 'paused') {
                 scoreEl.textContent = `Score: ${score} | Lives: ${lives}`;
@@ -1861,6 +1853,16 @@
                 });
             }
             renderHighScores();
+            // Inject gameover menu AFTER renderHighScores so it doesn't get overwritten
+            if (gameState === 'gameover') {
+                const gameoverOptions = ['Restart', 'Shop', 'Quit to Menu'];
+                let goHtml = '';
+                gameoverOptions.forEach((opt, i) => {
+                    const sel = i === gameoverMenuIndex ? ' selected' : '';
+                    goHtml += `<div class="pause-option${sel}" data-tap-action="gameover" data-tap-index="${i}"><span class="pause-arrow">&#9654;</span>${opt}</div>`;
+                });
+                highscoresEl.innerHTML = goHtml + highscoresEl.innerHTML;
+            }
         }
 
         function renderHighScores() {
@@ -2563,27 +2565,58 @@
                         shopMenuIndex = 0;
                         updateUI();
                     } else if (action === 'export') {
-                        exportProfile();
+                        if (activeProfile) exportProfile(activeProfile);
                     } else if (action === 'import') {
-                        importProfile();
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = '.sav';
+                        fileInput.onchange = (ev) => {
+                            const file = ev.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (re) => {
+                                const imported = importProfile(re.target.result);
+                                if (imported) {
+                                    saveProfile(imported);
+                                    activeProfile = imported;
+                                    setActiveProfileName(imported.name);
+                                    updateUI();
+                                }
+                            };
+                            reader.readAsText(file);
+                        };
+                        fileInput.click();
                     } else if (action === 'profile') {
                         gameState = 'profile_select';
                         profileSelectIndex = 0;
                         updateUI();
                     } else if (action === 'graphics') {
                         gameState = 'graphics_menu';
-                        graphicsMenuIndex = currentResolutionIndex;
+                        graphicsMenuIndex = activeProfile ? (activeProfile.resolution || 1) : 1;
                         updateUI();
                     }
                 } else if (gameState === 'modifier_select' && idx !== null) {
                     modifierSelectIndex = parseInt(idx);
                     const mod = MODIFIERS[modifierSelectIndex];
-                    const unlocked = Object.keys(MODIFIER_UNLOCK).filter(id => modifierUnlocked(id));
-                    unlocked.push('none');
+                    const unlocked = activeProfile ? activeProfile.unlockedModifiers : ['none'];
                     if (unlocked.includes(mod.id)) {
                         currentModifier = mod;
                         startGame();
                     }
+                    updateUI();
+                } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
+                    graphicsMenuIndex = parseInt(idx);
+                    const res = RESOLUTIONS[graphicsMenuIndex];
+                    canvas.width = res.width;
+                    canvas.height = res.height;
+                    currentResolution = res;
+                    SCALE = canvas.width / 1280;
+                    applyScale();
+                    if (activeProfile) {
+                        activeProfile.resolution = graphicsMenuIndex;
+                        saveProfile(activeProfile);
+                    }
+                    gameState = 'menu';
                     updateUI();
                 } else if (gameState === 'gameover' && idx !== null) {
                     gameoverMenuIndex = parseInt(idx);
@@ -2629,7 +2662,7 @@
                         const list = getProfileList();
                         if (pi >= 0 && pi < list.length) {
                             activeProfile = loadProfile(list[pi].name);
-                            saveActiveProfileName(list[pi].name);
+                            setActiveProfileName(list[pi].name);
                             gameState = 'menu';
                             updateUI();
                         }
