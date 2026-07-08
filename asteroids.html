@@ -804,24 +804,32 @@
         }
 
         function toggleFullscreen() {
-            if (!document.fullscreenEnabled) return;
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+            const doc = document;
+            const supported = doc.fullscreenEnabled || doc.webkitFullscreenEnabled;
+            if (!supported) return;
+            const isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement;
+            if (!isFullscreen) {
+                const el = doc.documentElement;
+                const req = el.requestFullscreen || el.webkitRequestFullscreen;
+                if (req) req.call(el).catch(() => {});
             } else {
-                document.exitFullscreen().catch(() => {});
+                const exit = doc.exitFullscreen || doc.webkitExitFullscreen;
+                if (exit) exit.call(doc).catch(() => {});
             }
         }
 
         function updateFullscreenBtn() {
             const btn = document.getElementById('fullscreenBtn');
             if (!btn) return;
-            if (!document.fullscreenEnabled) {
+            const supported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+            if (!supported) {
                 btn.style.display = 'none';
                 return;
             }
             btn.style.display = 'flex';
-            btn.innerHTML = document.fullscreenElement ? '&#x2716;' : '&#x26F6;';
-            btn.title = document.fullscreenElement ? 'Exit Fullscreen' : 'Fullscreen';
+            const active = document.fullscreenElement || document.webkitFullscreenElement;
+            btn.innerHTML = active ? '&#x2716;' : '&#x26F6;';
+            btn.title = active ? 'Exit Fullscreen' : 'Fullscreen';
         }
 
         // Shop state
@@ -839,6 +847,32 @@
             document.documentElement.style.setProperty('--s', SCALE);
         }
         applyScale();
+        applyCanvasStyle();
+
+        // Apply canvas CSS dimensions on mobile so resolution changes are visible
+        function applyCanvasStyle() {
+            const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (!isMobile) {
+                canvas.style.width = '';
+                canvas.style.height = '';
+                return;
+            }
+            const vw = window.innerWidth;
+            const vh = window.innerHeight - 60;
+            const aspect = canvas.width / canvas.height;
+            let displayW, displayH;
+            if (vw / vh > aspect) {
+                displayH = vh;
+                displayW = vh * aspect;
+            } else {
+                displayW = vw;
+                displayH = vw / aspect;
+            }
+            canvas.style.width = Math.floor(displayW) + 'px';
+            canvas.style.height = Math.floor(displayH) + 'px';
+        }
+        applyCanvasStyle();
+        window.addEventListener('resize', applyCanvasStyle);
 
         // Game state
         let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover
@@ -1337,7 +1371,7 @@
                 + `</div>`;
 
             // Section: Fullscreen
-            if (document.fullscreenEnabled) {
+            if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
                 html += '<div class="gfx-section">DISPLAY</div>';
                 const fsIdx = resList.length + 2;
                 const fsSel = graphicsMenuIndex === fsIdx ? ' selected' : '';
@@ -1637,7 +1671,7 @@
             if (gameState === 'graphics_menu') {
                 const resList = getResolutions();
                 const totalItems = resList.length + 3; // auto + resolutions + orientation + fullscreen
-                const selectableMax = document.fullscreenEnabled ? totalItems - 1 : totalItems - 2;
+                const selectableMax = (document.fullscreenEnabled || document.webkitFullscreenEnabled) ? totalItems - 1 : totalItems - 2;
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
                     graphicsMenuIndex = (graphicsMenuIndex - 1 + selectableMax + 1) % (selectableMax + 1);
@@ -1670,12 +1704,13 @@
                         currentResolution = res;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.orientation = currentOrientation;
                             saveProfile(activeProfile);
                         }
                         renderGraphicsList();
-                    } else if (graphicsMenuIndex === fsIdx && document.fullscreenEnabled) {
+                    } else if (graphicsMenuIndex === fsIdx && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
                         toggleFullscreen();
                         renderGraphicsList();
                     } else if (graphicsMenuIndex === 0) {
@@ -1686,6 +1721,7 @@
                         currentResolution = autoRes;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.resolution = 'auto';
                             activeProfile.orientation = currentOrientation;
@@ -1702,6 +1738,7 @@
                         currentResolution = res;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.resolution = resIdx;
                             activeProfile.orientation = currentOrientation;
@@ -1716,7 +1753,7 @@
                     updateUI();
                 } else if (e.key === 'f' || e.key === 'F') {
                     e.preventDefault();
-                    if (document.fullscreenEnabled) {
+            if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
                         toggleFullscreen();
                         renderGraphicsList();
                     }
@@ -3023,6 +3060,7 @@
                     canvas.height = currentResolution.height;
                     SCALE = Math.min(canvas.width, canvas.height) / 720;
                     applyScale();
+        applyCanvasStyle();
                 }
             } else {
                 setActiveProfileName(null);
@@ -3038,6 +3076,7 @@
                 canvas.height = currentResolution.height;
                 SCALE = Math.min(canvas.width, canvas.height) / 720;
                 applyScale();
+        applyCanvasStyle();
             }
         }
 
@@ -3051,15 +3090,17 @@
 
         // === FULLSCREEN ===
         updateFullscreenBtn();
-        document.addEventListener('fullscreenchange', () => {
+        const onFullscreenChange = () => {
             updateFullscreenBtn();
-            // If exited fullscreen while playing, auto-pause
-            if (!document.fullscreenElement && gameState === 'playing') {
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+            if (!isFullscreen && gameState === 'playing') {
                 pauseMenuIndex = 0;
                 gameState = 'paused';
                 updateUI();
             }
-        });
+        };
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange);
         document.getElementById('fullscreenBtn').addEventListener('click', (e) => {
             e.stopPropagation();
             toggleFullscreen();
@@ -3241,13 +3282,14 @@
                         currentResolution = res;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.orientation = currentOrientation;
                             saveProfile(activeProfile);
                         }
                         graphicsMenuIndex = oriIdx;
                         renderGraphicsList();
-                    } else if (tapIdx === fsIdx && document.fullscreenEnabled) {
+                    } else if (tapIdx === fsIdx && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
                         toggleFullscreen();
                         graphicsMenuIndex = fsIdx;
                         renderGraphicsList();
@@ -3259,6 +3301,7 @@
                         currentResolution = autoRes;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.resolution = 'auto';
                             activeProfile.orientation = currentOrientation;
@@ -3275,6 +3318,7 @@
                         currentResolution = res;
                         SCALE = Math.min(canvas.width, canvas.height) / 720;
                         applyScale();
+        applyCanvasStyle();
                         if (activeProfile) {
                             activeProfile.resolution = resIdx;
                             activeProfile.orientation = currentOrientation;
@@ -3460,13 +3504,14 @@
                     currentResolution = res;
                     SCALE = Math.min(canvas.width, canvas.height) / 720;
                     applyScale();
+        applyCanvasStyle();
                     if (activeProfile) {
                         activeProfile.orientation = currentOrientation;
                         saveProfile(activeProfile);
                     }
                     graphicsMenuIndex = oriIdx;
                     renderGraphicsList();
-                } else if (tapIdx === fsIdx && document.fullscreenEnabled) {
+                } else if (tapIdx === fsIdx && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
                     toggleFullscreen();
                     graphicsMenuIndex = fsIdx;
                     renderGraphicsList();
@@ -3477,6 +3522,7 @@
                     currentResolution = autoRes;
                     SCALE = Math.min(canvas.width, canvas.height) / 720;
                     applyScale();
+        applyCanvasStyle();
                     if (activeProfile) {
                         activeProfile.resolution = 'auto';
                         activeProfile.orientation = currentOrientation;
@@ -3492,6 +3538,7 @@
                     currentResolution = res;
                     SCALE = Math.min(canvas.width, canvas.height) / 720;
                     applyScale();
+        applyCanvasStyle();
                     if (activeProfile) {
                         activeProfile.resolution = resIdx;
                         activeProfile.orientation = currentOrientation;
