@@ -174,7 +174,8 @@
   - Last modifier preference
   - Unlocked modifiers (sequential progression)
   - Orientation preference (portrait/landscape)
-  - Resolution preference
+  - Resolution preference (numeric index or `'auto'` string; default `'auto'`)
+  - Fullscreen preference
   - Active run state (mid-run save)
 
 ### Export/Import
@@ -215,18 +216,25 @@
 - Locked modifiers show unlock condition
 
 ### Graphics Menu
-- Orientation toggle: Landscape / Portrait
-- Landscape resolutions:
-  - 640x360
-  - 1280x720 — default
-  - 1920x1080
-- Portrait resolutions:
-  - 360x640
-  - 720x1280
-  - 1080x1920
+- Grouped sections with non-selectable headers (navigation skips headers):
+  - **Resolution**
+    - Auto — detects device screen size via `window.screen.width/height * devicePixelRatio`, picks best matching resolution (accounts for iOS dimension behavior)
+    - 640x360 / 1280x720 / 1920x1080 (Landscape)
+    - 360x640 / 720x1280 / 1080x1920 (Portrait)
+  - **Orientation** — Landscape / Portrait (applies immediately, resizes canvas on toggle)
+  - **Fullscreen** — Toggle fullscreen mode (⛶/✖ button in top-left corner; also via F key)
 - Arrow key navigation or tap to select
-- Shows current resolution
-- Saves orientation and resolution per profile
+- Shows current resolution with indicator
+- Saves orientation, resolution (numeric index or `'auto'` string), and fullscreen preference per profile
+
+### Fullscreen Mode
+- Fullscreen button (⛶/✖) in top-left corner during menus; hidden if Fullscreen API not supported
+- Also toggleable via F key in menus and gameplay
+- Uses Fullscreen API (`requestFullscreen`/`exitFullscreen`)
+- Canvas sizing:
+  - Normal: `max-height: calc(100vh - 180px)` (preserves touch control spacing)
+  - Fullscreen: `max-height: 100vh` via `:fullscreen` CSS selector
+- PowerupHud bottom position adjusts in fullscreen
 
 ### Pause Menu
 - Arrow key navigation or tap to select
@@ -329,6 +337,7 @@
 | I | Import profile |
 | P | Change profile |
 | G | Graphics settings |
+| F | Toggle fullscreen |
 | N | New profile |
 
 ### Mobile (Touch)
@@ -372,7 +381,7 @@
 - Saved per profile
 
 ### Performance
-- Auto-selects 360p resolution on mobile for performance
+- Auto resolution detects device screen and picks best matching resolution (typically 360p on mobile)
 - Delta time normalization for consistent speed
 - `user-scalable=no` to prevent zoom issues
 - Prevents pull-to-refresh and bounce

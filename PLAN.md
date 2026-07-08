@@ -167,8 +167,10 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Pause menu with arrow navigation
 - [x] High scores display (per-profile)
 - [x] Export/Import profiles
-- [x] Graphics menu with resolution options
-- [x] Portrait/Landscape orientation toggle in graphics menu
+- [x] Graphics menu with grouped sections (Resolution, Orientation, Fullscreen)
+- [x] Portrait/Landscape orientation toggle in graphics menu (applies immediately)
+- [x] Auto resolution — detects device screen size, picks best match (stores `'auto'` string in profile)
+- [x] Fullscreen toggle — Fullscreen API support, F key, ⛶/✖ button, `:fullscreen` CSS
 
 ### Gameplay ✅
 - [x] Ship movement (arrows/WASD)

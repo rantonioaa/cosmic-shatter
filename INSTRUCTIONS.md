@@ -54,13 +54,15 @@ menu → modifier_select → playing → gameover → shop → ↑
 ### Resolution System
 - Landscape: `LANDSCAPE_RESOLUTIONS` (640x360, 1280x720, 1920x1080)
 - Portrait: `PORTRAIT_RESOLUTIONS` (360x640, 720x1280, 1080x1920)
+- Auto resolution: detects device screen via `window.screen.width/height * devicePixelRatio`, picks best match; normalized for iOS (doesn't swap dimensions on rotation); profile stores `'auto'` string or numeric index
 - `SCALE = Math.min(width, height) / 720` — same scale at 1280x720 and 720x1280
-- Profile stores `orientation` and `resolution` index
+- Profile stores `orientation`, `resolution` (index or `'auto'`), and `fullscreen` preference
 
 ### CSS Layout
 - `#ui` — absolutely positioned, `pointer-events: none`, scaled by `--s` CSS var
 - `[data-tap-action]` — `pointer-events: auto` for mobile taps
 - Canvas: `max-width: 100vw; max-height: calc(100vh - 180px)`
+- Canvas in fullscreen: `:fullscreen` pseudo-class sets `max-height: 100vh`
 - Mobile media query: `@media (max-width: 600px)` — hide keyboard hints, show touch hints
 - `#menuActions` must NOT be hidden on mobile (was a bug, fixed)
 
@@ -89,7 +91,8 @@ menu → modifier_select → playing → gameover → shop → ↑
 ## Gotchas
 
 ### Resolution Index
-- Use `?? 1` not `|| 1` for resolution index (index 0 is valid, `||` treats it as falsy)
+- Use `??` not `||` for resolution index (index 0 is valid, `||` treats it as falsy)
+- Default resolution is now `'auto'` (string) — stored as `'auto'` or a numeric index in the profile
 
 ### Gameover Menu
 - Menu options injected into `highscoresEl` AFTER `renderHighScores()` to prevent overwrite
@@ -103,8 +106,18 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Simple modulo won't work with dt > 1
 
 ### Graphics Menu
-- Index 0 = orientation toggle, indices 1+ = resolutions
-- `graphicsMenuIndex = savedRes + 1` when entering menu
+- Grouped sections with non-selectable headers; navigation skips headers
+- Resolution section: Auto option + numeric resolutions; `graphicsMenuIndex` maps across sections with header offsets
+- Orientation toggle applies immediately (canvas resizes on toggle, not just on resolution select)
+- Fullscreen toggle: hidden if Fullscreen API not supported; also toggleable via F key
+
+### Fullscreen Mode
+- Fullscreen button (⛶/✖) in top-left corner during menus; hidden via CSS if Fullscreen API not supported
+- Uses `document.documentElement.requestFullscreen()` / `document.exitFullscreen()`
+- Canvas sizing: normal `max-height: calc(100vh - 180px)`, fullscreen `max-height: 100vh` via `:fullscreen` CSS
+- PowerupHud bottom position adjusts in fullscreen
+- Profile stores fullscreen preference; restored on profile load
+- F key toggles fullscreen in menus and gameplay
 
 ### Magnet Radius
 - `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`
