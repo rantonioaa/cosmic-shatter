@@ -3325,6 +3325,221 @@
                 }
             }, { passive: false });
         }
+
+        // === MOUSE CLICK SUPPORT (desktop) ===
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-tap-action]');
+            if (!target) return;
+            const action = target.getAttribute('data-tap-action');
+            const idx = target.getAttribute('data-tap-index');
+
+            if (gameState === 'menu') {
+                if (action === 'start') {
+                    if (activeProfile && activeProfile.activeRun) {
+                        deserializeRun(activeProfile.activeRun);
+                        activeProfile.activeRun = null;
+                        saveProfile(activeProfile);
+                    } else {
+                        gameState = 'modifier_select';
+                        modifierSelectIndex = 0;
+                        updateUI();
+                    }
+                } else if (action === 'resume') {
+                    if (activeProfile && activeProfile.activeRun) {
+                        deserializeRun(activeProfile.activeRun);
+                        activeProfile.activeRun = null;
+                        saveProfile(activeProfile);
+                    }
+                } else if (action === 'shop') {
+                    gameState = 'shop';
+                    shopReturnState = 'menu';
+                    shopMenuIndex = 0;
+                    updateUI();
+                } else if (action === 'export') {
+                    if (activeProfile) exportProfile(activeProfile);
+                } else if (action === 'import') {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = '.sav';
+                    fileInput.onchange = (ev) => {
+                        const file = ev.target.files[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (re) => {
+                            const imported = importProfile(re.target.result);
+                            if (imported) {
+                                saveProfile(imported);
+                                activeProfile = imported;
+                                setActiveProfileName(imported.name);
+                                updateUI();
+                            }
+                        };
+                        reader.readAsText(file);
+                    };
+                    fileInput.click();
+                } else if (action === 'profile') {
+                    gameState = 'profile_select';
+                    profileSelectIndex = 0;
+                    updateUI();
+                } else if (action === 'graphics') {
+                    gameState = 'graphics_menu';
+                    currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                    RESOLUTIONS = getResolutions();
+                    const savedRes = activeProfile ? activeProfile.resolution : 'auto';
+                    if (savedRes === 'auto') {
+                        graphicsMenuIndex = 0;
+                    } else if (typeof savedRes === 'number') {
+                        graphicsMenuIndex = savedRes + 1;
+                    } else {
+                        graphicsMenuIndex = 1;
+                    }
+                    updateUI();
+                }
+            } else if (gameState === 'modifier_select' && idx !== null) {
+                modifierSelectIndex = parseInt(idx);
+                const mod = MODIFIERS[modifierSelectIndex];
+                const unlocked = activeProfile ? activeProfile.unlockedModifiers : ['none'];
+                if (unlocked.includes(mod.id)) {
+                    currentModifier = mod;
+                    startGame();
+                }
+                updateUI();
+            } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
+                const tapIdx = parseInt(idx);
+                const resList = getResolutions();
+                const oriIdx = resList.length + 1;
+                const fsIdx = resList.length + 2;
+                if (tapIdx === oriIdx) {
+                    currentOrientation = currentOrientation === 'landscape' ? 'portrait' : 'landscape';
+                    RESOLUTIONS = getResolutions();
+                    const newResList = getResolutions();
+                    const autoRes = getAutoResolution();
+                    let res;
+                    if (activeProfile && activeProfile.resolution === 'auto') {
+                        res = autoRes;
+                    } else if (activeProfile && typeof activeProfile.resolution === 'number' && newResList[activeProfile.resolution]) {
+                        res = newResList[activeProfile.resolution];
+                    } else {
+                        res = autoRes;
+                    }
+                    canvas.width = res.width;
+                    canvas.height = res.height;
+                    currentResolution = res;
+                    SCALE = Math.min(canvas.width, canvas.height) / 720;
+                    applyScale();
+                    if (activeProfile) {
+                        activeProfile.orientation = currentOrientation;
+                        saveProfile(activeProfile);
+                    }
+                    graphicsMenuIndex = oriIdx;
+                    renderGraphicsList();
+                } else if (tapIdx === fsIdx && document.fullscreenEnabled) {
+                    toggleFullscreen();
+                    graphicsMenuIndex = fsIdx;
+                    renderGraphicsList();
+                } else if (tapIdx === 0) {
+                    const autoRes = getAutoResolution();
+                    canvas.width = autoRes.width;
+                    canvas.height = autoRes.height;
+                    currentResolution = autoRes;
+                    SCALE = Math.min(canvas.width, canvas.height) / 720;
+                    applyScale();
+                    if (activeProfile) {
+                        activeProfile.resolution = 'auto';
+                        activeProfile.orientation = currentOrientation;
+                        saveProfile(activeProfile);
+                    }
+                    gameState = 'menu';
+                    updateUI();
+                } else {
+                    const resIdx = tapIdx - 1;
+                    const res = resList[resIdx];
+                    canvas.width = res.width;
+                    canvas.height = res.height;
+                    currentResolution = res;
+                    SCALE = Math.min(canvas.width, canvas.height) / 720;
+                    applyScale();
+                    if (activeProfile) {
+                        activeProfile.resolution = resIdx;
+                        activeProfile.orientation = currentOrientation;
+                        saveProfile(activeProfile);
+                    }
+                    gameState = 'menu';
+                    updateUI();
+                }
+            } else if (gameState === 'gameover' && idx !== null) {
+                gameoverMenuIndex = parseInt(idx);
+                const options = ['Restart', 'Shop', 'Quit to Menu'];
+                const choice = options[gameoverMenuIndex];
+                if (choice === 'Restart') {
+                    gameState = 'modifier_select';
+                    modifierSelectIndex = 0;
+                    updateUI();
+                } else if (choice === 'Shop') {
+                    gameState = 'shop';
+                    shopReturnState = 'gameover';
+                    shopMenuIndex = 0;
+                    updateUI();
+                } else {
+                    gameState = 'menu';
+                    updateUI();
+                }
+            } else if (gameState === 'shop' && idx !== null) {
+                shopMenuIndex = parseInt(idx);
+                const upg = UPGRADES[shopMenuIndex];
+                buyUpgrade(upg.id);
+                renderShopList();
+            } else if (gameState === 'paused' && idx !== null) {
+                pauseMenuIndex = parseInt(idx);
+                if (pauseMenuIndex === 0) {
+                    gameState = 'playing';
+                } else if (pauseMenuIndex === 2) {
+                    if (activeProfile) {
+                        activeProfile.activeRun = serializeRun();
+                        saveProfile(activeProfile);
+                    }
+                    gameState = 'menu';
+                } else {
+                    gameState = 'menu';
+                }
+                updateUI();
+            } else if (gameState === 'profile_select' && action === 'profile_select' && idx !== null) {
+                if (idx === 'new') {
+                    gameState = 'profile_create';
+                    updateUI();
+                    document.getElementById('profileNameInput').focus();
+                } else if (idx === 'guest') {
+                    activeProfile = null;
+                    gameState = 'menu';
+                    updateUI();
+                } else {
+                    const pi = parseInt(idx);
+                    const list = getProfileList();
+                    if (pi >= 0 && pi < list.length) {
+                        const loaded = loadProfile(list[pi].name);
+                        if (loaded) {
+                            activeProfile = loaded;
+                            setActiveProfileName(list[pi].name);
+                            gameState = 'menu';
+                            updateUI();
+                        }
+                    }
+                }
+            } else if (action === 'fullscreen') {
+                toggleFullscreen();
+            } else if (action === 'back') {
+                if (gameState === 'shop') {
+                    gameState = shopReturnState;
+                } else if (gameState === 'modifier_select') {
+                    gameState = 'menu';
+                } else if (gameState === 'graphics_menu') {
+                    gameState = 'menu';
+                } else if (gameState === 'profile_create') {
+                    gameState = 'profile_select';
+                }
+                updateUI();
+            }
+        });
     </script>
 </body>
 </html>
