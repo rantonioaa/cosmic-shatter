@@ -3187,6 +3187,24 @@
                 const action = target.getAttribute('data-tap-action');
                 const idx = target.getAttribute('data-tap-index');
 
+                // Global actions (work in any state)
+                if (action === 'fullscreen') {
+                    toggleFullscreen();
+                    return;
+                } else if (action === 'back') {
+                    if (gameState === 'shop') {
+                        gameState = shopReturnState;
+                    } else if (gameState === 'modifier_select') {
+                        gameState = 'menu';
+                    } else if (gameState === 'graphics_menu') {
+                        gameState = 'menu';
+                    } else if (gameState === 'profile_create') {
+                        gameState = 'profile_select';
+                    }
+                    updateUI();
+                    return;
+                }
+
                 if (gameState === 'menu') {
                     if (action === 'start') {
                         if (activeProfile && activeProfile.activeRun) {
@@ -3386,19 +3404,6 @@
                             }
                         }
                     }
-                } else if (action === 'fullscreen') {
-                    toggleFullscreen();
-                } else if (action === 'back') {
-                    if (gameState === 'shop') {
-                        gameState = shopReturnState;
-                    } else if (gameState === 'modifier_select') {
-                        gameState = 'menu';
-                    } else if (gameState === 'graphics_menu') {
-                        gameState = 'menu';
-                    } else if (gameState === 'profile_create') {
-                        gameState = 'profile_select';
-                    }
-                    updateUI();
                 }
             }, { passive: false });
         }
@@ -3409,6 +3414,24 @@
             if (!target) return;
             const action = target.getAttribute('data-tap-action');
             const idx = target.getAttribute('data-tap-index');
+
+            // Global actions (work in any state)
+            if (action === 'fullscreen') {
+                toggleFullscreen();
+                return;
+            } else if (action === 'back') {
+                if (gameState === 'shop') {
+                    gameState = shopReturnState;
+                } else if (gameState === 'modifier_select') {
+                    gameState = 'menu';
+                } else if (gameState === 'graphics_menu') {
+                    gameState = 'menu';
+                } else if (gameState === 'profile_create') {
+                    gameState = 'profile_select';
+                }
+                updateUI();
+                return;
+            }
 
             if (gameState === 'menu') {
                 if (action === 'start') {
@@ -3605,19 +3628,7 @@
                         }
                     }
                 }
-            } else if (action === 'fullscreen') {
-                toggleFullscreen();
-            } else if (action === 'back') {
-                if (gameState === 'shop') {
-                    gameState = shopReturnState;
-                } else if (gameState === 'modifier_select') {
-                    gameState = 'menu';
-                } else if (gameState === 'graphics_menu') {
-                    gameState = 'menu';
-                } else if (gameState === 'profile_create') {
-                    gameState = 'profile_select';
                 }
-                updateUI();
             }
         });
     </script>
