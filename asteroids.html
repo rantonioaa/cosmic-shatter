@@ -3050,6 +3050,12 @@
             e.stopPropagation();
             toggleFullscreen();
         });
+        // Block browser's default ESC-exit-fullscreen during gameplay
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape' && document.fullscreenElement && gameState === 'playing') {
+                e.preventDefault();
+            }
+        }, true);
 
         // === MOBILE TOUCH CONTROLS ===
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
