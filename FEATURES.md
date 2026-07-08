@@ -338,6 +338,7 @@
 | ▲ | Thrust forward |
 | FIRE | Shoot |
 | \| \| (top-right) | Pause |
+| ← Back | Return to previous menu |
 | Tap | Select menu items |
 
 ---
@@ -345,15 +346,21 @@
 ## Mobile Support
 
 ### Touch Controls
-- Virtual buttons at bottom of screen
+- Virtual buttons at bottom of screen — only visible during `playing` and `paused` states
 - Left side: rotate buttons (◀ ▶)
 - Right side: thrust (▲) and shoot (FIRE) stacked vertically
 - Pause button (top-right) during gameplay only
 - Semi-transparent, thumb-friendly sizing (68-74px)
+- Toggle visibility via `updateTouchPause()` based on `gameState`
+
+### Back Button (Mobile)
+- "← Back" button on shop, modifier select, graphics menu, and profile create screens
+- Hidden on desktop via CSS media query, shown on mobile only
+- Single touch handler routes back action based on current `gameState`
 
 ### Menu Navigation
 - Tap-to-select on all menu items
-- Touch-friendly hints replace keyboard hints
+- Touch-friendly hints replace keyboard hints (mention "Tap Back to exit")
 - GO button for profile name input
 - All menus fully functional via touch
 

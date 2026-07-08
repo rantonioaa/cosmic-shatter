@@ -248,10 +248,12 @@ profile_select → menu → challenge_select → modifier_select → playing →
 
 ### Mobile Support ✅
 - [x] Touch controls (rotate left/right, thrust, shoot, pause)
+- [x] Touch controls only visible during playing/paused states
 - [x] Tap-to-select on all menus
 - [x] Virtual keyboard GO button for profile creation
 - [x] Touch-friendly hints (hide keyboard hints on mobile)
 - [x] Pause button (top-right) during gameplay
+- [x] Back button on shop, modifier select, graphics menu, profile create (mobile only)
 - [x] Portrait/Landscape orientation support
 - [x] Auto-detect portrait on mobile first load
 - [x] Viewport meta tag (user-scalable=no)

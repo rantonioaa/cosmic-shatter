@@ -530,6 +530,18 @@
             margin-top: 10px;
             letter-spacing: 1px;
         }
+        .back-btn {
+            display: none;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            pointer-events: auto;
+            text-align: center;
+        }
+        .back-btn:hover {
+            color: #fff;
+        }
         #touchPause {
             display: none;
             position: fixed;
@@ -589,6 +601,9 @@
             .touch-hint {
                 display: block !important;
             }
+            .back-btn {
+                display: block !important;
+            }
         }
     </style>
 </head>
@@ -614,6 +629,7 @@
             <div class="touch-hint">Tap to select</div>
         </div>
         <input id="profileNameInput" type="text" maxlength="12" placeholder="Enter profile name..."><button id="profileNameGo">GO</button>
+        <div class="back-btn" data-tap-action="back">&larr; Back</div>
         <div id="pauseMenu">
             <div class="pause-title">PAUSED</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
@@ -626,20 +642,23 @@
             <div class="mod-title">SELECT MODIFIER</div>
             <div class="mod-list" id="modList"></div>
             <div class="mod-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
-            <div class="touch-hint">Tap a modifier to start</div>
+            <div class="touch-hint">Tap a modifier to start · Tap Back to exit</div>
+            <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
         <div id="graphicsMenu">
             <div class="gfx-title">GRAPHICS</div>
             <div class="gfx-list" id="gfxList"></div>
             <div class="gfx-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
-            <div class="touch-hint">Tap a resolution to apply</div>
+            <div class="touch-hint">Tap a resolution · Tap Back to exit</div>
+            <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
         <div id="shopMenu">
             <div class="shop-title">UPGRADE SHOP</div>
             <div class="shop-balance"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,0 8.8,5.2 14,5.2 9.8,8.4 11.4,14 7,10.6 2.6,14 4.2,8.4 0,5.2 5.2,5.2" fill="#ffd700"/></svg> Star Bits: <span id="shopBalance">0</span></div>
             <div class="shop-grid" id="shopGrid"></div>
             <div class="shop-hint">ARROWS browse · ENTER buy · ESC back</div>
-            <div class="touch-hint">Tap an upgrade to buy</div>
+            <div class="touch-hint">Tap an upgrade to buy · Tap Back to exit</div>
+            <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
     </div>
     <div id="powerupHud"></div>
@@ -2831,9 +2850,15 @@
             touchControlsEl.classList.add('active');
             const touchPauseEl = document.getElementById('touchPause');
 
-            // Show/hide pause button based on game state
+            // Show/hide touch controls and pause button based on game state
             function updateTouchPause() {
+                const inGame = (gameState === 'playing' || gameState === 'paused');
                 touchPauseEl.style.display = (gameState === 'playing') ? 'block' : 'none';
+                if (inGame) {
+                    touchControlsEl.classList.add('active');
+                } else {
+                    touchControlsEl.classList.remove('active');
+                }
             }
 
             // Pause button handler
@@ -3048,6 +3073,17 @@
                             }
                         }
                     }
+                } else if (action === 'back') {
+                    if (gameState === 'shop') {
+                        gameState = shopReturnState;
+                    } else if (gameState === 'modifier_select') {
+                        gameState = 'menu';
+                    } else if (gameState === 'graphics_menu') {
+                        gameState = 'menu';
+                    } else if (gameState === 'profile_create') {
+                        gameState = 'profile_select';
+                    }
+                    updateUI();
                 }
             }, { passive: false });
         }

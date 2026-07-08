@@ -65,11 +65,12 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `#menuActions` must NOT be hidden on mobile (was a bug, fixed)
 
 ### Mobile Touch Controls
-- `#touchControls` — fixed bottom bar with rotate/thrust/shoot buttons
+- `#touchControls` — fixed bottom bar with rotate/thrust/shoot buttons; visibility toggled by `updateTouchPause()` based on `gameState` (only shown during `playing` and `paused`)
 - `#touchPause` — fixed top-right pause button (only during `playing` state)
 - Buttons map to same `keys[]` object as keyboard
 - `data-tap-action` + `data-tap-index` attributes on all tappable elements
 - Touch handler at ~line 2550 dispatches based on `gameState` and `action`
+- Back button (`data-tap-action="back"`) on shop, modifier_select, graphics_menu, profile_create — hidden on desktop via CSS, routes to previous state based on `gameState`
 
 ### Delta Time
 - `dt = Math.min((timestamp - lastFrameTime) / (1000/60), 3)`
@@ -126,6 +127,16 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Pause menu has 3 options: Resume (index 0), Quit to Menu (index 1), Save & Quit (index 2)
 - Resume on main menu: R key, Space key, or tap the Resume button
 - Resume button only shown when `activeProfile.activeRun` is not null
+
+### Touch Controls Visibility
+- `#touchControls` is now hidden by default and only shown during `playing` and `paused` states
+- `updateTouchPause()` toggles both `#touchControls` and `#touchPause` visibility based on `gameState`
+- Prevents virtual buttons from appearing over menus on mobile
+
+### Mobile Back Button
+- `data-tap-action="back"` on 4 menus: shop, modifier_select, graphics_menu, profile_create
+- Touch handler maps `back` action to: `shop → menu`, `modifier_select → menu`, `graphics_menu → menu`, `profile_create → profile_select`
+- Hidden on desktop via `@media (min-width: 601px)` CSS rule
 
 ## Git Workflow
 
