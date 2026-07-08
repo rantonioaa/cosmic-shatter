@@ -355,23 +355,26 @@
 ## Mobile Support
 
 ### Touch Controls
-- Virtual buttons at bottom of screen — only visible during `playing` and `paused` states
+- Virtual buttons at bottom of screen — only visible during `playing` state
 - Left side: rotate buttons (◀ ▶)
 - Right side: thrust (▲) and shoot (FIRE) stacked vertically
 - Pause button (top-right) during gameplay only
 - Semi-transparent, thumb-friendly sizing (68-74px)
 - Toggle visibility via `updateTouchPause()` based on `gameState`
+- Hidden during pause and all menu states
 
-### Back Button (Mobile)
+### Back Button
 - "← Back" button on shop, modifier select, graphics menu, and profile create screens
-- Hidden on desktop via CSS media query, shown on mobile only
-- Single touch handler routes back action based on current `gameState`
+- Visible on all platforms (desktop and mobile)
+- Single touch/click handler routes back action based on current `gameState`
 
 ### Menu Navigation
-- Tap-to-select on all menu items
+- Tap-to-select on all menu items (mobile)
+- Click-to-select on all menu items (desktop mouse)
+- Global `document.addEventListener('click', ...)` handler mirrors touch behavior
 - Touch-friendly hints replace keyboard hints (mention "Tap Back to exit")
 - GO button for profile name input
-- All menus fully functional via touch
+- All menus fully functional via touch and mouse
 
 ### Orientation Support
 - Portrait mode (default on mobile)
@@ -385,6 +388,23 @@
 - Delta time normalization for consistent speed
 - `user-scalable=no` to prevent zoom issues
 - Prevents pull-to-refresh and bounce
+
+### Mobile UI/UX Standards
+- Touch targets meet Apple HIG (44px) and Material Design (48dp) minimums:
+  - Menu items: 48px min-height, 12px 16px padding on mobile
+  - Back buttons: 44px min-height, 12px 16px padding
+  - Fullscreen button: 44x44px
+  - Menu actions (E/I/P/G/S/R): 44px min-height, 8px 12px padding
+  - Shop cards: 48px min-height, 10px 8px 8px padding
+- Font sizes above legibility threshold on mobile:
+  - Shop name: 11px, Shop description: 10px
+  - Graphics section headers: 12px/opacity 0.6
+  - Profile info: 12px/opacity 0.7
+  - Modifier descriptions: 12px/opacity 0.7
+- Touch feedback: `:active` states with subtle background on all interactive elements
+- Hover effects on menu items for desktop users
+- Locked modifiers at opacity 0.5 (was 0.35)
+- Cant-afford shop cards dimmed to 0.5 opacity
 
 ---
 

@@ -67,12 +67,13 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `#menuActions` must NOT be hidden on mobile (was a bug, fixed)
 
 ### Mobile Touch Controls
-- `#touchControls` — fixed bottom bar with rotate/thrust/shoot buttons; visibility toggled by `updateTouchPause()` based on `gameState` (only shown during `playing` and `paused`)
+- `#touchControls` — fixed bottom bar with rotate/thrust/shoot buttons; visibility toggled by `updateTouchPause()` based on `gameState` (only shown during `playing` state)
 - `#touchPause` — fixed top-right pause button (only during `playing` state)
 - Buttons map to same `keys[]` object as keyboard
 - `data-tap-action` + `data-tap-index` attributes on all tappable elements
 - Touch handler at ~line 2550 dispatches based on `gameState` and `action`
-- Back button (`data-tap-action="back"`) on shop, modifier_select, graphics_menu, profile_create — hidden on desktop via CSS, routes to previous state based on `gameState`
+- Global click handler (`document.addEventListener('click', ...)`) mirrors touch behavior for desktop mouse
+- Back button (`data-tap-action="back"`) on shop, modifier_select, graphics_menu, profile_create — visible on all platforms, routes to previous state based on `gameState`
 
 ### Delta Time
 - `dt = Math.min((timestamp - lastFrameTime) / (1000/60), 3)`
@@ -112,12 +113,15 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Fullscreen toggle: hidden if Fullscreen API not supported; also toggleable via F key
 
 ### Fullscreen Mode
-- Fullscreen button (⛶/✖) in top-left corner during menus; hidden via CSS if Fullscreen API not supported
-- Uses `document.documentElement.requestFullscreen()` / `document.exitFullscreen()`
+- Fullscreen button (⛶/✖) in top-left corner; hidden via CSS if Fullscreen API not supported
+- Uses Fullscreen API with webkit prefix fallback (`requestFullscreen`/`webkitRequestFullscreen`)
+- Dedicated click handler with `stopPropagation()` to prevent double-fire with global click handler
 - Canvas sizing: normal `max-height: calc(100vh - 180px)`, fullscreen `max-height: 100vh` via `:fullscreen` CSS
 - PowerupHud bottom position adjusts in fullscreen
 - Profile stores fullscreen preference; restored on profile load
 - F key toggles fullscreen in menus and gameplay
+- ESC key pauses the game (does NOT exit fullscreen) — exiting fullscreen auto-pauses via `fullscreenchange` listener
+- `webkitfullscreenchange` event also listened for mobile browser compatibility
 
 ### Magnet Radius
 - `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`
@@ -142,14 +146,14 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Resume button only shown when `activeProfile.activeRun` is not null
 
 ### Touch Controls Visibility
-- `#touchControls` is now hidden by default and only shown during `playing` and `paused` states
+- `#touchControls` is hidden by default and only shown during `playing` state
 - `updateTouchPause()` toggles both `#touchControls` and `#touchPause` visibility based on `gameState`
-- Prevents virtual buttons from appearing over menus on mobile
+- Prevents virtual buttons from appearing over menus, pause screen, or any non-gameplay state
 
 ### Mobile Back Button
 - `data-tap-action="back"` on 4 menus: shop, modifier_select, graphics_menu, profile_create
-- Touch handler maps `back` action to: `shop → menu`, `modifier_select → menu`, `graphics_menu → menu`, `profile_create → profile_select`
-- Hidden on desktop via `@media (min-width: 601px)` CSS rule
+- Touch/click handler maps `back` action to: `shop → shopReturnState`, `modifier_select → menu`, `graphics_menu → menu`, `profile_create → profile_select`
+- Visible on all platforms (desktop and mobile)
 
 ## Git Workflow
 
@@ -189,6 +193,7 @@ Agent files live in `.opencode/agents/` — each has a focused prompt with proje
 
 ## Testing Checklist
 - [ ] Desktop: all menus work with keyboard
+- [ ] Desktop: all menus work with mouse clicks
 - [ ] Mobile portrait: all menus work with taps
 - [ ] Mobile landscape: all menus work with taps
 - [ ] Orientation toggle works in graphics menu
@@ -200,3 +205,7 @@ Agent files live in `.opencode/agents/` — each has a focused prompt with proje
 - [ ] Save & Quit preserves run state correctly
 - [ ] Resume button appears on main menu when saved run exists
 - [ ] Resume works after changing resolution between save and resume
+- [ ] Fullscreen button works on mobile (webkit prefix)
+- [ ] ESC pauses game (doesn't exit fullscreen) during gameplay
+- [ ] Back buttons work on all platforms
+- [ ] Touch controls hidden during pause
