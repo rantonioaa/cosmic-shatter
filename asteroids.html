@@ -549,7 +549,6 @@
             letter-spacing: 1px;
         }
         .back-btn {
-            display: none;
             margin-top: 12px;
             font-size: 12px;
             color: #888;
@@ -605,6 +604,25 @@
             background: rgba(255,255,255,0.2);
             border-color: rgba(255,255,255,0.7);
         }
+        #pauseMenu .pause-option:hover {
+            opacity: 0.8;
+            border-color: rgba(255,255,255,0.3);
+        }
+        #modifierSelect .mod-option:hover {
+            opacity: 0.8;
+        }
+        #graphicsMenu .gfx-option:hover {
+            opacity: 0.8;
+        }
+        #profileSelect .ps-option:hover {
+            opacity: 0.8;
+        }
+        #shopMenu .shop-card:hover {
+            border-color: rgba(255,204,0,0.4);
+        }
+        #message:hover {
+            opacity: 0.8;
+        }
         @media (max-width: 600px) {
             #ui {
                 width: 92%;
@@ -647,9 +665,6 @@
                 display: none !important;
             }
             .touch-hint {
-                display: block !important;
-            }
-            .back-btn {
                 display: block !important;
             }
         }
@@ -3031,6 +3046,10 @@
         // === FULLSCREEN ===
         updateFullscreenBtn();
         document.addEventListener('fullscreenchange', updateFullscreenBtn);
+        document.getElementById('fullscreenBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFullscreen();
+        });
 
         // === MOBILE TOUCH CONTROLS ===
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
