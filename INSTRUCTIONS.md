@@ -110,6 +110,25 @@ git commit -m "description"
 git push  # user must run manually (SSH agent issue)
 ```
 
+## Agents
+
+Configured in `opencode.json`. All subagents, only run when explicitly invoked via the Task tool.
+
+| Agent | Model | Purpose | Monthly budget |
+|-------|-------|---------|----------------|
+| `bug-hunter` | opencode-go/qwen3.7-plus | Reviews code for undefined refs, null derefs, CSS mismatches | 21,600 req |
+| `qa-tester` | opencode-go/deepseek-v4-flash | QA: logic bugs, edge cases, mobile compat, memory leaks | 158,150 req |
+| `doc-keeper` | opencode-go/mimo-v2.5 | Updates FEATURES.md, PLAN.md, INSTRUCTIONS.md, save file | 150,400 req |
+| `game-design` | opencode-go/kimi-k2.7-code | Designs mechanics, progression, balance for roguelite systems | 9,250 req |
+
+### Usage
+- `bug-hunter`: invoke before commits to catch obvious bugs
+- `qa-tester`: invoke after non-trivial changes for comprehensive testing
+- `doc-keeper`: invoke when user says "update docs" or after feature additions
+- `game-design`: invoke when planning new features or balancing existing ones
+
+Agent files live in `.opencode/agents/` — each has a focused prompt with project-specific context.
+
 ## Testing Checklist
 - [ ] Desktop: all menus work with keyboard
 - [ ] Mobile portrait: all menus work with taps
