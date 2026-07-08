@@ -33,10 +33,11 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 ### Game States
 ```
 menu → modifier_select → playing → gameover → shop → ↑
-  ↓                        ↑
-  profile_select        paused
-  profile_create
-  graphics_menu
+  ↓           ↑              ↑
+  profile_select         paused → save_quit
+  profile_create              ↓
+  graphics_menu          (activeRun saved)
+  resume_run → playing
 ```
 
 ### Key Variables
@@ -48,6 +49,7 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `SCALE` — `Math.min(canvas.width, canvas.height) / 720`
 - `sc(v)` — multiply value by SCALE
 - `dt` — delta time, normalized to 60fps, capped at 3
+- `activeRun` — serialized mid-run save state (or `null`)
 
 ### Resolution System
 - Landscape: `LANDSCAPE_RESOLUTIONS` (640x360, 1280x720, 1920x1080)
@@ -111,6 +113,20 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Use `??` not `||` for numeric defaults that can be 0 (e.g., `coolingSystem ?? 0`)
 - `|| 0` treats `0` as falsy and replaces it; `?? 0` only replaces `null`/`undefined`
 
+### Mid-Run Save/Resume
+- `activeRun` stores serialized run state in `activeProfile.activeRun` (localStorage)
+- Resolution scaling on resume: positions/velocities are multiplied by `newScale / oldScale` if resolution changed between save and resume
+- Asteroid shapes are regenerated on load (not saved) — cosmetic only
+- Particles are not saved — they recreate naturally
+- `activeRun` is cleared on: gameover, starting a new game, or completing a resume
+- Profile migration ensures `activeRun` field exists (set to `null` for old profiles)
+- Estimated save size: ~8–12 KB per run
+
+### Save & Quit Button
+- Pause menu has 3 options: Resume (index 0), Quit to Menu (index 1), Save & Quit (index 2)
+- Resume on main menu: R key, Space key, or tap the Resume button
+- Resume button only shown when `activeProfile.activeRun` is not null
+
 ## Git Workflow
 
 **The AI handles commits. The user handles pushes.**
@@ -157,3 +173,6 @@ Agent files live in `.opencode/agents/` — each has a focused prompt with proje
 - [ ] Profile create GO button works on mobile
 - [ ] Shop card grid works with touch
 - [ ] Export/Import work on mobile (file picker)
+- [ ] Save & Quit preserves run state correctly
+- [ ] Resume button appears on main menu when saved run exists
+- [ ] Resume works after changing resolution between save and resume

@@ -142,6 +142,25 @@
 
 ---
 
+## Mid-Run Save & Resume
+
+- Pause menu offers **Save & Quit** option
+- Serializes entire run state to `activeProfile.activeRun` in localStorage:
+  - Ship position, velocity, angle, lives, shield, invulnerability
+  - All asteroids (position, velocity, size, color, health)
+  - All bullets and powerup projectiles
+  - Active powerups and timers
+  - Star bits on screen, score, level, heat, modifier
+- Saved run appears on main menu as **"[R] Resume Run"** with level/score preview
+- Resume via R key, Space key, or tapping the Resume button
+- Resolution scaling: positions and physics uniformly adjusted if resolution changed between save and resume
+- Asteroid shapes regenerated on load (cosmetic only, not saved)
+- Particles not saved — recreate naturally
+- `activeRun` cleared on: gameover, starting a new game, or resuming
+- Estimated save size: ~8–12 KB per run
+
+---
+
 ## Profile System
 
 ### Profiles
@@ -156,6 +175,7 @@
   - Unlocked modifiers (sequential progression)
   - Orientation preference (portrait/landscape)
   - Resolution preference
+  - Active run state (mid-run save)
 
 ### Export/Import
 - Export as encrypted `.sav` file
@@ -169,6 +189,7 @@
 - Create "Default" profile from old scores
 - Remove old key after migration
 - Ensures `profile.stats` and `profile.totalStarBitsEarned` exist for old profiles
+- Ensures `profile.activeRun` exists for old profiles (set to `null`)
 
 ---
 
@@ -185,6 +206,7 @@
 - Profile name and Star Bits display
 - High scores list (top 8)
 - Actions: Export (E), Import (I), Profile (P), Graphics (G), Shop (S)
+- Resume Run option (R) when a saved run exists — shows level and score preview
 
 ### Modifier Select
 - 6 modifiers with descriptions
@@ -208,7 +230,7 @@
 
 ### Pause Menu
 - Arrow key navigation or tap to select
-- Resume or Quit to Menu
+- 3 options: Resume, Quit to Menu, Save & Quit
 - Dim overlay on frozen game
 
 ### Game Over
@@ -218,6 +240,7 @@
   - Shop → upgrade shop
   - Quit to Menu
 - High scores list shown
+- Clears any active saved run (`activeRun`)
 
 ### Upgrade Shop (Card Grid)
 - 2x4 card grid layout
@@ -297,6 +320,7 @@
 | Key | Action |
 |---|---|
 | Arrow keys / WASD | Rotate / Thrust |
+| R | Resume saved run |
 | Space | Shoot / Select / Start |
 | Enter | Confirm |
 | Escape | Pause / Back / Skip |

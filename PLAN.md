@@ -91,6 +91,16 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] `shop` state accessible from menu and gameover
 - [x] Gameover arrow menu (Restart, Shop, Quit)
 
+### 2D. Mid-Run Save & Resume ✅
+- [x] Pause menu: Resume, Quit to Menu, Save & Quit
+- [x] Save & Quit serializes run state to `activeProfile.activeRun`
+- [x] Resume option on main menu with level/score preview (R key, Space, or tap)
+- [x] Resolution scaling on resume (uniform position adjustment)
+- [x] Asteroid shapes regenerated on load (cosmetic only)
+- [x] `activeRun` cleared on gameover, new game, or resume
+- [x] Profile migration ensures `activeRun` field exists
+- [x] Estimated save size ~8–12 KB
+
 ---
 
 ## Difficulty Scaling ✅ (Capped at Level 20)
@@ -222,6 +232,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Import profile from .sav file
 - [x] Migration from old high score format
 - [x] Per-profile orientation and resolution settings
+- [x] Mid-run save/resume (Save & Quit, Resume on main menu)
 
 ### UI/UX ✅
 - [x] Clean menu screens with selective element visibility
@@ -232,6 +243,8 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Shield rings visual indicator
 - [x] Star bits counter in HUD
 - [x] SVG wireframe icons in upgrade shop
+- [x] Save & Quit option in pause menu
+- [x] Resume Run button on main menu with level/score preview
 
 ### Mobile Support ✅
 - [x] Touch controls (rotate left/right, thrust, shoot, pause)

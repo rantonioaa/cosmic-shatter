@@ -600,6 +600,7 @@
         <div id="message" data-tap-action="start">Press SPACE to start</div>
         <div id="highscores"></div>
         <div id="menuActions">
+            <span id="btnResume" data-tap-action="resume" style="display:none">[R] Resume Run</span>
             <span id="btnExport" data-tap-action="export">[E] Export</span>
             <span id="btnImport" data-tap-action="import">[I] Import</span>
             <span id="btnProfile" data-tap-action="profile">[P] Profile</span>
@@ -617,6 +618,7 @@
             <div class="pause-title">PAUSED</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="1"><span class="pause-arrow">&#9654;</span>Quit to Menu</div>
+            <div class="pause-option" data-tap-action="pause" data-tap-index="2"><span class="pause-arrow">&#9654;</span>Save & Quit</div>
             <div class="pause-hint">UP/DOWN to browse · ENTER to select · ESC quit</div>
             <div class="touch-hint">Tap to select</div>
         </div>
@@ -670,6 +672,7 @@
         const profileNameInputEl = document.getElementById('profileNameInput');
         const profileNameGoEl = document.getElementById('profileNameGo');
         const menuActionsEl = document.getElementById('menuActions');
+        const btnResumeEl = document.getElementById('btnResume');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
@@ -911,7 +914,8 @@
                 lastModifier: 'none',
                 unlockedModifiers: ['none'],
                 resolution: 1, // index into RESOLUTIONS (1 = 720p)
-                orientation: 'landscape'
+                orientation: 'landscape',
+                activeRun: null
             };
         }
 
@@ -981,6 +985,10 @@
             }
             if (profile.totalStarBitsEarned === undefined) {
                 profile.totalStarBitsEarned = 0;
+                changed = true;
+            }
+            if (profile.activeRun === undefined) {
+                profile.activeRun = null;
                 changed = true;
             }
             if (changed) saveProfile(profile);
@@ -1106,6 +1114,10 @@
         function submitScore() {
             lastHighScoreRank = saveHighScore(lastScore, lastLevel, currentModifier.id);
             lastUnlockedModifier = checkModifierUnlocks();
+            if (activeProfile) {
+                activeProfile.activeRun = null;
+                saveProfile(activeProfile);
+            }
             gameoverMenuIndex = 0;
             gameState = 'gameover';
             updateUI();
@@ -1314,8 +1326,26 @@
             if (e.code === 'Space') {
                 e.preventDefault();
                 if (gameState === 'menu') {
-                    gameState = 'modifier_select';
-                    updateUI();
+                    if (activeProfile && activeProfile.activeRun) {
+                        // Resume saved run
+                        deserializeRun(activeProfile.activeRun);
+                        activeProfile.activeRun = null;
+                        saveProfile(activeProfile);
+                    } else {
+                        gameState = 'modifier_select';
+                        updateUI();
+                    }
+                    return;
+                }
+            }
+
+            // Menu - R to resume saved run
+            if (e.code === 'KeyR') {
+                e.preventDefault();
+                if (gameState === 'menu' && activeProfile && activeProfile.activeRun) {
+                    deserializeRun(activeProfile.activeRun);
+                    activeProfile.activeRun = null;
+                    saveProfile(activeProfile);
                     return;
                 }
             }
@@ -1526,16 +1556,23 @@
             if (gameState === 'paused') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex - 1 + 2) % 2;
+                    pauseMenuIndex = (pauseMenuIndex - 1 + 3) % 3;
                     updateUI();
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex + 1) % 2;
+                    pauseMenuIndex = (pauseMenuIndex + 1) % 3;
                     updateUI();
                 } else if (e.code === 'Enter' || e.code === 'Space') {
                     e.preventDefault();
                     if (pauseMenuIndex === 0) {
                         gameState = 'playing';
+                    } else if (pauseMenuIndex === 2) {
+                        // Save & Quit
+                        if (activeProfile) {
+                            activeProfile.activeRun = serializeRun();
+                            saveProfile(activeProfile);
+                        }
+                        gameState = 'menu';
                     } else {
                         gameState = 'menu';
                     }
@@ -1811,6 +1848,10 @@
         function startGame() {
             gameState = 'playing';
             score = 0;
+            if (activeProfile) {
+                activeProfile.activeRun = null;
+                saveProfile(activeProfile);
+            }
             const extraLives = activeProfile ? activeProfile.upgrades.extraLife : 0;
             lives = currentModifier.id === 'glass_cannon' ? 1 : 3 + extraLives;
             level = 1;
@@ -1843,6 +1884,149 @@
                 activePowerups.shield = activeProfile.upgrades.startShield;
             }
             spawnAsteroids();
+            updateUI();
+        }
+
+        // Serialize current run state for saving
+        function serializeRun() {
+            return {
+                score, lives, level, runStarBits, levelTransitionTimer,
+                heat, overheating, overheatTimer, shootCooldown,
+                canvasWidth: canvas.width, canvasHeight: canvas.height,
+                ship: {
+                    x: ship.x, y: ship.y, angle: ship.angle,
+                    velocity: { x: ship.velocity.x, y: ship.velocity.y },
+                    invulnerable: ship.invulnerable, invulnerableTimer: ship.invulnerableTimer,
+                    blinkOn: ship.blinkOn, blinkTimer: ship.blinkTimer
+                },
+                activePowerups: { ...activePowerups },
+                modifierId: currentModifier.id,
+                asteroids: asteroids.map(a => ({
+                    x: a.x, y: a.y,
+                    velocity: { x: a.velocity.x, y: a.velocity.y },
+                    rotation: a.rotation, rotSpeed: a.rotSpeed,
+                    size: a.size, hp: a.hp, maxHp: a.maxHp,
+                    colorId: a.color.id, erraticTimer: a.erraticTimer
+                })),
+                bullets: bullets.map(b => ({
+                    x: b.x, y: b.y,
+                    velocity: { x: b.velocity.x, y: b.velocity.y },
+                    life: b.life, explosive: b.explosive
+                })),
+                powerups: powerups.map(p => ({
+                    x: p.x, y: p.y,
+                    velocity: { x: p.velocity.x, y: p.velocity.y },
+                    type: p.type.id, pulse: p.pulse, life: p.life
+                })),
+                starBits: starBits.map(s => ({
+                    x: s.x, y: s.y,
+                    velocity: { x: s.velocity.x, y: s.velocity.y },
+                    amount: s.amount, pulse: s.pulse, life: s.life
+                }))
+            };
+        }
+
+        // Deserialize saved run state and restore game
+        function deserializeRun(data) {
+            // Uniform scaling if resolution changed between save and resume
+            const savedW = data.canvasWidth || canvas.width;
+            const savedH = data.canvasHeight || canvas.height;
+            const savedScale = Math.min(savedW, savedH) / 720;
+            const newScale = Math.min(canvas.width, canvas.height) / 720;
+            const physicsScale = newScale / savedScale;
+
+            score = data.score;
+            lives = data.lives;
+            level = data.level;
+            runStarBits = data.runStarBits ?? 0;
+            levelTransitionTimer = data.levelTransitionTimer ?? 0;
+            heat = data.heat;
+            overheating = data.overheating;
+            overheatTimer = data.overheatTimer;
+            shootCooldown = data.shootCooldown ?? 0;
+
+            ship.x = data.ship.x * physicsScale;
+            ship.y = data.ship.y * physicsScale;
+            ship.angle = data.ship.angle;
+            ship.velocity = { x: data.ship.velocity.x * physicsScale, y: data.ship.velocity.y * physicsScale };
+            ship.invulnerable = data.ship.invulnerable;
+            ship.invulnerableTimer = data.ship.invulnerableTimer;
+            ship.blinkOn = data.ship.blinkOn ?? true;
+            ship.blinkTimer = data.ship.blinkTimer ?? 0;
+
+            // Recompute derived ship properties from modifier + upgrades
+            const thrustBonus = activeProfile ? activeProfile.upgrades.thrustPower * 0.02 : 0;
+            if (data.modifierId === 'tiny_ship') {
+                ship.radius = sc(7);
+                ship.thrust = (0.04 + thrustBonus) * physicsScale;
+            } else {
+                ship.radius = sc(15);
+                ship.thrust = (0.06 + thrustBonus) * physicsScale;
+            }
+            ship.friction = 0.99;
+            ship.rotSpeed = 0.07;
+
+            // Restore modifier
+            currentModifier = MODIFIERS.find(m => m.id === data.modifierId) || MODIFIERS[0];
+
+            // Restore active powerups
+            for (const id in activePowerups) activePowerups[id] = 0;
+            if (data.activePowerups) {
+                for (const id in data.activePowerups) {
+                    if (id in activePowerups) activePowerups[id] = data.activePowerups[id];
+                }
+            }
+
+            // Restore asteroids (regenerate shapes)
+            asteroids = (data.asteroids || []).map(a => {
+                const colorObj = ASTEROID_COLORS.find(c => c.id === a.colorId) || ASTEROID_COLORS[0];
+                const vertices = Math.floor(Math.random() * 5) + 7;
+                const shape = [];
+                for (let i = 0; i < vertices; i++) {
+                    const angle = (i / vertices) * Math.PI * 2;
+                    const radius = 0.8 + Math.random() * 0.4;
+                    shape.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
+                }
+                return {
+                    x: a.x * physicsScale, y: a.y * physicsScale,
+                    velocity: { x: a.velocity.x * physicsScale, y: a.velocity.y * physicsScale },
+                    rotation: a.rotation, rotSpeed: a.rotSpeed,
+                    size: a.size, radius: sc(a.size * 15),
+                    shape, color: colorObj,
+                    hp: a.hp, maxHp: a.maxHp,
+                    erraticTimer: a.erraticTimer ?? 0
+                };
+            });
+
+            // Restore bullets
+            bullets = (data.bullets || []).map(b => ({
+                x: b.x * physicsScale, y: b.y * physicsScale,
+                velocity: { x: b.velocity.x * physicsScale, y: b.velocity.y * physicsScale },
+                life: b.life, explosive: b.explosive
+            }));
+
+            // Restore ground powerups
+            powerups = (data.powerups || []).map(p => {
+                const typeObj = POWERUP_TYPES.find(t => t.id === p.type) || POWERUP_TYPES[0];
+                return {
+                    x: p.x * physicsScale, y: p.y * physicsScale,
+                    velocity: { x: p.velocity.x * physicsScale, y: p.velocity.y * physicsScale },
+                    type: typeObj, radius: sc(12),
+                    pulse: p.pulse, life: p.life
+                };
+            });
+
+            // Restore ground star bits
+            starBits = (data.starBits || []).map(s => ({
+                x: s.x * physicsScale, y: s.y * physicsScale,
+                velocity: { x: s.velocity.x * physicsScale, y: s.velocity.y * physicsScale },
+                amount: s.amount, radius: sc(6),
+                pulse: s.pulse, life: s.life
+            }));
+
+            particles = [];
+
+            gameState = 'playing';
             updateUI();
         }
 
@@ -1883,8 +2067,17 @@
                     scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆`;
                     scoreEl.style.display = 'block';
                     menuActionsEl.style.display = 'block';
+                    const hasRun = activeProfile.activeRun != null;
+                    btnResumeEl.style.display = hasRun ? 'inline' : 'none';
+                    if (hasRun) {
+                        const runMod = activeProfile.activeRun.modifierId !== 'none' ? ` [${activeProfile.activeRun.modifierId}]` : '';
+                        messageEl.textContent = `Resume: Lv.${activeProfile.activeRun.level}${runMod} — Score ${activeProfile.activeRun.score}`;
+                    } else {
+                        messageEl.textContent = 'Press SPACE to start';
+                    }
+                } else {
+                    messageEl.textContent = 'Press SPACE to start';
                 }
-                messageEl.textContent = 'Press SPACE to start';
                 messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
                 lastHighScoreRank = -1;
@@ -2707,9 +2900,21 @@
 
                 if (gameState === 'menu') {
                     if (action === 'start') {
-                        gameState = 'modifier_select';
-                        modifierSelectIndex = 0;
-                        updateUI();
+                        if (activeProfile && activeProfile.activeRun) {
+                            deserializeRun(activeProfile.activeRun);
+                            activeProfile.activeRun = null;
+                            saveProfile(activeProfile);
+                        } else {
+                            gameState = 'modifier_select';
+                            modifierSelectIndex = 0;
+                            updateUI();
+                        }
+                    } else if (action === 'resume') {
+                        if (activeProfile && activeProfile.activeRun) {
+                            deserializeRun(activeProfile.activeRun);
+                            activeProfile.activeRun = null;
+                            saveProfile(activeProfile);
+                        }
                     } else if (action === 'shop') {
                         gameState = 'shop';
                         shopReturnState = 'menu';
@@ -2810,6 +3015,13 @@
                     pauseMenuIndex = parseInt(idx);
                     if (pauseMenuIndex === 0) {
                         gameState = 'playing';
+                    } else if (pauseMenuIndex === 2) {
+                        // Save & Quit
+                        if (activeProfile) {
+                            activeProfile.activeRun = serializeRun();
+                            saveProfile(activeProfile);
+                        }
+                        gameState = 'menu';
                     } else {
                         gameState = 'menu';
                     }
