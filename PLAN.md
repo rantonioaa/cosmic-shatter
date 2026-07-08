@@ -248,3 +248,17 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] XOR encryption for exports
 - [x] Base64 encoding
 - [x] Checksum verification on import
+
+---
+
+## Bug Fixes ✅
+
+- [x] Null dereference after `loadProfile()` in keyboard profile select
+- [x] Null dereference after `loadProfile()` in touch profile select
+- [x] Magnet base radius stale after resolution change — now dynamic via `sc(70)`
+- [x] Missing `stats`/`totalStarBitsEarned` field migration in `migrateProfile()`
+- [x] `gameoverMenuIndex` not reset between games
+- [x] `ship.blinkTimer`/`blinkOn` not reset on respawn
+- [x] `URL.revokeObjectURL()` called too early in export — delayed 1000ms
+- [x] `coolingSystem || 0` replaced with `?? 0` for correctness
+- [x] Redundant `renderShopList()` calls removed from keyboard handler

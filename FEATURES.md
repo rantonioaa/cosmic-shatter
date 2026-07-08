@@ -101,7 +101,7 @@
 
 ## Magnet System
 
-- **Base radius:** 70px (always active)
+- **Base radius:** 70px (dynamically scaled via `sc(70)` — updates with resolution changes)
 - Items within radius drift toward ship
 - Pull strength increases as items get closer
 - **Magnet Boost:** Doubles radius to 140px for 10 seconds
@@ -168,6 +168,7 @@
 - Auto-detect old `asteroids_highscores` key
 - Create "Default" profile from old scores
 - Remove old key after migration
+- Ensures `profile.stats` and `profile.totalStarBitsEarned` exist for old profiles
 
 ---
 
@@ -344,6 +345,20 @@
 - Delta time normalization for consistent speed
 - `user-scalable=no` to prevent zoom issues
 - Prevents pull-to-refresh and bounce
+
+---
+
+## Bug Fixes
+
+- Null dereference after `loadProfile()` in keyboard profile select — null-checks before accessing `.name`
+- Null dereference after `loadProfile()` in touch profile select — null-checks before setting active profile
+- Magnet base radius (`MAGNET_BASE_RADIUS`) was stale after resolution change — now dynamically calculated via `sc(70)` in `getMagnetRadius()`
+- Missing `stats` field migration in `migrateProfile()` — now ensures `profile.stats` and `profile.totalStarBitsEarned` exist
+- `gameoverMenuIndex` not reset between games — now set to 0 in `submitScore()`
+- `ship.blinkTimer`/`blinkOn` not reset on respawn — now reset when ship becomes invulnerable
+- `URL.revokeObjectURL()` called too early in export — now delayed by 1000ms
+- `coolingSystem || 0` used `||` instead of `??` — now uses `??` for correctness
+- Redundant `renderShopList()` calls in keyboard handler — removed, `updateUI()` handles it
 
 ---
 

@@ -784,7 +784,6 @@
         }
 
         // Magnet constants
-        const MAGNET_BASE_RADIUS = sc(70);
         const MAGNET_PULL_STRENGTH = 2;
 
         // Modifier types (ordered by unlock progression)
@@ -976,6 +975,14 @@
                     }
                 }
             }
+            if (!profile.stats) {
+                profile.stats = { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0 };
+                changed = true;
+            }
+            if (profile.totalStarBitsEarned === undefined) {
+                profile.totalStarBitsEarned = 0;
+                changed = true;
+            }
             if (changed) saveProfile(profile);
             return profile;
         }
@@ -1035,7 +1042,7 @@
             a.href = URL.createObjectURL(blob);
             a.download = `cosmicshatter_${profile.name}.sav`;
             a.click();
-            URL.revokeObjectURL(a.href);
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
         }
 
         // Import profile
@@ -1099,6 +1106,7 @@
         function submitScore() {
             lastHighScoreRank = saveHighScore(lastScore, lastLevel, currentModifier.id);
             lastUnlockedModifier = checkModifierUnlocks();
+            gameoverMenuIndex = 0;
             gameState = 'gameover';
             updateUI();
         }
@@ -1251,9 +1259,11 @@
                     e.preventDefault();
                     if (profileSelectIndex < profileList.length) {
                         activeProfile = loadProfile(profileList[profileSelectIndex].name);
-                        setActiveProfileName(activeProfile.name);
-                        gameState = 'menu';
-                        updateUI();
+                        if (activeProfile) {
+                            setActiveProfileName(activeProfile.name);
+                            gameState = 'menu';
+                            updateUI();
+                        }
                     } else if (profileSelectIndex === profileList.length) {
                         gameState = 'profile_create';
                         profileNameInputEl.value = '';
@@ -1332,7 +1342,6 @@
                         gameState = 'shop';
                         shopReturnState = 'gameover';
                         shopMenuIndex = 0;
-                        renderShopList();
                         updateUI();
                     } else if (gameoverMenuIndex === 2) {
                         // Quit to menu
@@ -1389,7 +1398,6 @@
                     gameState = 'shop';
                     shopReturnState = 'menu';
                     shopMenuIndex = 0;
-                    renderShopList();
                     updateUI();
                 }
             }
@@ -1691,7 +1699,7 @@
 
         // Get magnet radius
         function getMagnetRadius() {
-            let radius = MAGNET_BASE_RADIUS;
+            let radius = sc(70);
             if (activeProfile && activeProfile.upgrades.magnetRange) {
                 radius += activeProfile.upgrades.magnetRange * sc(20);
             }
@@ -2075,7 +2083,7 @@
         }
 
         function getHeatLimit() {
-            const coolingLevel = activeProfile ? activeProfile.upgrades.coolingSystem || 0 : 0;
+            const coolingLevel = activeProfile ? (activeProfile.upgrades.coolingSystem ?? 0) : 0;
             return BASE_HEAT_LIMIT + coolingLevel * 10;
         }
 
@@ -2275,6 +2283,8 @@
                             ship.velocity = { x: 0, y: 0 };
                             ship.invulnerable = true;
                             ship.invulnerableTimer = 120;
+                            ship.blinkTimer = 0;
+                            ship.blinkOn = true;
                         }
                         break;
                     }
@@ -2817,10 +2827,13 @@
                         const pi = parseInt(idx);
                         const list = getProfileList();
                         if (pi >= 0 && pi < list.length) {
-                            activeProfile = loadProfile(list[pi].name);
-                            setActiveProfileName(list[pi].name);
-                            gameState = 'menu';
-                            updateUI();
+                            const loaded = loadProfile(list[pi].name);
+                            if (loaded) {
+                                activeProfile = loaded;
+                                setActiveProfileName(list[pi].name);
+                                gameState = 'menu';
+                                updateUI();
+                            }
                         }
                     }
                 }

@@ -92,7 +92,8 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Menu options injected into `highscoresEl` AFTER `renderHighScores()` to prevent overwrite
 
 ### Profile Loading
-- `loadProfile()` can return `null` if data is corrupted — always null-check before accessing `.orientation` or `.resolution`
+- `loadProfile()` can return `null` if data is corrupted — always null-check before accessing `.name`, `.orientation`, or `.resolution`
+- Must null-check in both keyboard AND touch profile select handlers
 
 ### Blink/Erratic Timers
 - Use crossing detection: `Math.floor(timer) % N === 0 && Math.floor(timer - dt) % N !== 0`
@@ -101,6 +102,14 @@ menu → modifier_select → playing → gameover → shop → ↑
 ### Graphics Menu
 - Index 0 = orientation toggle, indices 1+ = resolutions
 - `graphicsMenuIndex = savedRes + 1` when entering menu
+
+### Magnet Radius
+- `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`
+- Must recompute after resolution changes; a stale cached value breaks magnet range at different resolutions
+
+### Nullish Coalescing vs Logical OR
+- Use `??` not `||` for numeric defaults that can be 0 (e.g., `coolingSystem ?? 0`)
+- `|| 0` treats `0` as falsy and replaces it; `?? 0` only replaces `null`/`undefined`
 
 ## Git Workflow
 
