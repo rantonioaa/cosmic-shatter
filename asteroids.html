@@ -1764,6 +1764,12 @@
                 return;
             }
 
+            // Playing - F to toggle fullscreen
+            if (gameState === 'playing' && (e.key === 'f' || e.key === 'F')) {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+
             // Paused
             if (gameState === 'paused') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -3045,17 +3051,19 @@
 
         // === FULLSCREEN ===
         updateFullscreenBtn();
-        document.addEventListener('fullscreenchange', updateFullscreenBtn);
+        document.addEventListener('fullscreenchange', () => {
+            updateFullscreenBtn();
+            // If exited fullscreen while playing, auto-pause
+            if (!document.fullscreenElement && gameState === 'playing') {
+                pauseMenuIndex = 0;
+                gameState = 'paused';
+                updateUI();
+            }
+        });
         document.getElementById('fullscreenBtn').addEventListener('click', (e) => {
             e.stopPropagation();
             toggleFullscreen();
         });
-        // Block browser's default ESC-exit-fullscreen during gameplay
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape' && document.fullscreenElement && gameState === 'playing') {
-                e.preventDefault();
-            }
-        }, true);
 
         // === MOBILE TOUCH CONTROLS ===
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
