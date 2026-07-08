@@ -105,11 +105,14 @@
             color: #ffcc00;
         }
         #modifierSelect .mod-option.locked {
-            opacity: 0.35;
+            opacity: 0.5;
         }
         #modifierSelect .mod-option.selected.locked {
             opacity: 0.6;
             color: #888;
+        }
+        #modifierSelect .mod-option:active {
+            background: rgba(255, 255, 255, 0.08);
         }
         #modifierSelect .mod-option .mod-arrow {
             display: none;
@@ -189,6 +192,9 @@
             opacity: 1;
             color: #ffcc00;
         }
+        #profileSelect .ps-option:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
         #profileSelect .ps-option .ps-arrow {
             display: none;
             margin-right: 6px;
@@ -199,7 +205,7 @@
         }
         #profileSelect .ps-option .ps-info {
             font-size: 11px;
-            opacity: 0.5;
+            opacity: 0.7;
             margin-left: 22px;
         }
         #profileSelect .ps-option.selected .ps-info {
@@ -255,13 +261,22 @@
             opacity: 0.5;
         }
         #menuActions span {
-            margin: 0 8px;
+            margin: 0 4px;
             cursor: pointer;
             pointer-events: auto;
+            display: inline-block;
+            padding: 8px 12px;
+            min-height: 44px;
+            line-height: 44px;
+            border-radius: 4px;
+            transition: background 0.15s;
         }
         #menuActions span:hover {
             opacity: 1;
             color: #ffcc00;
+        }
+        #menuActions span:active {
+            background: rgba(255, 255, 255, 0.08);
         }
         #pauseMenu {
             display: none;
@@ -281,6 +296,9 @@
         #pauseMenu .pause-option.selected {
             opacity: 1;
             color: #ffcc00;
+        }
+        #pauseMenu .pause-option:active {
+            background: rgba(255, 255, 255, 0.08);
         }
         #pauseMenu .pause-arrow {
             display: none;
@@ -307,7 +325,7 @@
         }
         #graphicsMenu .gfx-section {
             font-size: 11px;
-            opacity: 0.4;
+            opacity: 0.6;
             letter-spacing: 2px;
             margin-top: 14px;
             margin-bottom: 6px;
@@ -322,6 +340,9 @@
         #graphicsMenu .gfx-option.selected {
             opacity: 1;
             color: #ffcc00;
+        }
+        #graphicsMenu .gfx-option:active {
+            background: rgba(255, 255, 255, 0.08);
         }
         #graphicsMenu .gfx-arrow {
             display: none;
@@ -371,13 +392,17 @@
             margin: 0 auto;
         }
         #shopMenu .shop-card {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 6px;
             padding: 10px 8px 8px;
             text-align: center;
             transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
-            cursor: default;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        #shopMenu .shop-card:active {
+            transform: scale(0.97);
         }
         #shopMenu .shop-card.selected {
             border-color: #ffcc00;
@@ -392,6 +417,7 @@
             box-shadow: 0 0 12px rgba(68,204,68,0.25), inset 0 0 20px rgba(68,204,68,0.04);
         }
         #shopMenu .shop-card.cant-afford {
+            opacity: 0.5;
         }
         #shopMenu .shop-card.selected.cant-afford {
             border-color: #666;
@@ -550,14 +576,26 @@
         }
         .back-btn {
             margin-top: 12px;
-            font-size: 12px;
-            color: #888;
+            font-size: 14px;
+            color: #aaa;
             cursor: pointer;
             pointer-events: auto;
             text-align: center;
+            padding: 12px 16px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.15s;
         }
         .back-btn:hover {
             color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .back-btn:active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
         }
         #touchPause {
             display: none;
@@ -582,8 +620,8 @@
             top: 12px;
             left: 12px;
             z-index: 100;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border: 1px solid rgba(255,255,255,0.25);
             border-radius: 6px;
             background: rgba(255,255,255,0.05);
@@ -595,6 +633,7 @@
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s, border-color 0.15s;
         }
         #fullscreenBtn:hover {
             border-color: rgba(255,255,255,0.6);
@@ -633,27 +672,49 @@
                 letter-spacing: 3px !important;
             }
             .ps-option, .mod-option, .pause-option, .gfx-option {
-                padding: 10px 8px !important;
-                min-height: 44px;
+                padding: 12px 16px !important;
+                min-height: 48px;
                 display: flex;
                 align-items: center;
+                gap: 8px;
+            }
+            .gfx-option {
+                padding-left: 24px !important;
+            }
+            .ps-info {
+                font-size: 12px !important;
+            }
+            .mod-desc {
+                font-size: 12px !important;
+                opacity: 0.7 !important;
+            }
+            .gfx-section {
+                font-size: 12px !important;
+                opacity: 0.6 !important;
             }
             #shopMenu .shop-grid {
-                gap: 6px;
+                gap: 8px;
             }
             #shopMenu .shop-card {
-                padding: 8px 4px 6px;
-                min-height: 44px;
+                padding: 10px 8px 8px;
+                min-height: 48px;
             }
             #shopMenu .shop-name {
-                font-size: 9px;
+                font-size: 11px;
             }
             #shopMenu .shop-desc {
-                font-size: 8px;
+                font-size: 10px;
             }
             #shopMenu .shop-icon svg {
-                width: 26px;
-                height: 26px;
+                width: 28px;
+                height: 28px;
+            }
+            #highscores {
+                font-size: 14px !important;
+                opacity: 0.7 !important;
+            }
+            #message {
+                font-size: 18px !important;
             }
             #powerupHud {
                 bottom: 180px !important;
@@ -3116,9 +3177,8 @@
 
             // Show/hide touch controls and pause button based on game state
             function updateTouchPause() {
-                const inGame = (gameState === 'playing' || gameState === 'paused');
                 touchPauseEl.style.display = (gameState === 'playing') ? 'block' : 'none';
-                if (inGame) {
+                if (gameState === 'playing') {
                     touchControlsEl.classList.add('active');
                 } else {
                     touchControlsEl.classList.remove('active');
