@@ -103,11 +103,20 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `graphicsMenuIndex = savedRes + 1` when entering menu
 
 ## Git Workflow
+
+**The AI handles commits. The user handles pushes.**
+
+The AI has no SSH permissions, so it cannot push. After committing, the AI tells the user to push. The user runs `git push` in their own terminal.
+
 ```bash
+# AI runs:
 cd /mnt/c/Users/cazbo/Proyectos/Test
 git add -A
 git commit -m "description"
-git push  # user must run manually (SSH agent issue)
+
+# User runs in their terminal:
+cd /mnt/c/Users/cazbo/Proyectos/Test
+git push
 ```
 
 ## Agents
