@@ -178,18 +178,42 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 5: Juice & Onboarding ⬜
+## Phase 5: Juice, Audio & Onboarding ⬜
 
-### 5A. Screen Juice
-- [ ] Screen shake on explosions and player hits
-- [ ] Hit-flash / hit-stop on damage
-- [ ] Muzzle flash on shoot
-- [ ] Bigger destruction particles
-- [ ] Combo number popups (float up from kill position)
+### 5A. Audio System
+- [ ] Web Audio API AudioContext with lazy init on first interaction
+- [ ] `AUDIO` namespace with `play(name, opts?)` dispatcher
+- [ ] Master gain limiter (DynamicsCompressorNode) to prevent clipping
+- [ ] Audio toggle in profile (`audioEnabled`)
+- [ ] Mobile unlock: resume on every tap, silent oscillator primed
 
-### 5B. Onboarding
-- [ ] First-run tutorial overlay (rotate, thrust, shoot, collect star bits)
-- [ ] Dismissable, remembers completion in profile
+### 5B. Sound Effects (8 essential)
+- [ ] Shoot — sawtooth 880→220Hz pitch slide, 100ms
+- [ ] Asteroid break — square + noise burst, 200-350ms (scales by size)
+- [ ] Powerup pickup — sine arpeggio 523→784→1047Hz, 250ms
+- [ ] Player hit — square 300→100Hz dive, 250ms
+- [ ] Wave clear — triangle major triad ascent, 700ms
+- [ ] Shop buy — sine coin chime 988→1319Hz, 150ms
+- [ ] Low health — sine 220Hz beep, 100ms repeating every 600ms
+- [ ] Game over — sawtooth descending drone + filtered noise, 1.5s
+
+### 5C. Visual Effects
+- [ ] Screen shake — canvas translate offset on death + big breaks
+- [ ] Muzzle flash — bright particle burst at ship nose on shoot
+- [ ] Asteroid hit-flash — white tint for 2-3 frames on damage
+- [ ] Hit-stop — 3-6 frame update pause on player damage
+- [ ] Combo popups — floating score text from kill position
+- [ ] Death shockwave — expanding ring + particle burst on player death
+
+### 5D. Procedural Ambient Music
+- [ ] Low sine/triangle drone (40-80Hz) with LFO filtering
+- [ ] Sparse pentatonic arpeggios every 2-4 seconds
+- [ ] Intensity layers: calm menu → active waves → low rumble at low health
+- [ ] Unobtrusive — space atmosphere through silence + punctuated sound
+
+### 5E. Onboarding
+- [ ] First-run tutorial overlay (rotate, thrust, shoot, collect)
+- [ ] Dismissable, stored in profile
 
 ---
 
