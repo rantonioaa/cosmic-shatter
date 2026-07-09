@@ -163,31 +163,64 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 4: Challenge Modes ⬜
+## Phase 4: Economy Overhaul ⬜
 
-### 4A. Challenge Types
+### 4A. Stardust Currency
+- [ ] New currency: Stardust — earned by converting run score at gameover
+- [ ] Stardust persists across runs (never resets)
+- [ ] Spent on: modifier unlocks, loadout unlocks, ship cosmetics
+- [ ] Separate from Star Bits (which remain stat upgrade currency)
+
+### 4B. Stardust Conversion
+- [ ] Piecewise diminishing rate:
+  - 1% of first 10,000 score
+  - 0.5% of next 40,000 score (10k-50k)
+  - 0.2% beyond 50,000 score
+- [ ] Applied to 100% of final run score (no hidden tax)
+- [ ] Modifier multiplier applies (Glass Cannon earns 2.5x Stardust)
+- [ ] Show "+X Stardust" on gameover screen
+
+### 4C. Stardust Unlock Shop
+- [ ] New screen accessible from main menu
+- [ ] Categories: Modifiers, Loadouts, Cosmetics
+- [ ] Each item shows Stardust cost and locked/unlocked state
+- [ ] Purchased items persist in profile
+
+### 4D. Golden Lure Asteroids (NEW variant)
+- [ ] New asteroid type: Golden Lure (distinct from existing Gold)
+- [ ] Visual: bright golden shimmer with particle trail, spawn at screen edges only
+- [ ] Behavior: 3x score, drops bonus Star Bits, aggressive movement
+- [ ] Risk/reward: always far from safe zone, forces player to venture out
+- [ ] Spawn rate: 3-5% per wave, increases at higher levels
+- [ ] Unique particle trail to distinguish from regular gold
+
+---
+
+## Phase 5: Challenge Modes ⬜
+
+### 5A. Challenge Types
 - [ ] Classic — Standard rules (1x score)
 - [ ] One Hit — 1 life, no respawn (3x score)
 - [ ] Horde — 2x asteroid count, faster level progression (2.5x score)
 - [ ] Speed Clear — Timer bonus for fast level clears (2x score)
 
-### 4B. Challenge UI
+### 5B. Challenge UI
 - [ ] `challenge_select` state before modifier select
 - [ ] Challenge-specific rules display
 - [ ] Per-challenge high scores (4 leaderboards)
 
 ---
 
-## Phase 5: Juice, Audio & Onboarding ⬜
+## Phase 6: Juice, Audio & Onboarding ⬜
 
-### 5A. Audio System
+### 6A. Audio System
 - [ ] Web Audio API AudioContext with lazy init on first interaction
 - [ ] `AUDIO` namespace with `play(name, opts?)` dispatcher
 - [ ] Master gain limiter (DynamicsCompressorNode) to prevent clipping
 - [ ] Audio toggle in profile (`audioEnabled`)
 - [ ] Mobile unlock: resume on every tap, silent oscillator primed
 
-### 5B. Sound Effects (8 essential)
+### 6B. Sound Effects (8 essential)
 - [ ] Shoot — sawtooth 880→220Hz pitch slide, 100ms
 - [ ] Asteroid break — square + noise burst, 200-350ms (scales by size)
 - [ ] Powerup pickup — sine arpeggio 523→784→1047Hz, 250ms
@@ -197,7 +230,7 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [ ] Low health — sine 220Hz beep, 100ms repeating every 600ms
 - [ ] Game over — sawtooth descending drone + filtered noise, 1.5s
 
-### 5C. Visual Effects
+### 6C. Visual Effects
 - [ ] Screen shake — canvas translate offset on death + big breaks
 - [ ] Muzzle flash — bright particle burst at ship nose on shoot
 - [ ] Asteroid hit-flash — white tint for 2-3 frames on damage
@@ -205,21 +238,21 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [ ] Combo popups — floating score text from kill position
 - [ ] Death shockwave — expanding ring + particle burst on player death
 
-### 5D. Procedural Ambient Music
+### 6D. Procedural Ambient Music
 - [ ] Low sine/triangle drone (40-80Hz) with LFO filtering
 - [ ] Sparse pentatonic arpeggios every 2-4 seconds
 - [ ] Intensity layers: calm menu → active waves → low rumble at low health
 - [ ] Unobtrusive — space atmosphere through silence + punctuated sound
 
-### 5E. Onboarding
+### 6E. Onboarding
 - [ ] First-run tutorial overlay (rotate, thrust, shoot, collect)
 - [ ] Dismissable, stored in profile
 
 ---
 
-## Phase 6: In-Run Modules + Mini-Bosses ⬜
+## Phase 7: In-Run Modules + Mini-Bosses ⬜
 
-### 6A. Module Pods
+### 7A. Module Pods
 - [ ] Every 3 levels, present choice of 3 temporary modules
 - [ ] 12 modules total:
   - Offensive: Piercing Rounds, Ricochet, Chain Lightning, Heavy Caliber, Bigger Boom
@@ -229,7 +262,7 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [ ] Modules saved in `activeRun` for mid-run resume
 - [ ] Active modules shown in HUD bar
 
-### 6B. Mini-Bosses
+### 7B. Mini-Bosses
 - [ ] Every 5 levels, spawn a mini-boss asteroid
 - [ ] 3 boss types: Splitter Tyrant, Armored Behemoth, Berserker
 - [ ] Boss health bar displayed above
@@ -237,7 +270,7 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 7: Ship Loadouts ⬜
+## Phase 8: Ship Loadouts ⬜
 
 - [ ] Choose starting weapon type after modifier select
 - [ ] 5 loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
@@ -247,14 +280,14 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 8: Endgame (Lite) ⬜
+## Phase 9: Endgame (Lite) ⬜
 
-### 8A. Achievements
+### 9A. Achievements
 - [ ] 10–12 achievements across categories (Combat, Progression, Challenge)
 - [ ] Achievement popup on unlock
 - [ ] Achievement gallery in profile
 
-### 8B. Prestige
+### 9B. Prestige
 - [ ] Available when all 8 upgrades are maxed
 - [ ] Resets upgrades and star bits
 - [ ] Grants +5% permanent score bonus per prestige
@@ -266,6 +299,8 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ```
 profile_select → menu → challenge_select → modifier_select → playing → gameover → shop → ↑
+                  ↓
+              stardust_shop (unlock modifiers, loadouts, cosmetics)
 ```
 
 ---
