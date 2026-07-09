@@ -149,6 +149,95 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
+## Phase 4: Balance & Polish ⬜ (Quick Wins)
+
+### 4A. Heat Overdrive System ⬜
+- [ ] Heat above 50% = bonus damage (1.5x) and faster fire rate (30% reduction)
+- [ ] Orange glow visual when in overdrive
+- [ ] "OVERDRIVE" HUD text when active
+- [ ] Risk/reward: overheat still triggers at 100%
+
+### 4B. Shield Rework ⬜
+- [ ] Cap shield at 3 charges (from 5)
+- [ ] Add decay: each charge expires after 20 seconds
+- [ ] Shield visual pulses faster as it decays
+- [ ] Start Shield upgrade still works (1-3 charges at start)
+
+### 4C. Modifier Rebalance ⬜
+- [ ] Tiny Ship: 1.25x → 1.5x (triple penalty deserves higher reward)
+- [ ] Dark Mode: 1.5x → 1.75x (score-farming potential)
+- [ ] Glass Cannon: 2x → 2.5x (1 life + no splits is brutal)
+
+### 4D. Combo Scoring ⬜
+- [ ] Combo meter: destroys within 2s build combo (1x → 1.5x → 2x → 2.5x → 3x)
+- [ ] Combo decays after 3 seconds of no kills
+- [ ] Getting hit resets combo to 0
+- [ ] Star bit drops increase by 20% per combo level
+- [ ] HUD combo counter next to score
+- [ ] Screen flash on high combos (4-5x)
+
+---
+
+## Phase 5: Core Roguelite ⬜
+
+### 5A. In-Run Module Pods (Boon Selection) ⬜
+- [ ] After every 3 levels, present choice of 3 temporary modules
+- [ ] Module categories: Offensive, Defensive, Utility, Special
+- [ ] 15-20 modules total (Piercing, Ricochet, Chain Lightning, Auto-Shield, Vampire, etc.)
+- [ ] Active modules persist for rest of run
+- [ ] Modules saved in `activeRun` for mid-run resume
+- [ ] Active modules shown in HUD bar
+
+### 5B. Boss/Elite Asteroids ⬜
+- [ ] Every 5 levels, spawn a mini-boss asteroid
+- [ ] Boss types: Splitter Tyrant, Regenerator, Spawner, Armored, Berserker
+- [ ] Boss health bar displayed above
+- [ ] Defeat rewards: guaranteed power-up + 500 star bits + bonus score
+- [ ] Boss visual: larger, pulsing glow, unique color
+
+---
+
+## Phase 6: Retention ⬜
+
+### 6A. Prestige/Ascension System ⬜
+- [ ] Available when all 8 upgrades are maxed
+- [ ] Resets upgrades and star bits
+- [ ] Grants "Ascension Shards" based on total star bits: `floor(sqrt(total / 1000))`
+- [ ] Shard shop: +1% score/level (max 20%), +1 life/5 shards, cosmetic unlocks
+- [ ] Prestige level displayed on profile
+
+### 6B. Daily Challenges ⬜
+- [ ] One fixed seed per day from date hash
+- [ ] Seeded RNG for asteroid layout and power-up drops
+- [ ] Fixed modifier cycling daily
+- [ ] Track best score per profile per day
+- [ ] Calendar UI showing past daily scores
+
+### 6C. Achievement System ⬜
+- [ ] 30-40 achievements across categories (Combat, Progression, Challenge, Collection)
+- [ ] Achievement popup on unlock
+- [ ] Achievement gallery in profile
+- [ ] Rewards: star bits, cosmetic unlocks, prestige shards
+
+---
+
+## Phase 7: Depth ⬜
+
+### 7A. Weapon Loadouts / Ship Classes ⬜
+- [ ] Choose starting weapon type after modifier select
+- [ ] Loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
+- [ ] Each modifies bullet creation, damage, and behavior
+- [ ] Unlock new loadouts via achievements or prestige
+- [ ] Different bullet colors/shapes per loadout
+
+### 7B. Challenge Modes ⬜
+- [ ] Separate challenge mode menu
+- [ ] Modes: Dodge Only, One Hit, Speed Clear, Horde, Pacific
+- [ ] Per-challenge high scores
+- [ ] Mode-specific UI tweaks (timer, score display)
+
+---
+
 ## Full Game Flow (After All Phases)
 
 ```
