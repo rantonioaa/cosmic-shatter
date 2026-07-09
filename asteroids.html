@@ -54,6 +54,22 @@
             font-size: 22px;
             margin-bottom: 10px;
         }
+        #comboBar {
+            display: none;
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            margin: -4px auto 10px;
+            overflow: hidden;
+        }
+        #comboFill {
+            height: 100%;
+            width: 100%;
+            background: #ffcc00;
+            border-radius: 2px;
+            transition: width 0.05s linear;
+        }
         #message {
             font-size: 16px;
             opacity: 0.7;
@@ -736,6 +752,7 @@
         <div id="gameTitle">COSMIC SHATTER</div>
         <div id="levelTransition"></div>
         <div id="score">Score: 0</div>
+        <div id="comboBar"><div id="comboFill"></div></div>
         <div id="message" data-tap-action="start">Press SPACE to start</div>
         <div id="highscores"></div>
         <div id="menuActions">
@@ -3071,6 +3088,25 @@
                 updateActivePowerups(dt);
                 updateMagnet(dt);
                 checkCollisions();
+
+                // Update score display with live combo (every frame)
+                const comboText = combo > 0 ? ` | Combo x${(1 + combo * 0.5).toFixed(1)}` : '';
+                scoreEl.textContent = `Score: ${score}${comboText} | Lives: ${lives}`;
+
+                // Combo timer bar
+                const comboBar = document.getElementById('comboBar');
+                const comboFill = document.getElementById('comboFill');
+                if (combo > 0 && comboTimer > 0) {
+                    comboBar.style.display = 'block';
+                    const pct = (comboTimer / COMBO_TIMEOUT) * 100;
+                    comboFill.style.width = pct + '%';
+                    // Color: green > 60%, yellow 30-60%, red < 30%
+                    if (pct > 60) comboFill.style.background = '#00ff00';
+                    else if (pct > 30) comboFill.style.background = '#ffcc00';
+                    else comboFill.style.background = '#ff4444';
+                } else {
+                    comboBar.style.display = 'none';
+                }
 
                 drawShip();
                 drawHeatBar();
