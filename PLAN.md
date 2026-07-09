@@ -169,12 +169,14 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Glass Cannon: 2x → 2.5x (1 life + no splits is brutal)
 
 ### 4D. Combo Scoring ✅
-- [x] Combo meter: destroys within 2s build combo (1x → 1.5x → 2x → 2.5x → 3x)
+- [x] Combo meter: destroys within 3s build combo (1x → 1.5x → 2x → 2.5x → 3x)
 - [x] Combo decays after 3 seconds of no kills
 - [x] Getting hit resets combo to 0
 - [x] Star bit drops increase by 20% per combo level
 - [x] HUD combo counter next to score
 - [x] Screen flash on high combos (4-5x)
+- [x] Color-coded combo timer bar (green/yellow/red)
+- [x] Explosive chain kills build combo
 
 ---
 

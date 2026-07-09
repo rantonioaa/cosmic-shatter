@@ -56,7 +56,6 @@
         }
         #comboBar {
             display: none;
-            width: 200px;
             height: 4px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
@@ -840,6 +839,8 @@
         const shopMenuEl = document.getElementById('shopMenu');
         const shopGridEl = document.getElementById('shopGrid');
         const shopBalanceEl = document.getElementById('shopBalance');
+        const comboBarEl = document.getElementById('comboBar');
+        const comboFillEl = document.getElementById('comboFill');
 
         // Resolution options
         const LANDSCAPE_RESOLUTIONS = [
@@ -923,6 +924,7 @@
         function sc(v) { return v * SCALE; }
         function applyScale() {
             document.documentElement.style.setProperty('--s', SCALE);
+            comboBarEl.style.width = sc(200) + 'px';
         }
         applyScale();
         applyCanvasStyle();
@@ -2421,6 +2423,7 @@
             pauseMenuEl.style.display = 'none';
             graphicsMenuEl.style.display = 'none';
             shopMenuEl.style.display = 'none';
+            comboBarEl.style.display = 'none';
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
@@ -2469,8 +2472,6 @@
                 shopMenuEl.style.display = 'block';
                 renderShopList();
             } else if (gameState === 'playing') {
-                const comboText = combo > 0 ? ` | Combo x${(1 + combo * 0.5).toFixed(1)}` : '';
-                scoreEl.textContent = `Score: ${score}${comboText} | Lives: ${lives}`;
                 scoreEl.style.display = 'block';
             } else if (gameState === 'level_transition') {
                 levelTransitionEl.textContent = `LEVEL ${level + 1}`;
@@ -2673,15 +2674,6 @@
                 overdrive = false;
                 shootCooldown = Math.max(shootCooldown, OVERHEAT_COOLDOWN);
             }
-
-            // Combo decay
-            if (comboTimer > 0) {
-                comboTimer -= dt;
-                if (comboTimer <= 0) {
-                    combo = 0;
-                    comboTimer = 0;
-                }
-            }
         }
 
         // Update asteroids
@@ -2750,6 +2742,8 @@
                                         const ePoints = ea.size === 3 ? 20 : ea.size === 2 ? 50 : 100;
                                         const eComboMult = 1 + combo * 0.5;
                                         score += Math.floor(ePoints * eComboMult * (scoreMultActive ? 2 : 1));
+                                        combo = Math.min(5, combo + 1);
+                                        comboTimer = COMBO_TIMEOUT;
                                         if (ea.size === 1 && ea.color) spawnStarBits(ea.x, ea.y, ea.color);
                                         if (ea.size > 1) {
                                             for (let s = 0; s < 2; s++) {
@@ -3089,23 +3083,30 @@
                 updateMagnet(dt);
                 checkCollisions();
 
+                // Combo decay (runs every frame regardless of heat state)
+                if (comboTimer > 0) {
+                    comboTimer -= dt;
+                    if (comboTimer <= 0) {
+                        combo = 0;
+                        comboTimer = 0;
+                    }
+                }
+
                 // Update score display with live combo (every frame)
                 const comboText = combo > 0 ? ` | Combo x${(1 + combo * 0.5).toFixed(1)}` : '';
                 scoreEl.textContent = `Score: ${score}${comboText} | Lives: ${lives}`;
 
                 // Combo timer bar
-                const comboBar = document.getElementById('comboBar');
-                const comboFill = document.getElementById('comboFill');
                 if (combo > 0 && comboTimer > 0) {
-                    comboBar.style.display = 'block';
+                    comboBarEl.style.display = 'block';
                     const pct = (comboTimer / COMBO_TIMEOUT) * 100;
-                    comboFill.style.width = pct + '%';
+                    comboFillEl.style.width = pct + '%';
                     // Color: green > 60%, yellow 30-60%, red < 30%
-                    if (pct > 60) comboFill.style.background = '#00ff00';
-                    else if (pct > 30) comboFill.style.background = '#ffcc00';
-                    else comboFill.style.background = '#ff4444';
+                    if (pct > 60) comboFillEl.style.background = '#00ff00';
+                    else if (pct > 30) comboFillEl.style.background = '#ffcc00';
+                    else comboFillEl.style.background = '#ff4444';
                 } else {
-                    comboBar.style.display = 'none';
+                    comboBarEl.style.display = 'none';
                 }
 
                 drawShip();

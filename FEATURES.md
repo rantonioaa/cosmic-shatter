@@ -300,6 +300,14 @@
 - Score multiplied by modifier
 - Score multiplied by Score x2 power-up
 
+### Combo System
+- Consecutive kills within 3s build combo (1x → 1.5x → 2x → 2.5x → 3x)
+- Explosive chain kills also build combo
+- Getting hit (or shield hit) resets combo to 0
+- Live combo multiplier shown next to score during gameplay
+- Color-coded timer bar below score: green (>60%), yellow (30-60%), red (<30%)
+- Combo bar hidden during pause, gameover, and level transitions
+
 ---
 
 ## Visuals
