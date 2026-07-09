@@ -132,43 +132,26 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 3: Challenge Modes ⬜
+## Phase 3: Balance & Polish ✅ (Quick Wins)
 
-### 3A. Challenge Types
-- [ ] Classic — Standard rules
-- [ ] Dodge Only — Cannot shoot, survive as long as possible (3x score)
-- [ ] One Hit — 1 life, no respawn (3x score)
-- [ ] Speed Clear — Timer bonus for fast clears (2x score)
-- [ ] Horde — 3x asteroids, endless spawning (2.5x score)
-- [ ] Pacific — Asteroids on timer, dodge only (2x score)
-
-### 3B. Challenge UI
-- [ ] `challenge_select` state before modifier select
-- [ ] Challenge-specific rules display
-- [ ] Per-challenge high scores
-
----
-
-## Phase 4: Balance & Polish ⬜ (Quick Wins)
-
-### 4A. Heat Overdrive System ✅
+### 3A. Heat Overdrive System ✅
 - [x] Heat above 50% = bonus damage (1.5x) and faster fire rate (30% reduction)
 - [x] Orange glow visual when in overdrive
 - [x] "OVERDRIVE" HUD text when active
 - [x] Risk/reward: overheat still triggers at 100%
 
-### 4B. Shield Rework ✅
+### 3B. Shield Rework ✅
 - [x] Cap shield at 3 charges (from 5)
 - [x] Add decay: each charge expires after 20 seconds
 - [x] Shield visual pulses faster as it decays
 - [x] Start Shield upgrade still works (1-3 charges at start)
 
-### 4C. Modifier Rebalance ✅
+### 3C. Modifier Rebalance ✅
 - [x] Tiny Ship: 1.25x → 1.5x (triple penalty deserves higher reward)
 - [x] Dark Mode: 1.5x → 1.75x (score-farming potential)
 - [x] Glass Cannon: 2x → 2.5x (1 life + no splits is brutal)
 
-### 4D. Combo Scoring ✅
+### 3D. Combo Scoring ✅
 - [x] Combo meter: destroys within 3s build combo (1x → 1.5x → 2x → 2.5x → 3x)
 - [x] Combo decays after 3 seconds of no kills
 - [x] Getting hit resets combo to 0
@@ -180,63 +163,78 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 5: Core Roguelite ⬜
+## Phase 4: Challenge Modes ⬜
 
-### 5A. In-Run Module Pods (Boon Selection) ⬜
-- [ ] After every 3 levels, present choice of 3 temporary modules
-- [ ] Module categories: Offensive, Defensive, Utility, Special
-- [ ] 15-20 modules total (Piercing, Ricochet, Chain Lightning, Auto-Shield, Vampire, etc.)
+### 4A. Challenge Types
+- [ ] Classic — Standard rules (1x score)
+- [ ] One Hit — 1 life, no respawn (3x score)
+- [ ] Horde — 2x asteroid count, faster level progression (2.5x score)
+- [ ] Speed Clear — Timer bonus for fast level clears (2x score)
+
+### 4B. Challenge UI
+- [ ] `challenge_select` state before modifier select
+- [ ] Challenge-specific rules display
+- [ ] Per-challenge high scores (4 leaderboards)
+
+---
+
+## Phase 5: Juice & Onboarding ⬜
+
+### 5A. Screen Juice
+- [ ] Screen shake on explosions and player hits
+- [ ] Hit-flash / hit-stop on damage
+- [ ] Muzzle flash on shoot
+- [ ] Bigger destruction particles
+- [ ] Combo number popups (float up from kill position)
+
+### 5B. Onboarding
+- [ ] First-run tutorial overlay (rotate, thrust, shoot, collect star bits)
+- [ ] Dismissable, remembers completion in profile
+
+---
+
+## Phase 6: In-Run Modules + Mini-Bosses ⬜
+
+### 6A. Module Pods
+- [ ] Every 3 levels, present choice of 3 temporary modules
+- [ ] 12 modules total:
+  - Offensive: Piercing Rounds, Ricochet, Chain Lightning, Heavy Caliber, Bigger Boom
+  - Defensive: Vampire Plating, Auto-Shield, Ablative Armor
+  - Utility: Magnet Field, Overclock, Haste, Lucky Star
 - [ ] Active modules persist for rest of run
 - [ ] Modules saved in `activeRun` for mid-run resume
 - [ ] Active modules shown in HUD bar
 
-### 5B. Boss/Elite Asteroids ⬜
+### 6B. Mini-Bosses
 - [ ] Every 5 levels, spawn a mini-boss asteroid
-- [ ] Boss types: Splitter Tyrant, Regenerator, Spawner, Armored, Berserker
+- [ ] 3 boss types: Splitter Tyrant, Armored Behemoth, Berserker
 - [ ] Boss health bar displayed above
 - [ ] Defeat rewards: guaranteed power-up + 500 star bits + bonus score
-- [ ] Boss visual: larger, pulsing glow, unique color
 
 ---
 
-## Phase 6: Retention ⬜
+## Phase 7: Ship Loadouts ⬜
 
-### 6A. Prestige/Ascension System ⬜
-- [ ] Available when all 8 upgrades are maxed
-- [ ] Resets upgrades and star bits
-- [ ] Grants "Ascension Shards" based on total star bits: `floor(sqrt(total / 1000))`
-- [ ] Shard shop: +1% score/level (max 20%), +1 life/5 shards, cosmetic unlocks
-- [ ] Prestige level displayed on profile
-
-### 6B. Daily Challenges ⬜
-- [ ] One fixed seed per day from date hash
-- [ ] Seeded RNG for asteroid layout and power-up drops
-- [ ] Fixed modifier cycling daily
-- [ ] Track best score per profile per day
-- [ ] Calendar UI showing past daily scores
-
-### 6C. Achievement System ⬜
-- [ ] 30-40 achievements across categories (Combat, Progression, Challenge, Collection)
-- [ ] Achievement popup on unlock
-- [ ] Achievement gallery in profile
-- [ ] Rewards: star bits, cosmetic unlocks, prestige shards
-
----
-
-## Phase 7: Depth ⬜
-
-### 7A. Weapon Loadouts / Ship Classes ⬜
 - [ ] Choose starting weapon type after modifier select
-- [ ] Loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
+- [ ] 5 loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
 - [ ] Each modifies bullet creation, damage, and behavior
-- [ ] Unlock new loadouts via achievements or prestige
+- [ ] Unlock new loadouts via progression
 - [ ] Different bullet colors/shapes per loadout
 
-### 7B. Challenge Modes ⬜
-- [ ] Separate challenge mode menu
-- [ ] Modes: Dodge Only, One Hit, Speed Clear, Horde, Pacific
-- [ ] Per-challenge high scores
-- [ ] Mode-specific UI tweaks (timer, score display)
+---
+
+## Phase 8: Endgame (Lite) ⬜
+
+### 8A. Achievements
+- [ ] 10–12 achievements across categories (Combat, Progression, Challenge)
+- [ ] Achievement popup on unlock
+- [ ] Achievement gallery in profile
+
+### 8B. Prestige
+- [ ] Available when all 8 upgrades are maxed
+- [ ] Resets upgrades and star bits
+- [ ] Grants +5% permanent score bonus per prestige
+- [ ] Prestige badge displayed on profile
 
 ---
 
@@ -281,6 +279,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Small asteroid: 100 pts
 - [x] Score multiplier from modifiers
 - [x] Score x2 power-up
+- [x] Combo multiplier (1x → 3x) with timer bar
 
 ### Power-ups ✅
 - [x] Shield (absorbs hits, stackable up to 5)
@@ -373,3 +372,8 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] `URL.revokeObjectURL()` called too early in export — delayed 1000ms
 - [x] `coolingSystem || 0` replaced with `?? 0` for correctness
 - [x] Redundant `renderShopList()` calls removed from keyboard handler
+- [x] Combo bar leaked into pause/gameover screens — now hidden on all non-playing states
+- [x] Explosive chain kills didn't build combo — now increment combo counter
+- [x] Combo timer stopped ticking during overheat — moved decay to game loop
+- [x] Combo bar DOM lookups every frame — cached at init
+- [x] Combo bar width not resolution-scaled — now uses `sc(200)`
