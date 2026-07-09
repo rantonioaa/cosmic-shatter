@@ -949,10 +949,16 @@
         let heat = 0;
         let overheating = false;
         let overheatTimer = 0;
+        let overdrive = false;
         const HEAT_PER_SHOT = 5;
         const HEAT_DECAY = 0.5;
         const OVERHEAT_COOLDOWN = 120;
         const BASE_HEAT_LIMIT = 20;
+
+        // Combo system
+        let combo = 0;
+        let comboTimer = 0;
+        const COMBO_TIMEOUT = 180; // 3 seconds at 60fps
 
         // Powerup types
         const POWERUP_TYPES = [
@@ -1011,11 +1017,11 @@
         // Modifier types (ordered by unlock progression)
         const MODIFIERS = [
             { id: 'none',          label: 'None',          mult: 1,    desc: 'Standard gameplay' },
-            { id: 'tiny_ship',     label: 'Tiny Ship',     mult: 1.25, desc: 'Half size, less thrust, 2x bullet damage needed' },
+            { id: 'tiny_ship',     label: 'Tiny Ship',     mult: 1.5,  desc: 'Half size, less thrust, 2x bullet damage needed' },
             { id: 'speed_demon',   label: 'Speed Demon',   mult: 1.5,  desc: 'Asteroids 1.5x faster' },
-            { id: 'dark_mode',     label: 'Dark Mode',     mult: 1.5,  desc: 'Limited vision radius' },
+            { id: 'dark_mode',     label: 'Dark Mode',     mult: 1.75, desc: 'Limited vision radius' },
             { id: 'bullet_storm',  label: 'Bullet Storm',  mult: 2,    desc: '2x asteroids, faster spawn' },
-            { id: 'glass_cannon',  label: 'Glass Cannon',  mult: 2,    desc: 'Instant split, 1 hit = death' }
+            { id: 'glass_cannon',  label: 'Glass Cannon',  mult: 2.5,  desc: 'Instant split, 1 hit = death' }
         ];
 
         // Unlock requirements: prev = prerequisite modifier id, level = required level
@@ -2127,14 +2133,26 @@
         }
 
         // Update active powerup timers
+        // Shield system
+        let shieldTimer = 0;
+        const SHIELD_DECAY_TIME = 1200; // 20 seconds at 60fps
+
         function updateActivePowerups(dt) {
             for (const id in activePowerups) {
-                if (id === 'shield') continue; // shield persists until hit
+                if (id === 'shield') continue; // shield handled separately
                 if (activePowerups[id] > 0) {
                     activePowerups[id] -= dt;
                     if (activePowerups[id] <= 0) {
                         activePowerups[id] = 0;
                     }
+                }
+            }
+            // Shield decay
+            if (activePowerups.shield > 0) {
+                shieldTimer -= dt;
+                if (shieldTimer <= 0) {
+                    activePowerups.shield--;
+                    shieldTimer = SHIELD_DECAY_TIME;
                 }
             }
         }
@@ -2194,10 +2212,15 @@
             heat = 0;
             overheating = false;
             overheatTimer = 0;
+            overdrive = false;
+            combo = 0;
+            comboTimer = 0;
+            shieldTimer = 0;
             for (const id in activePowerups) activePowerups[id] = 0;
             // Start shield upgrade
             if (activeProfile && activeProfile.upgrades.startShield > 0) {
-                activePowerups.shield = activeProfile.upgrades.startShield;
+                activePowerups.shield = Math.min(3, activeProfile.upgrades.startShield);
+                shieldTimer = SHIELD_DECAY_TIME;
             }
             spawnAsteroids();
             updateUI();
@@ -2207,7 +2230,8 @@
         function serializeRun() {
             return {
                 score, lives, level, runStarBits, levelTransitionTimer,
-                heat, overheating, overheatTimer, shootCooldown,
+                heat, overheating, overheatTimer, shootCooldown, overdrive,
+                combo, comboTimer, shieldTimer,
                 canvasWidth: canvas.width, canvasHeight: canvas.height,
                 ship: {
                     x: ship.x, y: ship.y, angle: ship.angle,
@@ -2260,6 +2284,10 @@
             overheating = data.overheating;
             overheatTimer = data.overheatTimer;
             shootCooldown = data.shootCooldown ?? 0;
+            overdrive = data.overdrive ?? false;
+            combo = data.combo ?? 0;
+            comboTimer = data.comboTimer ?? 0;
+            shieldTimer = data.shieldTimer ?? SHIELD_DECAY_TIME;
 
             ship.x = data.ship.x * physicsScale;
             ship.y = data.ship.y * physicsScale;
@@ -2424,7 +2452,8 @@
                 shopMenuEl.style.display = 'block';
                 renderShopList();
             } else if (gameState === 'playing') {
-                scoreEl.textContent = `Score: ${score} | Lives: ${lives}`;
+                const comboText = combo > 0 ? ` | Combo x${(1 + combo * 0.5).toFixed(1)}` : '';
+                scoreEl.textContent = `Score: ${score}${comboText} | Lives: ${lives}`;
                 scoreEl.style.display = 'block';
             } else if (gameState === 'level_transition') {
                 levelTransitionEl.textContent = `LEVEL ${level + 1}`;
@@ -2539,7 +2568,10 @@
             const bvy = Math.sin(ship.angle) * sc(5) * bulletSpeedMult + ship.velocity.y * 0.5;
             const explosive = activePowerups.explosive > 0;
 
-            bullets.push({ x: bx, y: by, velocity: { x: bvx, y: bvy }, life: 60, explosive });
+            // Overdrive: faster bullet speed
+            const overdriveSpeedMult = overdrive ? 1.2 : 1;
+
+            bullets.push({ x: bx, y: by, velocity: { x: bvx * overdriveSpeedMult, y: bvy * overdriveSpeedMult }, life: 60, explosive });
 
             // Back shot: fire a bullet backwards too
             if (activePowerups.backshot > 0) {
@@ -2575,7 +2607,8 @@
             if (keys['Space'] && shootCooldown <= 0 && gameState === 'playing' && !overheating) {
                 shoot();
                 const fireRateBonus = activeProfile ? activeProfile.upgrades.fireRate : 0;
-                shootCooldown = Math.max(5, 15 - fireRateBonus);
+                const overdriveFireBonus = overdrive ? 0.7 : 1; // 30% faster in overdrive
+                shootCooldown = Math.max(3, (15 - fireRateBonus) * overdriveFireBonus);
             }
             shootCooldown -= dt;
 
@@ -2600,6 +2633,7 @@
             if (overheating) {
                 overheatTimer -= dt;
                 heat = Math.max(0, heat - 2 * dt);
+                overdrive = false;
                 if (overheatTimer <= 0) {
                     overheating = false;
                 }
@@ -2611,12 +2645,25 @@
                 heat = Math.max(0, heat - HEAT_DECAY * dt);
             }
 
+            // Overdrive: heat >= 50% = bonus damage and fire rate
+            overdrive = heat >= 50;
+
             // Check overheat
             if (heat >= 100) {
                 heat = 100;
                 overheating = true;
                 overheatTimer = OVERHEAT_COOLDOWN;
+                overdrive = false;
                 shootCooldown = Math.max(shootCooldown, OVERHEAT_COOLDOWN);
+            }
+
+            // Combo decay
+            if (comboTimer > 0) {
+                comboTimer -= dt;
+                if (comboTimer <= 0) {
+                    combo = 0;
+                    comboTimer = 0;
+                }
             }
         }
 
@@ -2656,7 +2703,9 @@
         function checkCollisions() {
             const explosiveRadius = sc(60);
             const scoreMultActive = activePowerups.scoremult > 0;
-            const bulletDamage = currentModifier.id === 'tiny_ship' ? 0.5 : 1;
+            const overdriveDamageBonus = overdrive ? 1.5 : 1;
+            const baseBulletDamage = currentModifier.id === 'tiny_ship' ? 0.5 : 1;
+            const bulletDamage = baseBulletDamage * overdriveDamageBonus;
 
             // Bullets vs asteroids
             for (let i = bullets.length - 1; i >= 0; i--) {
@@ -2682,7 +2731,8 @@
                                             particles.push(createParticle(ea.x, ea.y, ea.color ? ea.color.hex : '#fff', 3));
                                         }
                                         const ePoints = ea.size === 3 ? 20 : ea.size === 2 ? 50 : 100;
-                                        score += ePoints * (scoreMultActive ? 2 : 1);
+                                        const eComboMult = 1 + combo * 0.5;
+                                        score += Math.floor(ePoints * eComboMult * (scoreMultActive ? 2 : 1));
                                         if (ea.size === 1 && ea.color) spawnStarBits(ea.x, ea.y, ea.color);
                                         if (ea.size > 1) {
                                             for (let s = 0; s < 2; s++) {
@@ -2710,9 +2760,14 @@
                                 particles.push(createParticle(a.x, a.y, a.color ? a.color.hex : '#fff', 3));
                             }
 
-                            // Score based on size
+                            // Score based on size with combo and overdrive bonus
                             const points = a.size === 3 ? 20 : a.size === 2 ? 50 : 100;
-                            score += points * (scoreMultActive ? 2 : 1);
+                            const comboMult = 1 + combo * 0.5;
+                            score += Math.floor(points * comboMult * (scoreMultActive ? 2 : 1));
+
+                            // Build combo
+                            combo = Math.min(5, combo + 1);
+                            comboTimer = COMBO_TIMEOUT;
 
                             // Spawn star bits from small asteroids
                             if (a.size === 1 && a.color) {
@@ -2754,6 +2809,9 @@
                         // Shield absorbs hit
                         if (activePowerups.shield > 0) {
                             activePowerups.shield--;
+                            shieldTimer = SHIELD_DECAY_TIME;
+                            combo = 0;
+                            comboTimer = 0;
                             for (let k = 0; k < 15; k++) {
                                 particles.push(createParticle(ship.x, ship.y, '#00ffff', 3));
                             }
@@ -2775,6 +2833,8 @@
                         for (let k = 0; k < 20; k++) {
                             particles.push(createParticle(ship.x, ship.y, '#ff0000', 4));
                         }
+                        combo = 0;
+                        comboTimer = 0;
                         lives--;
                         // Reset magnet powerup on death
                         activePowerups.magnetboost = 0;
@@ -2808,7 +2868,10 @@
                 if (Math.sqrt(dx * dx + dy * dy) < p.radius + ship.radius) {
                     // Activate powerup
                     if (p.type.id === 'shield') {
-                        if (activePowerups.shield < 5) activePowerups.shield++;
+                        if (activePowerups.shield < 3) {
+                            activePowerups.shield++;
+                            shieldTimer = SHIELD_DECAY_TIME;
+                        }
                     } else {
                         activePowerups[p.type.id] = p.type.duration;
                     }
@@ -2910,10 +2973,12 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.fillRect(x, y, indicatorWidth, indicatorHeight);
 
-            // Heat fill (color: green → yellow → red)
+            // Heat fill (color: green → yellow → red, with overdrive orange)
             let color;
             if (overheating) {
                 color = Math.floor(Date.now() / 100) % 2 ? '#ff0000' : '#ff6600';
+            } else if (overdrive) {
+                color = '#ff8800'; // orange for overdrive
             } else if (heat < 50) {
                 color = '#00ff00';
             } else if (heat < 80) {
