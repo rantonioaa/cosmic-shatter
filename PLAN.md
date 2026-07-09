@@ -151,30 +151,30 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ## Phase 4: Balance & Polish ⬜ (Quick Wins)
 
-### 4A. Heat Overdrive System ⬜
-- [ ] Heat above 50% = bonus damage (1.5x) and faster fire rate (30% reduction)
-- [ ] Orange glow visual when in overdrive
-- [ ] "OVERDRIVE" HUD text when active
-- [ ] Risk/reward: overheat still triggers at 100%
+### 4A. Heat Overdrive System ✅
+- [x] Heat above 50% = bonus damage (1.5x) and faster fire rate (30% reduction)
+- [x] Orange glow visual when in overdrive
+- [x] "OVERDRIVE" HUD text when active
+- [x] Risk/reward: overheat still triggers at 100%
 
-### 4B. Shield Rework ⬜
-- [ ] Cap shield at 3 charges (from 5)
-- [ ] Add decay: each charge expires after 20 seconds
-- [ ] Shield visual pulses faster as it decays
-- [ ] Start Shield upgrade still works (1-3 charges at start)
+### 4B. Shield Rework ✅
+- [x] Cap shield at 3 charges (from 5)
+- [x] Add decay: each charge expires after 20 seconds
+- [x] Shield visual pulses faster as it decays
+- [x] Start Shield upgrade still works (1-3 charges at start)
 
-### 4C. Modifier Rebalance ⬜
-- [ ] Tiny Ship: 1.25x → 1.5x (triple penalty deserves higher reward)
-- [ ] Dark Mode: 1.5x → 1.75x (score-farming potential)
-- [ ] Glass Cannon: 2x → 2.5x (1 life + no splits is brutal)
+### 4C. Modifier Rebalance ✅
+- [x] Tiny Ship: 1.25x → 1.5x (triple penalty deserves higher reward)
+- [x] Dark Mode: 1.5x → 1.75x (score-farming potential)
+- [x] Glass Cannon: 2x → 2.5x (1 life + no splits is brutal)
 
-### 4D. Combo Scoring ⬜
-- [ ] Combo meter: destroys within 2s build combo (1x → 1.5x → 2x → 2.5x → 3x)
-- [ ] Combo decays after 3 seconds of no kills
-- [ ] Getting hit resets combo to 0
-- [ ] Star bit drops increase by 20% per combo level
-- [ ] HUD combo counter next to score
-- [ ] Screen flash on high combos (4-5x)
+### 4D. Combo Scoring ✅
+- [x] Combo meter: destroys within 2s build combo (1x → 1.5x → 2x → 2.5x → 3x)
+- [x] Combo decays after 3 seconds of no kills
+- [x] Getting hit resets combo to 0
+- [x] Star bit drops increase by 20% per combo level
+- [x] HUD combo counter next to score
+- [x] Screen flash on high combos (4-5x)
 
 ---
 
