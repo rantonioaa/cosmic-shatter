@@ -23,16 +23,22 @@
         }
         #ui {
             position: absolute;
-            top: 20px;
+            top: 16px;
             left: 50%;
-            transform: translateX(-50%) scale(var(--s, 1));
+            transform: translateX(-50%) scale(var(--u, 1));
             transform-origin: top center;
             color: #fff;
             font-family: 'Courier New', monospace;
             text-align: center;
             pointer-events: none;
-            width: 50%;
-            max-width: 640px;
+            width: 96%;
+            max-width: 600px;
+        }
+        @media (min-width: 601px) {
+            #ui { top: 20px; }
+        }
+        @media (max-width: 600px) {
+            #ui { top: 8px; }
         }
         #gameTitle {
             display: none;
@@ -271,27 +277,48 @@
         }
         #menuActions {
             display: none;
-            margin-top: 12px;
-            font-size: 12px;
-            opacity: 0.5;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: stretch;
+            gap: 3px;
+            margin-top: 10px;
         }
         #menuActions span {
-            margin: 0 4px;
+            flex: 0 1 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            padding: 5px 6px;
+            min-height: 32px;
+            line-height: 1.2;
+            border-radius: 4px;
             cursor: pointer;
             pointer-events: auto;
-            display: inline-block;
-            padding: 8px 12px;
-            min-height: 44px;
-            line-height: 44px;
-            border-radius: 4px;
             transition: background 0.15s;
         }
         #menuActions span:hover {
-            opacity: 1;
             color: #ffcc00;
         }
         #menuActions span:active {
             background: rgba(255, 255, 255, 0.08);
+        }
+        @media (max-width: 600px) {
+            #menuActions {
+                flex-wrap: wrap;
+                max-width: 360px;
+                margin-left: auto;
+                margin-right: auto;
+                gap: 6px;
+            }
+            #menuActions span {
+                flex: 1 1 30%;
+                font-size: 10px;
+                padding: 8px 4px;
+                min-height: 42px;
+            }
         }
         #pauseMenu {
             display: none;
@@ -510,29 +537,29 @@
         /* Stardust Shop */
         #stardustShopMenu {
             display: none;
-            margin-top: 12px;
+            margin-top: 10px;
         }
         .sd-title {
             font-size: 16px;
             letter-spacing: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .sd-balance {
             font-size: 13px;
             opacity: 0.9;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: #ffcc00;
         }
         .sd-tabs {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .sd-tab {
             font-size: 12px;
-            padding: 12px 16px;
-            min-height: 48px;
+            padding: 8px 14px;
+            min-height: 38px;
             display: flex;
             align-items: center;
             border: 1px solid #444;
@@ -549,74 +576,167 @@
         .sd-tab:active {
             background: rgba(255,255,255,0.08);
         }
-        .sd-list {
-            text-align: left;
-            display: inline-block;
-            min-width: 280px;
-            max-width: 340px;
+        .sd-slot-tabs {
+            display: none;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
-        .sd-section {
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: #888;
-            margin: 12px 0 6px;
+        .sd-slot-tab {
+            font-size: 9px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-        }
-        .sd-item {
-            font-size: 13px;
-            padding: 12px 10px;
-            min-height: 48px;
-            margin: 4px 0;
-            border: 1px solid #333;
+            padding: 5px 8px;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #444;
             border-radius: 3px;
-            opacity: 0.9;
+            opacity: 0.65;
+            cursor: pointer;
             pointer-events: auto;
+            white-space: nowrap;
+        }
+        .sd-slot-tab.selected {
+            opacity: 1;
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+        .sd-preview {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto 12px;
+            padding: 10px;
+            max-width: 220px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+        #sdPreviewCanvas {
+            width: 120px;
+            height: 80px;
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 3px;
+        }
+        .sd-preview-label {
+            font-size: 11px;
+            color: #aaa;
+            text-align: center;
+            line-height: 1.3;
+        }
+        .sd-preview-action {
+            font-size: 12px;
+            color: #ffcc00;
+            min-height: 16px;
+        }
+        .sd-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-width: 440px;
+            margin: 0 auto;
+            max-height: calc(100vh - 360px);
+            overflow-y: auto;
+            padding-right: 4px;
+            text-align: left;
+        }
+        .sd-list.loadouts {
+            grid-template-columns: 1fr;
+            max-width: 380px;
+        }
+        .sd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            min-height: 56px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            opacity: 0.92;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: border-color 0.12s, background 0.12s;
         }
         .sd-item.selected {
             border-color: #ffcc00;
             color: #ffcc00;
-        }
-        .sd-item.locked {
-            opacity: 0.5;
-        }
-        .sd-item.selected.locked {
-            opacity: 0.7;
+            background: rgba(255, 204, 0, 0.05);
         }
         .sd-item.equipped {
             border-color: #44cc44;
         }
-        .sd-item .sd-name {
+        .sd-item.cant-afford {
+            opacity: 0.55;
+        }
+        .sd-thumb {
+            width: 36px;
+            height: 36px;
+            flex: 0 0 36px;
+            border: 1px solid #444;
+            border-radius: 3px;
+            background: #000;
+        }
+        .sd-meta {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .sd-meta .sd-name {
+            font-size: 12px;
             font-weight: bold;
             margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .sd-item .sd-desc {
-            font-size: 11px;
+        .sd-meta .sd-desc {
+            font-size: 10px;
             opacity: 0.7;
-            margin-bottom: 4px;
+            line-height: 1.25;
         }
-        .sd-item .sd-cost {
-            font-size: 12px;
-            color: #ffcc00;
+        .sd-cost, .sd-owned, .sd-equipped {
+            font-size: 11px;
+            margin-top: 3px;
         }
-        .sd-item .sd-owned {
-            font-size: 12px;
-            color: #44cc44;
-        }
-        .sd-item .sd-equipped {
-            font-size: 12px;
-            color: #44cc44;
-        }
-        .sd-item.cant-afford {
-            opacity: 0.4;
-        }
+        .sd-cost { color: #ffcc00; }
+        .sd-owned { color: #44cc44; }
+        .sd-equipped { color: #44cc44; font-weight: bold; }
         .sd-hint {
             font-size: 11px;
             opacity: 0.4;
             margin-top: 12px;
             letter-spacing: 1px;
+        }
+        @media (max-width: 600px) {
+            .sd-list {
+                grid-template-columns: 1fr;
+                max-height: calc(100vh - 330px);
+            }
+            .sd-preview {
+                max-width: 180px;
+                padding: 8px;
+            }
+            #sdPreviewCanvas {
+                width: 100px;
+                height: 66px;
+            }
+            .sd-slot-tab {
+                font-size: 8px;
+                padding: 4px 6px;
+                min-height: 36px;
+            }
+        }
+        @media (max-height: 700px) {
+            .sd-list {
+                max-height: calc(100vh - 300px);
+            }
+            #sdPreviewCanvas {
+                width: 90px;
+                height: 60px;
+            }
         }
 
         /* Mobile touch controls */
@@ -836,10 +956,8 @@
                 width: 28px;
                 height: 28px;
             }
-            .sd-tab { font-size: 11px; padding: 5px 8px; }
-            .sd-item { font-size: 12px; padding: 6px 8px; }
-            .sd-item .sd-name { font-size: 12px; }
-            .sd-item .sd-desc { font-size: 10px; }
+            .sd-tab { font-size: 11px; padding: 5px 8px; min-height: 32px; }
+            .sd-slot-tab { font-size: 8px; padding: 4px 6px; min-height: 32px; }
             #highscores {
                 font-size: 14px !important;
                 opacity: 0.7 !important;
@@ -924,9 +1042,15 @@
                 <div class="sd-tab selected" data-tap-action="sd_tab" data-tap-index="0">Loadouts</div>
                 <div class="sd-tab" data-tap-action="sd_tab" data-tap-index="1">Cosmetics</div>
             </div>
+            <div class="sd-slot-tabs" id="stardustSlotTabs"></div>
+            <div class="sd-preview" id="stardustPreview">
+                <canvas id="sdPreviewCanvas" width="120" height="80"></canvas>
+                <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
+                <div class="sd-preview-action" id="sdPreviewAction"></div>
+            </div>
             <div class="sd-list" id="stardustList"></div>
-            <div class="sd-hint">LEFT/RIGHT tab · UP/DOWN browse · ENTER unlock · ESC back</div>
-            <div class="touch-hint">Tap tab · Tap item to unlock · Tap Back to exit</div>
+            <div class="sd-hint" id="sdHint">W/S browse · Q/E tab · ENTER buy · ESC back</div>
+            <div class="touch-hint">Tap tab, slot, or item · Tap Back to exit</div>
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
     </div>
@@ -975,6 +1099,11 @@
         const stardustBalanceEl = document.getElementById('stardustBalance');
         const stardustListEl = document.getElementById('stardustList');
         const stardustTabsEl = document.getElementById('stardustTabs');
+        const stardustSlotTabsEl = document.getElementById('stardustSlotTabs');
+        const sdPreviewCanvas = document.getElementById('sdPreviewCanvas');
+        const sdPreviewLabelEl = document.getElementById('sdPreviewLabel');
+        const sdPreviewActionEl = document.getElementById('sdPreviewAction');
+        const sdHintEl = document.getElementById('sdHint');
 
         // Resolution options
         const LANDSCAPE_RESOLUTIONS = [
@@ -1057,8 +1186,11 @@
         let SCALE = Math.min(canvas.width, canvas.height) / 720;
         function sc(v) { return v * SCALE; }
         function applyScale() {
+            SCALE = Math.min(canvas.width, canvas.height) / 720;
+            const UI_SCALE = Math.min(Math.max(SCALE, 0.9), 1.2);
             document.documentElement.style.setProperty('--s', SCALE);
-            comboBarEl.style.width = sc(200) + 'px';
+            document.documentElement.style.setProperty('--u', UI_SCALE);
+            comboBarEl.style.width = (200 * SCALE / UI_SCALE) + 'px';
         }
         applyScale();
         applyCanvasStyle();
@@ -1327,7 +1459,8 @@
             ]}
         ];
         let sdShopTab = 0;
-        let sdShopIndex = 0;
+        let sdShopSlot = 0;
+        let sdShopItem = 0;
 
         function getStardustUnlocksOwned() {
             if (!activeProfile) return { loadouts: [], cosmetics: {} };
@@ -1370,6 +1503,230 @@
         function getCosmeticDeathId() {
             if (!activeProfile || !activeProfile.stardustUnlocks?.cosmetics) return 'death_standard';
             return activeProfile.stardustUnlocks.cosmetics.death || 'death_standard';
+        }
+
+        // Preview drawing helpers
+        function cosmeticColor(item) {
+            if (!item || !item.color) return '#ffffff';
+            if (item.color === 'prismatic') {
+                return `hsl(${(Date.now() / 20) % 360}, 100%, 60%)`;
+            }
+            return item.color;
+        }
+
+        function drawBulletShape(ctx, shape, r) {
+            ctx.beginPath();
+            if (shape === 'diamond') {
+                ctx.moveTo(0, -r); ctx.lineTo(r * 0.6, 0); ctx.lineTo(0, r); ctx.lineTo(-r * 0.6, 0);
+                ctx.closePath();
+            } else if (shape === 'triangle') {
+                ctx.moveTo(0, -r); ctx.lineTo(r, r * 0.7); ctx.lineTo(-r, r * 0.7);
+                ctx.closePath();
+            } else if (shape === 'square') {
+                ctx.rect(-r * 0.6, -r * 0.6, r * 1.2, r * 1.2);
+            } else if (shape === 'star') {
+                for (let i = 0; i < 5; i++) {
+                    const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+                }
+                ctx.closePath();
+            } else {
+                ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2);
+            }
+        }
+
+        function drawStarbitShape(ctx, shape, r) {
+            ctx.beginPath();
+            if (shape === 'heart') {
+                ctx.moveTo(0, r * 0.3);
+                ctx.bezierCurveTo(-r, -r * 0.3, -r * 0.5, -r, 0, -r * 0.5);
+                ctx.bezierCurveTo(r * 0.5, -r, r, -r * 0.3, 0, r * 0.3);
+            } else if (shape === 'diamond') {
+                ctx.moveTo(0, -r); ctx.lineTo(r * 0.6, 0); ctx.lineTo(0, r); ctx.lineTo(-r * 0.6, 0);
+                ctx.closePath();
+            } else if (shape === 'moon') {
+                ctx.arc(0, 0, r, -Math.PI * 0.8, Math.PI * 0.8);
+                ctx.arc(r * 0.3, 0, r * 0.6, Math.PI * 0.8, -Math.PI * 0.8, true);
+            } else if (shape === 'crystal') {
+                ctx.moveTo(0, -r); ctx.lineTo(r * 0.4, -r * 0.2); ctx.lineTo(r * 0.3, r * 0.6);
+                ctx.lineTo(-r * 0.3, r * 0.6); ctx.lineTo(-r * 0.4, -r * 0.2);
+                ctx.closePath();
+            } else if (shape === 'cube') {
+                const t = Date.now() / 500;
+                const cos = Math.cos(t), sin = Math.sin(t);
+                ctx.moveTo(r * cos, -r * 0.5);
+                ctx.lineTo(r * 0.5 * cos + r * 0.3 * sin, -r * 0.5 + r * 0.3);
+                ctx.lineTo(r * 0.5 * cos + r * 0.3 * sin, r * 0.3);
+                ctx.lineTo(r * cos, r * 0.5 + r * 0.3);
+                ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, r * 0.5 + r * 0.3);
+                ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, -r * 0.5 + r * 0.3);
+                ctx.closePath();
+            } else {
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                    const rad = i % 2 === 0 ? r : r * 0.4;
+                    ctx.lineTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
+                }
+                ctx.closePath();
+            }
+        }
+
+        function drawPowerupShape(ctx, shape, r) {
+            ctx.beginPath();
+            if (shape === 'orb' || shape === 'core') {
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+            } else if (shape === 'polygon') {
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                    ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                }
+                ctx.closePath();
+            } else if (shape === 'ring') {
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2, true);
+            } else if (shape === 'runestone') {
+                ctx.rect(-r * 0.5, -r * 0.7, r, r * 1.4);
+            } else if (shape === 'card') {
+                ctx.rect(-r * 0.6, -r * 0.8, r * 1.2, r * 1.6);
+            } else if (shape === 'egg') {
+                ctx.ellipse(0, 0, r * 0.6, r, 0, 0, Math.PI * 2);
+            } else if (shape === 'relic') {
+                ctx.rect(-r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
+                ctx.rect(-r * 0.5, -r * 0.5, r, r);
+            } else {
+                ctx.moveTo(0, -r); ctx.lineTo(r * 0.7, 0); ctx.lineTo(0, r); ctx.lineTo(-r * 0.7, 0);
+                ctx.closePath();
+            }
+        }
+
+        function drawDeathPreview(ctx, id, r) {
+            r = r || 12;
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 1.5;
+            if (id === 'death_shockwave' || id === 'death_annihilation') {
+                ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2); ctx.stroke();
+            } else if (id === 'death_supernova') {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(0, 0, r * 0.3, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#ffcc00';
+                for (let i = 0; i < 8; i++) {
+                    const a = (i / 8) * Math.PI * 2;
+                    ctx.beginPath(); ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); ctx.stroke();
+                }
+            } else if (id === 'death_blackhole') {
+                ctx.fillStyle = '#220044';
+                ctx.beginPath(); ctx.arc(0, 0, r * 0.8, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#cc66ff';
+                ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+            } else if (id === 'death_glitch') {
+                const colors = ['#ff0000', '#00ff00', '#0000ff'];
+                for (let i = 0; i < 6; i++) {
+                    ctx.fillStyle = colors[i % 3];
+                    ctx.fillRect(-r + Math.random() * r * 2, -r + Math.random() * r * 2, 4, 4);
+                }
+            } else {
+                for (let i = 0; i < 8; i++) {
+                    const a = (i / 8) * Math.PI * 2;
+                    ctx.beginPath(); ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); ctx.stroke();
+                }
+            }
+        }
+
+        // 36x36 thumbnail on each card
+        function drawCosmeticThumb(canvas, slot, itemId) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+            ctx.save();
+            ctx.translate(w / 2, h / 2);
+            const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
+            if (!slotDef) { ctx.restore(); return; }
+            const item = slotDef.items.find(i => i.id === itemId);
+            if (!item) { ctx.restore(); return; }
+            const color = cosmeticColor(item);
+
+            if (slot === 'hull') {
+                ctx.strokeStyle = color; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-8, -6); ctx.lineTo(-5, 0); ctx.lineTo(-8, 6); ctx.closePath(); ctx.stroke();
+            } else if (slot === 'bullets') {
+                ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 4;
+                drawBulletShape(ctx, item.shape, 6); ctx.fill(); ctx.shadowBlur = 0;
+            } else if (slot === 'thruster') {
+                ctx.strokeStyle = color; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(0, -4); ctx.lineTo(-10, 0); ctx.lineTo(0, 4); ctx.stroke();
+            } else if (slot === 'death') {
+                drawDeathPreview(ctx, item.id, 10);
+            } else if (slot === 'starbits') {
+                ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 4;
+                drawStarbitShape(ctx, item.shape, 8); ctx.fill(); ctx.shadowBlur = 0;
+            } else if (slot === 'powerups') {
+                ctx.fillStyle = '#00ffff'; ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 4;
+                drawPowerupShape(ctx, item.shape, 10); ctx.fill(); ctx.shadowBlur = 0;
+            }
+            ctx.restore();
+        }
+
+        // 120x80 composite preview
+        function updateStardustPreview(slot, itemId, balance) {
+            const ctx = sdPreviewCanvas.getContext('2d');
+            const w = sdPreviewCanvas.width, h = sdPreviewCanvas.height;
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+
+            if (slot === 'loadout' || !itemId) {
+                const item = SD_LOADOUTS.find(l => l.id === itemId);
+                sdPreviewLabelEl.textContent = item ? item.name : '';
+                sdPreviewActionEl.textContent = item ? item.desc : '';
+                sdPreviewActionEl.style.color = '#aaa';
+                return;
+            }
+
+            const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
+            if (!slotDef) return;
+            const item = slotDef.items.find(i => i.id === itemId);
+            if (!item) return;
+            const owned = item.cost === 0 || activeProfile?.stardustUnlocks?.ownedCosmetics?.includes(itemId);
+            const equipped = activeProfile?.stardustUnlocks?.cosmetics?.[slot] === itemId;
+
+            sdPreviewLabelEl.textContent = item.name + (equipped ? ' — EQUIPPED' : '');
+            if (owned || item.cost === 0) {
+                sdPreviewActionEl.textContent = 'ENTER to equip';
+                sdPreviewActionEl.style.color = '#44cc44';
+            } else if (balance >= item.cost) {
+                sdPreviewActionEl.textContent = `${item.cost} ✦ — ENTER to buy`;
+                sdPreviewActionEl.style.color = '#ffcc00';
+            } else {
+                sdPreviewActionEl.textContent = `${item.cost} ✦ (need ${item.cost - balance} more)`;
+                sdPreviewActionEl.style.color = '#ff4444';
+            }
+
+            const hullId = activeProfile?.stardustUnlocks?.cosmetics?.hull || 'hull_spectre';
+            const hullItem = SD_COSMETIC_SLOTS[0].items.find(i => i.id === (slot === 'hull' ? itemId : hullId));
+            const hullColor = cosmeticColor(hullItem);
+
+            ctx.save(); ctx.translate(w / 2, h / 2);
+            // Ship
+            ctx.strokeStyle = hullColor; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(-14, -11); ctx.lineTo(-9, 0); ctx.lineTo(-14, 11); ctx.closePath(); ctx.stroke();
+            // Slot overlay
+            if (slot === 'bullets') {
+                ctx.fillStyle = cosmeticColor(item); ctx.shadowColor = cosmeticColor(item); ctx.shadowBlur = 6;
+                drawBulletShape(ctx, item.shape, 8); ctx.fill(); ctx.shadowBlur = 0;
+            } else if (slot === 'thruster') {
+                ctx.strokeStyle = cosmeticColor(item); ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(-22, 0); ctx.lineTo(-10, 5); ctx.stroke();
+            } else if (slot === 'death') {
+                ctx.save(); ctx.translate(24, 0); drawDeathPreview(ctx, item.id, 14); ctx.restore();
+            } else if (slot === 'starbits') {
+                ctx.save(); ctx.translate(22, -18); ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 5;
+                drawStarbitShape(ctx, item.shape, 10); ctx.fill(); ctx.restore();
+            } else if (slot === 'powerups') {
+                ctx.save(); ctx.translate(-22, 18); ctx.fillStyle = '#00ffff'; ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 6;
+                drawPowerupShape(ctx, item.shape, 12); ctx.fill(); ctx.restore();
+            }
+            ctx.restore();
         }
 
         let currentModifier = MODIFIERS[0];
@@ -1828,56 +2185,96 @@
         function renderStardustShop() {
             const balance = activeProfile ? (activeProfile.stardust ?? 0) : 0;
             stardustBalanceEl.textContent = balance;
+
+            // Top tabs
             const tabs = stardustTabsEl.querySelectorAll('.sd-tab');
             tabs.forEach((t, i) => t.classList.toggle('selected', i === sdShopTab));
-            const tabName = SD_TAB_NAMES[sdShopTab];
+
+            // Slot tabs (cosmetics only)
+            if (sdShopTab === 1) {
+                stardustSlotTabsEl.style.display = 'flex';
+                let slotHtml = '';
+                SD_COSMETIC_SLOTS.forEach((def, i) => {
+                    const cls = i === sdShopSlot ? ' selected' : '';
+                    slotHtml += `<div class="sd-slot-tab${cls}" data-tap-action="sd_slot" data-tap-index="${i}">${def.label}</div>`;
+                });
+                stardustSlotTabsEl.innerHTML = slotHtml;
+            } else {
+                stardustSlotTabsEl.style.display = 'none';
+                stardustSlotTabsEl.innerHTML = '';
+            }
+
+            // Build list
             let html = '';
-            if (tabName === 'loadouts') {
-                const owned = activeProfile ? (activeProfile.stardustUnlocks?.loadouts || []) : [];
+            let previewSlot = null;
+            let previewItemId = null;
+
+            if (sdShopTab === 0) {
+                // Loadouts
+                stardustListEl.classList.add('loadouts');
                 const equipped = activeProfile ? activeProfile.selectedLoadout : 'standard';
+
                 SD_LOADOUTS.forEach((item, i) => {
-                    const isOwned = owned.includes(item.id) || item.cost === 0;
+                    const isOwned = item.cost === 0 || activeProfile?.stardustUnlocks?.loadouts?.includes(item.id);
                     const isEquipped = equipped === item.id;
-                    const isSelected = i === sdShopIndex;
+                    const isSelected = i === sdShopItem;
                     const canAfford = balance >= item.cost;
-                    const selClass = isSelected ? ' selected' : '';
-                    const equipClass = isEquipped ? ' equipped' : '';
-                    const affordClass = !isOwned && !canAfford ? ' cant-afford' : '';
+
                     let statusHtml = '';
                     if (isEquipped) statusHtml = '<span class="sd-equipped">EQUIPPED</span>';
                     else if (isOwned) statusHtml = '<span class="sd-owned">OWNED — ENTER to equip</span>';
                     else statusHtml = `<span class="sd-cost">${item.cost} ✦</span>`;
-                    html += `<div class="sd-item${selClass}${equipClass}${affordClass}" data-tap-action="sd_item" data-tap-index="${i}">`
-                        + `<div class="sd-name">${item.name}</div>`
-                        + `<div class="sd-desc">${item.desc}</div>`
-                        + statusHtml + `</div>`;
+
+                    html += `<div class="sd-item${isSelected ? ' selected' : ''}${isEquipped ? ' equipped' : ''}${!isOwned && !canAfford ? ' cant-afford' : ''}" data-tap-action="sd_item" data-tap-index="${i}">`
+                        + `<div class="sd-meta"><div class="sd-name">${item.name}</div><div class="sd-desc">${item.desc}</div>${statusHtml}</div></div>`;
                 });
+
+                previewSlot = 'loadout';
+                previewItemId = SD_LOADOUTS[sdShopItem]?.id;
             } else {
-                let flatIdx = 0;
-                SD_COSMETIC_SLOTS.forEach((slotDef, si) => {
-                    html += `<div class="sd-section">${slotDef.label}</div>`;
-                    const equipped = activeProfile ? activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] : slotDef.items[0].id;
-                    slotDef.items.forEach((item, ii) => {
-                        const isSelected = flatIdx === sdShopIndex;
-                        const isOwned = item.cost === 0 || (activeProfile && activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] === item.id) || (activeProfile && activeProfile.stardustUnlocks?.ownedCosmetics?.includes(item.id));
-                        const isEquipped = equipped === item.id;
-                        const canAfford = balance >= item.cost;
-                        const selClass = isSelected ? ' selected' : '';
-                        const equipClass = isEquipped ? ' equipped' : '';
-                        const affordClass = !isOwned && !canAfford ? ' cant-afford' : '';
-                        let statusHtml = '';
-                        if (isEquipped) statusHtml = '<span class="sd-equipped">EQUIPPED</span>';
-                        else if (isOwned) statusHtml = '<span class="sd-owned">OWNED — ENTER to equip</span>';
-                        else statusHtml = `<span class="sd-cost">${item.cost} ✦</span>`;
-                        html += `<div class="sd-item${selClass}${equipClass}${affordClass}" data-tap-action="sd_cosmetic" data-tap-slot="${slotDef.slot}" data-tap-index="${ii}">`
-                            + `<div class="sd-name">${item.name}</div>`
-                            + `<div class="sd-desc">${item.desc}</div>`
-                            + statusHtml + `</div>`;
-                        flatIdx++;
-                    });
+                // Cosmetics
+                stardustListEl.classList.remove('loadouts');
+                const slotDef = SD_COSMETIC_SLOTS[sdShopSlot];
+                const equipped = activeProfile?.stardustUnlocks?.cosmetics?.[slotDef.slot] || slotDef.items[0].id;
+
+                slotDef.items.forEach((item, i) => {
+                    const isOwned = item.cost === 0 || activeProfile?.stardustUnlocks?.ownedCosmetics?.includes(item.id);
+                    const isEquipped = equipped === item.id;
+                    const isSelected = i === sdShopItem;
+                    const canAfford = balance >= item.cost;
+
+                    let statusHtml = '';
+                    if (isEquipped) statusHtml = '<span class="sd-equipped">EQUIPPED</span>';
+                    else if (isOwned) statusHtml = '<span class="sd-owned">OWNED</span>';
+                    else statusHtml = `<span class="sd-cost">${item.cost} ✦</span>`;
+
+                    html += `<div class="sd-item${isSelected ? ' selected' : ''}${isEquipped ? ' equipped' : ''}${!isOwned && !canAfford ? ' cant-afford' : ''}" data-tap-action="sd_cosmetic" data-tap-slot="${slotDef.slot}" data-tap-index="${i}">`
+                        + `<canvas class="sd-thumb" width="36" height="36" data-slot="${slotDef.slot}" data-item="${item.id}"></canvas>`
+                        + `<div class="sd-meta"><div class="sd-name">${item.name}</div>${statusHtml}</div></div>`;
+                });
+
+                previewSlot = slotDef.slot;
+                previewItemId = slotDef.items[sdShopItem]?.id;
+            }
+
+            stardustListEl.innerHTML = html;
+
+            // Draw cosmetic thumbnails
+            if (sdShopTab === 1) {
+                stardustListEl.querySelectorAll('.sd-thumb').forEach(cvs => {
+                    drawCosmeticThumb(cvs, cvs.dataset.slot, cvs.dataset.item);
                 });
             }
-            stardustListEl.innerHTML = html;
+
+            // Update preview + hint
+            updateStardustPreview(previewSlot, previewItemId, balance);
+            sdHintEl.textContent = sdShopTab === 0
+                ? 'W/S loadout · Q/E tab · ENTER equip · ESC back'
+                : 'A/D slot · W/S item · Q/E tab · ENTER buy/equip · ESC back';
+
+            // Keep selected item visible
+            const selectedEl = stardustListEl.querySelector('.sd-item.selected');
+            if (selectedEl) selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
 
         function buyStardustUnlock(category, id) {
@@ -2049,7 +2446,8 @@
                 if (gameState === 'menu' && activeProfile) {
                     gameState = 'stardust_shop';
                     sdShopTab = 0;
-                    sdShopIndex = 0;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
                     updateUI();
                     return;
                 }
@@ -2313,45 +2711,48 @@
 
             // Stardust Shop
             if (gameState === 'stardust_shop') {
-                const tabName = SD_TAB_NAMES[sdShopTab];
-                let items = [];
-                if (tabName === 'loadouts') {
-                    items = SD_LOADOUTS;
-                } else {
-                    SD_COSMETIC_SLOTS.forEach(slot => {
-                        slot.items.forEach(item => items.push(item));
-                    });
-                }
-                const total = items.length;
-                if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                if (e.code === 'KeyQ' || e.code === 'ArrowLeft') {
+                    // Switch top tab left
                     e.preventDefault();
-                    sdShopTab = (sdShopTab - 1 + SD_TAB_NAMES.length) % SD_TAB_NAMES.length;
-                    sdShopIndex = 0;
-                } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                    sdShopTab = (sdShopTab - 1 + 2) % 2;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
+                } else if (e.code === 'KeyE' || e.code === 'ArrowRight') {
+                    // Switch top tab right
                     e.preventDefault();
-                    sdShopTab = (sdShopTab + 1) % SD_TAB_NAMES.length;
-                    sdShopIndex = 0;
+                    sdShopTab = (sdShopTab + 1) % 2;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
+                } else if (sdShopTab === 1 && (e.code === 'KeyA' || e.code === 'KeyZ')) {
+                    // Switch cosmetic slot left
+                    e.preventDefault();
+                    sdShopSlot = (sdShopSlot - 1 + SD_COSMETIC_SLOTS.length) % SD_COSMETIC_SLOTS.length;
+                    sdShopItem = 0;
+                } else if (sdShopTab === 1 && (e.code === 'KeyD' || e.code === 'KeyX')) {
+                    // Switch cosmetic slot right
+                    e.preventDefault();
+                    sdShopSlot = (sdShopSlot + 1) % SD_COSMETIC_SLOTS.length;
+                    sdShopItem = 0;
                 } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+                    // Navigate items up
                     e.preventDefault();
-                    sdShopIndex = (sdShopIndex - 1 + total) % total;
+                    const items = sdShopTab === 0 ? SD_LOADOUTS : SD_COSMETIC_SLOTS[sdShopSlot].items;
+                    sdShopItem = (sdShopItem - 1 + items.length) % items.length;
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+                    // Navigate items down
                     e.preventDefault();
-                    sdShopIndex = (sdShopIndex + 1) % total;
+                    const items = sdShopTab === 0 ? SD_LOADOUTS : SD_COSMETIC_SLOTS[sdShopSlot].items;
+                    sdShopItem = (sdShopItem + 1) % items.length;
                 } else if (e.code === 'Enter' || e.code === 'Space') {
+                    // Buy or equip
                     e.preventDefault();
-                    if (tabName === 'loadouts') {
-                        const item = SD_LOADOUTS[sdShopIndex];
+                    if (sdShopTab === 0) {
+                        const item = SD_LOADOUTS[sdShopItem];
                         if (item) buyStardustUnlock('loadouts', item.id);
                     } else {
-                        // Find which cosmetic slot and item
-                        let globalIdx = sdShopIndex;
-                        for (const slotDef of SD_COSMETIC_SLOTS) {
-                            if (globalIdx < slotDef.items.length) {
-                                buyOrEquipCosmetic(slotDef.slot, slotDef.items[globalIdx].id);
-                                break;
-                            }
-                            globalIdx -= slotDef.items.length;
-                        }
+                        const slotDef = SD_COSMETIC_SLOTS[sdShopSlot];
+                        const item = slotDef.items[sdShopItem];
+                        if (item) buyOrEquipCosmetic(slotDef.slot, item.id);
                     }
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
@@ -3054,7 +3455,7 @@
                 if (activeProfile) {
                     scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆ · ${activeProfile.stardust ?? 0} ✦`;
                     scoreEl.style.display = 'block';
-                    menuActionsEl.style.display = 'block';
+                    menuActionsEl.style.display = 'flex';
                     const hasRun = activeProfile.activeRun != null;
                     btnResumeEl.style.display = hasRun ? 'inline' : 'none';
                     btnStardustShopEl.style.display = 'inline';
@@ -4146,10 +4547,11 @@
                         shopMenuIndex = 0;
                         updateUI();
                     } else if (action === 'stardust_shop') {
-                        gameState = 'stardust_shop';
-                        sdShopTab = 0;
-                        sdShopIndex = 0;
-                        updateUI();
+                    gameState = 'stardust_shop';
+                    sdShopTab = 0;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
+                    updateUI();
                     } else if (action === 'export') {
                         if (activeProfile) exportProfile(activeProfile);
                     } else if (action === 'import') {
@@ -4293,27 +4695,23 @@
                 } else if (gameState === 'stardust_shop') {
                     if (action === 'sd_tab' && idx !== null) {
                         sdShopTab = parseInt(idx);
-                        sdShopIndex = 0;
+                        sdShopSlot = 0;
+                        sdShopItem = 0;
+                        renderStardustShop();
+                    } else if (action === 'sd_slot' && idx !== null) {
+                        sdShopSlot = parseInt(idx);
+                        sdShopItem = 0;
                         renderStardustShop();
                     } else if (action === 'sd_item' && idx !== null) {
-                        sdShopIndex = parseInt(idx);
-                        buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopIndex].id);
+                        sdShopItem = parseInt(idx);
+                        buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopItem].id);
                         renderStardustShop();
                     } else if (action === 'sd_cosmetic' && idx !== null) {
                         const slot = el.getAttribute('data-tap-slot');
-                        const itemIdx = parseInt(idx);
-                        // Compute flat index for sdShopIndex
-                        let flatIdx = 0;
-                        for (const slotDef of SD_COSMETIC_SLOTS) {
-                            if (slotDef.slot === slot) {
-                                sdShopIndex = flatIdx + itemIdx;
-                                break;
-                            }
-                            flatIdx += slotDef.items.length;
-                        }
+                        sdShopItem = parseInt(idx);
                         const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
-                        if (slotDef && slotDef.items[itemIdx]) {
-                            buyOrEquipCosmetic(slot, slotDef.items[itemIdx].id);
+                        if (slotDef && slotDef.items[sdShopItem]) {
+                            buyOrEquipCosmetic(slot, slotDef.items[sdShopItem].id);
                         }
                         renderStardustShop();
                     }
@@ -4410,7 +4808,8 @@
                 } else if (action === 'stardust_shop') {
                     gameState = 'stardust_shop';
                     sdShopTab = 0;
-                    sdShopIndex = 0;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
                     updateUI();
                 } else if (action === 'export') {
                     if (activeProfile) exportProfile(activeProfile);
@@ -4552,26 +4951,23 @@
             } else if (gameState === 'stardust_shop') {
                 if (action === 'sd_tab' && idx !== null) {
                     sdShopTab = parseInt(idx);
-                    sdShopIndex = 0;
+                    sdShopSlot = 0;
+                    sdShopItem = 0;
+                    renderStardustShop();
+                } else if (action === 'sd_slot' && idx !== null) {
+                    sdShopSlot = parseInt(idx);
+                    sdShopItem = 0;
                     renderStardustShop();
                 } else if (action === 'sd_item' && idx !== null) {
-                    sdShopIndex = parseInt(idx);
-                    buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopIndex].id);
+                    sdShopItem = parseInt(idx);
+                    buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopItem].id);
                     renderStardustShop();
                 } else if (action === 'sd_cosmetic' && idx !== null) {
                     const slot = target.getAttribute('data-tap-slot');
-                    const itemIdx = parseInt(idx);
-                    let flatIdx = 0;
-                    for (const slotDef of SD_COSMETIC_SLOTS) {
-                        if (slotDef.slot === slot) {
-                            sdShopIndex = flatIdx + itemIdx;
-                            break;
-                        }
-                        flatIdx += slotDef.items.length;
-                    }
+                    sdShopItem = parseInt(idx);
                     const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
-                    if (slotDef && slotDef.items[itemIdx]) {
-                        buyOrEquipCosmetic(slot, slotDef.items[itemIdx].id);
+                    if (slotDef && slotDef.items[sdShopItem]) {
+                        buyOrEquipCosmetic(slot, slotDef.items[sdShopItem].id);
                     }
                     renderStardustShop();
                 }
