@@ -507,6 +507,111 @@
             letter-spacing: 1px;
         }
 
+        /* Stardust Shop */
+        #stardustShopMenu {
+            display: none;
+            margin-top: 12px;
+        }
+        .sd-title {
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .sd-balance {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            color: #ffcc00;
+        }
+        .sd-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .sd-tab {
+            font-size: 12px;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            border-radius: 3px;
+            opacity: 0.6;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .sd-tab.selected {
+            opacity: 1;
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+        .sd-tab:active {
+            background: rgba(255,255,255,0.08);
+        }
+        .sd-list {
+            text-align: left;
+            display: inline-block;
+            min-width: 280px;
+            max-width: 400px;
+        }
+        .sd-section {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #888;
+            margin: 12px 0 6px;
+            text-transform: uppercase;
+        }
+        .sd-item {
+            font-size: 13px;
+            padding: 8px 10px;
+            margin: 4px 0;
+            border: 1px solid #333;
+            border-radius: 3px;
+            opacity: 0.9;
+            pointer-events: auto;
+        }
+        .sd-item.selected {
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+        .sd-item.locked {
+            opacity: 0.5;
+        }
+        .sd-item.selected.locked {
+            opacity: 0.7;
+        }
+        .sd-item.equipped {
+            border-color: #44cc44;
+        }
+        .sd-item .sd-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .sd-item .sd-desc {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        .sd-item .sd-cost {
+            font-size: 12px;
+            color: #ffcc00;
+        }
+        .sd-item .sd-owned {
+            font-size: 12px;
+            color: #44cc44;
+        }
+        .sd-item .sd-equipped {
+            font-size: 12px;
+            color: #44cc44;
+        }
+        .sd-item.cant-afford {
+            opacity: 0.4;
+        }
+        .sd-hint {
+            font-size: 11px;
+            opacity: 0.4;
+            margin-top: 12px;
+            letter-spacing: 1px;
+        }
+
         /* Mobile touch controls */
         [data-tap-action] {
             pointer-events: auto;
@@ -724,6 +829,10 @@
                 width: 28px;
                 height: 28px;
             }
+            .sd-tab { font-size: 11px; padding: 5px 8px; }
+            .sd-item { font-size: 12px; padding: 6px 8px; }
+            .sd-item .sd-name { font-size: 12px; }
+            .sd-item .sd-desc { font-size: 10px; }
             #highscores {
                 font-size: 14px !important;
                 opacity: 0.7 !important;
@@ -761,6 +870,7 @@
             <span id="btnProfile" data-tap-action="profile">[P] Profile</span>
             <span id="btnGraphics" data-tap-action="graphics">[G] Graphics</span>
             <span id="btnShop" data-tap-action="shop">[S] Shop</span>
+            <span id="btnStardustShop" data-tap-action="stardust_shop">[U] Unlocks</span>
         </div>
         <div id="profileSelect">
             <div class="ps-title">SELECT PROFILE</div>
@@ -798,6 +908,18 @@
             <div class="shop-grid" id="shopGrid"></div>
             <div class="shop-hint">ARROWS browse · ENTER buy · ESC back</div>
             <div class="touch-hint">Tap an upgrade to buy · Tap Back to exit</div>
+            <div class="back-btn" data-tap-action="back">&larr; Back</div>
+        </div>
+        <div id="stardustShopMenu">
+            <div class="sd-title">STARDUST UNLOCKS</div>
+            <div class="sd-balance">✦ Stardust: <span id="stardustBalance">0</span></div>
+            <div class="sd-tabs" id="stardustTabs">
+                <div class="sd-tab selected" data-tap-action="sd_tab" data-tap-index="0">Loadouts</div>
+                <div class="sd-tab" data-tap-action="sd_tab" data-tap-index="1">Cosmetics</div>
+            </div>
+            <div class="sd-list" id="stardustList"></div>
+            <div class="sd-hint">LEFT/RIGHT tab · UP/DOWN browse · ENTER unlock · ESC back</div>
+            <div class="touch-hint">Tap tab · Tap item to unlock · Tap Back to exit</div>
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
     </div>
@@ -841,6 +963,11 @@
         const shopBalanceEl = document.getElementById('shopBalance');
         const comboBarEl = document.getElementById('comboBar');
         const comboFillEl = document.getElementById('comboFill');
+        const btnStardustShopEl = document.getElementById('btnStardustShop');
+        const stardustShopMenuEl = document.getElementById('stardustShopMenu');
+        const stardustBalanceEl = document.getElementById('stardustBalance');
+        const stardustListEl = document.getElementById('stardustList');
+        const stardustTabsEl = document.getElementById('stardustTabs');
 
         // Resolution options
         const LANDSCAPE_RESOLUTIONS = [
@@ -955,13 +1082,14 @@
         window.addEventListener('resize', applyCanvasStyle);
 
         // Game state
-        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover
+        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop
         let score = 0;
         let lives = 3;
         let level = 1;
         let lastHighScoreRank = -1;
         let lastScore = 0;
         let lastLevel = 1;
+        let lastStardustEarned = 0;
         let levelTransitionTimer = 0;
 
         // Heat system
@@ -1004,6 +1132,21 @@
             { id: 'gold',   hex: '#ffcc00', weight: 5,  health: 1, speedMult: 1.5, starBits: 5, behavior: 'rare' }
         ];
         const ASTEROID_WEIGHT_TOTAL = ASTEROID_COLORS.reduce((s, c) => s + c.weight, 0);
+
+        // Golden Lure asteroid (distinct from regular Gold)
+        const GOLDEN_LURE = {
+            id: 'golden_lure',
+            hex: '#fffacd',
+            coreHex: '#ffffff',
+            trailHex: '#ffd700',
+            health: 2,
+            speedMult: 2.2,
+            starBits: 8,
+            scoreMult: 3,
+            basePoints: 100,
+            radiusMult: 1.8,
+            behavior: 'lure'
+        };
 
         // Difficulty scaling (capped at level 20)
         function getLevelCap() { return Math.min(level, 20); }
@@ -1103,6 +1246,125 @@
             return Math.floor(upg.baseCost * Math.pow(upg.costMult, level));
         }
 
+        // Stardust shop data
+        const SD_TAB_NAMES = ['loadouts', 'cosmetics'];
+        const SD_LOADOUTS = [
+            { id: 'standard', name: 'Standard', desc: 'Default loadout', cost: 0 },
+            { id: 'spread_shot', name: 'Spread Shot', desc: '3-way spread fire', cost: 800 },
+            { id: 'rapid_fire', name: 'Rapid Fire', desc: '+50% fire rate', cost: 1200 },
+            { id: 'piercing_bolt', name: 'Piercing Bolt', desc: 'Bullets pierce 1 asteroid', cost: 2000 },
+            { id: 'missiles', name: 'Missiles', desc: 'Explosive projectiles', cost: 3500 }
+        ];
+        const SD_COSMETIC_SLOTS = [
+            { slot: 'hull', label: 'Ship Hull', items: [
+                { id: 'hull_spectre', name: 'Spectre White', desc: 'Default white wireframe', cost: 0, color: '#ffffff' },
+                { id: 'hull_void', name: 'Void Black', desc: 'Near-black with white outline', cost: 80, color: '#222222' },
+                { id: 'hull_crimson', name: 'Crimson Star', desc: 'Blood-red wireframe', cost: 160, color: '#ff3333' },
+                { id: 'hull_abyss', name: 'Abyss Blue', desc: 'Deep blue wireframe', cost: 260, color: '#3366ff' },
+                { id: 'hull_verdant', name: 'Verdant Core', desc: 'Neon green wireframe', cost: 400, color: '#33ff66' },
+                { id: 'hull_solar', name: 'Solar Gold', desc: 'Golden yellow wireframe', cost: 600, color: '#ffcc00' },
+                { id: 'hull_plasma', name: 'Plasma Purple', desc: 'Violet wireframe', cost: 800, color: '#cc33ff' },
+                { id: 'hull_rose', name: 'Rose Nebula', desc: 'Pink/magenta wireframe', cost: 1150, color: '#ff66cc' },
+                { id: 'hull_prismatic', name: 'Prismatic', desc: 'Rainbow hue cycling', cost: 1400, color: 'prismatic' }
+            ]},
+            { slot: 'bullets', label: 'Bullet Skins', items: [
+                { id: 'bullet_standard', name: 'Standard Bolt', desc: 'Default circle', cost: 0, color: '#ffffff', shape: 'circle' },
+                { id: 'bullet_crimson', name: 'Crimson Dart', desc: 'Red diamond + glow', cost: 80, color: '#ff3333', shape: 'diamond' },
+                { id: 'bullet_azure', name: 'Azure Sphere', desc: 'Blue circle + glow', cost: 160, color: '#3388ff', shape: 'circle' },
+                { id: 'bullet_verdant', name: 'Verdant Shard', desc: 'Green triangle + spark', cost: 260, color: '#33ff66', shape: 'triangle' },
+                { id: 'bullet_solar', name: 'Solar Piercer', desc: 'Gold square + glow', cost: 420, color: '#ffcc00', shape: 'square' },
+                { id: 'bullet_violet', name: 'Violet Star', desc: 'Purple star + long glow', cost: 640, color: '#cc33ff', shape: 'star' },
+                { id: 'bullet_comet', name: 'Comet Tail', desc: 'Circle with particle trail', cost: 920, color: '#ffffff', shape: 'circle' },
+                { id: 'bullet_void', name: 'Void Needle', desc: 'Dark diamond + spark', cost: 1250, color: '#8844cc', shape: 'diamond' }
+            ]},
+            { slot: 'thruster', label: 'Thruster Trail', items: [
+                { id: 'thruster_standard', name: 'Standard Jets', desc: 'Default white stream', cost: 0, color: '#ffffff' },
+                { id: 'thruster_blue', name: 'Blue Afterburner', desc: 'Blue jet stream', cost: 80, color: '#3388ff' },
+                { id: 'thruster_purple', name: 'Purple Ion', desc: 'Purple jet stream', cost: 160, color: '#cc33ff' },
+                { id: 'thruster_gold', name: 'Gold Flame', desc: 'Orange/gold stream', cost: 260, color: '#ff8800' },
+                { id: 'thruster_green', name: 'Green Plasma', desc: 'Green stream', cost: 420, color: '#33ff66' },
+                { id: 'thruster_cryo', name: 'Cryo Mist', desc: 'Wider cyan mist', cost: 640, color: '#88ffff' },
+                { id: 'thruster_rainbow', name: 'Rainbow Boost', desc: 'Cycling rainbow stream', cost: 920, color: 'prismatic' },
+                { id: 'thruster_twin', name: 'Twin Thrusters', desc: 'Two offset streams', cost: 1250, color: '#ffffff' }
+            ]},
+            { slot: 'death', label: 'Death Effects', items: [
+                { id: 'death_standard', name: 'Standard Burst', desc: 'Default particle burst', cost: 0 },
+                { id: 'death_implosion', name: 'Implosion Nova', desc: 'Pull in, then explode', cost: 100 },
+                { id: 'death_shockwave', name: 'Shockwave Ring', desc: 'Expanding neon ring', cost: 210 },
+                { id: 'death_shatter', name: 'Screen Shatter', desc: 'Cracks from death point', cost: 360 },
+                { id: 'death_blackhole', name: 'Mini Black Hole', desc: 'Brief suction vortex', cost: 570 },
+                { id: 'death_supernova', name: 'Supernova', desc: 'Flash + particle ring', cost: 850 },
+                { id: 'death_glitch', name: 'Glitch Out', desc: 'Wireframe fragments', cost: 1100 },
+                { id: 'death_annihilation', name: 'Total Annihilation', desc: 'All effects combined', cost: 1200 }
+            ]},
+            { slot: 'starbits', label: 'Star Bit Skins', items: [
+                { id: 'starbit_gold', name: 'Golden Star', desc: 'Default 4-pointed star', cost: 0, shape: 'star' },
+                { id: 'starbit_crystal', name: 'Blue Crystal', desc: 'Crystal shard', cost: 70, shape: 'crystal' },
+                { id: 'starbit_moon', name: 'Silver Moon', desc: 'Crescent moon', cost: 140, shape: 'moon' },
+                { id: 'starbit_heart', name: 'Red Heart', desc: 'Heart shape', cost: 250, shape: 'heart' },
+                { id: 'starbit_diamond', name: 'Green Diamond', desc: 'Diamond outline', cost: 400, shape: 'diamond' },
+                { id: 'starbit_cube', name: 'Spinning Cube', desc: '3D wireframe cube', cost: 620, shape: 'cube' },
+                { id: 'starbit_comet', name: 'Comet Fragment', desc: 'Glowing bit with tail', cost: 900, shape: 'comet' },
+                { id: 'starbit_prismatic', name: 'Prismatic Bit', desc: 'Color-changing star', cost: 1200, shape: 'prismatic' }
+            ]},
+            { slot: 'powerups', label: 'Powerup Visuals', items: [
+                { id: 'powerup_diamond', name: 'Standard Diamond', desc: 'Default diamond with label', cost: 0, shape: 'diamond' },
+                { id: 'powerup_orb', name: 'Glowing Orb', desc: 'Filled orb with glow', cost: 70, shape: 'orb' },
+                { id: 'powerup_polygon', name: 'Spinning Polygon', desc: 'Rotating hexagon', cost: 150, shape: 'polygon' },
+                { id: 'powerup_ring', name: 'Pulsing Ring', desc: 'Pulsing ring', cost: 270, shape: 'ring' },
+                { id: 'powerup_runestone', name: 'Floating Runestone', desc: 'Rune-etched slab', cost: 430, shape: 'runestone' },
+                { id: 'powerup_card', name: 'Holographic Card', desc: 'Rectangular card tilt', cost: 640, shape: 'card' },
+                { id: 'powerup_core', name: 'Energy Core', desc: 'Pulsing energy sphere', cost: 900, shape: 'core' },
+                { id: 'powerup_egg', name: 'Cosmic Egg', desc: 'Egg-shaped orb', cost: 1000, shape: 'egg' },
+                { id: 'powerup_relic', name: 'Ancient Relic', desc: 'Ornate relic frame', cost: 1200, shape: 'relic' }
+            ]}
+        ];
+        let sdShopTab = 0;
+        let sdShopIndex = 0;
+
+        function getStardustUnlocksOwned() {
+            if (!activeProfile) return { loadouts: [], cosmetics: {} };
+            return activeProfile.stardustUnlocks || { loadouts: [], cosmetics: {} };
+        }
+
+        // Cosmetic helpers
+        function getCosmeticColor(slot, fallback) {
+            if (!activeProfile || !activeProfile.stardustUnlocks?.cosmetics) return fallback || '#ffffff';
+            const equipped = activeProfile.stardustUnlocks.cosmetics[slot];
+            if (!equipped) return fallback || '#ffffff';
+            for (const slotDef of SD_COSMETIC_SLOTS) {
+                if (slotDef.slot === slot) {
+                    const item = slotDef.items.find(i => i.id === equipped);
+                    if (item && item.color) {
+                        if (item.color === 'prismatic') {
+                            const hue = (Date.now() / 20) % 360;
+                            return `hsl(${hue}, 100%, 60%)`;
+                        }
+                        return item.color;
+                    }
+                }
+            }
+            return fallback || '#ffffff';
+        }
+
+        function getCosmeticShape(slot) {
+            if (!activeProfile || !activeProfile.stardustUnlocks?.cosmetics) return null;
+            const equipped = activeProfile.stardustUnlocks.cosmetics[slot];
+            if (!equipped) return null;
+            for (const slotDef of SD_COSMETIC_SLOTS) {
+                if (slotDef.slot === slot) {
+                    const item = slotDef.items.find(i => i.id === equipped);
+                    if (item) return item.shape || null;
+                }
+            }
+            return null;
+        }
+
+        function getCosmeticDeathId() {
+            if (!activeProfile || !activeProfile.stardustUnlocks?.cosmetics) return 'death_standard';
+            return activeProfile.stardustUnlocks.cosmetics.death || 'death_standard';
+        }
+
         let currentModifier = MODIFIERS[0];
         let modifierSelectIndex = 0;
 
@@ -1152,12 +1414,16 @@
                 createdAt: new Date().toISOString(),
                 starBits: 0,
                 totalStarBitsEarned: 0,
+                stardust: 0,
+                totalStardustEarned: 0,
                 upgrades: { extraLife: 0, thrustPower: 0, fireRate: 0, startShield: 0, powerupLuck: 0, bulletSpeed: 0, magnetRange: 0, coolingSystem: 0 },
                 stats: { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0 },
                 highScores: [],
                 lastModifier: 'none',
                 unlockedModifiers: ['none'],
-                resolution: 'auto', // 'auto' or numeric index into RESOLUTIONS
+                stardustUnlocks: { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' } },
+                selectedLoadout: 'standard',
+                resolution: 'auto',
                 orientation: 'landscape',
                 activeRun: null
             };
@@ -1233,6 +1499,22 @@
             }
             if (profile.activeRun === undefined) {
                 profile.activeRun = null;
+                changed = true;
+            }
+            if (profile.stardust === undefined) {
+                profile.stardust = 0;
+                changed = true;
+            }
+            if (profile.totalStardustEarned === undefined) {
+                profile.totalStardustEarned = 0;
+                changed = true;
+            }
+            if (!profile.stardustUnlocks) {
+                profile.stardustUnlocks = { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' } };
+                changed = true;
+            }
+            if (!profile.selectedLoadout) {
+                profile.selectedLoadout = 'standard';
                 changed = true;
             }
             if (changed) saveProfile(profile);
@@ -1355,12 +1637,34 @@
             return newUnlock;
         }
 
+        // Stardust conversion: piecewise diminishing rate
+        function convertScoreToStardust(score) {
+            if (score <= 0) return 0;
+            let dust = 0;
+            if (score <= 10000) {
+                dust = Math.floor(score * 0.01);
+            } else if (score <= 50000) {
+                dust = Math.floor(10000 * 0.01 + (score - 10000) * 0.005);
+            } else {
+                dust = Math.floor(10000 * 0.01 + 40000 * 0.005 + (score - 50000) * 0.002);
+            }
+            return dust;
+        }
+
         function submitScore() {
             lastHighScoreRank = saveHighScore(lastScore, lastLevel, currentModifier.id);
             lastUnlockedModifier = checkModifierUnlocks();
             if (activeProfile) {
+                // Earn Stardust from score
+                const baseDust = convertScoreToStardust(lastScore);
+                const earnedDust = Math.floor(baseDust * currentModifier.mult);
+                lastStardustEarned = earnedDust;
+                activeProfile.stardust = (activeProfile.stardust ?? 0) + earnedDust;
+                activeProfile.totalStardustEarned = (activeProfile.totalStardustEarned ?? 0) + earnedDust;
                 activeProfile.activeRun = null;
                 saveProfile(activeProfile);
+            } else {
+                lastStardustEarned = 0;
             }
             gameoverMenuIndex = 0;
             gameState = 'gameover';
@@ -1513,6 +1817,109 @@
             return true;
         }
 
+        // Stardust shop rendering
+        function renderStardustShop() {
+            const balance = activeProfile ? (activeProfile.stardust ?? 0) : 0;
+            stardustBalanceEl.textContent = balance;
+            const tabs = stardustTabsEl.querySelectorAll('.sd-tab');
+            tabs.forEach((t, i) => t.classList.toggle('selected', i === sdShopTab));
+            const tabName = SD_TAB_NAMES[sdShopTab];
+            let html = '';
+            if (tabName === 'loadouts') {
+                const owned = activeProfile ? (activeProfile.stardustUnlocks?.loadouts || []) : [];
+                const equipped = activeProfile ? activeProfile.selectedLoadout : 'standard';
+                SD_LOADOUTS.forEach((item, i) => {
+                    const isOwned = owned.includes(item.id) || item.cost === 0;
+                    const isEquipped = equipped === item.id;
+                    const isSelected = i === sdShopIndex;
+                    const canAfford = balance >= item.cost;
+                    const selClass = isSelected ? ' selected' : '';
+                    const equipClass = isEquipped ? ' equipped' : '';
+                    const affordClass = !isOwned && !canAfford ? ' cant-afford' : '';
+                    let statusHtml = '';
+                    if (isEquipped) statusHtml = '<span class="sd-equipped">EQUIPPED</span>';
+                    else if (isOwned) statusHtml = '<span class="sd-owned">OWNED — ENTER to equip</span>';
+                    else statusHtml = `<span class="sd-cost">${item.cost} ✦</span>`;
+                    html += `<div class="sd-item${selClass}${equipClass}${affordClass}" data-tap-action="sd_item" data-tap-index="${i}">`
+                        + `<div class="sd-name">${item.name}</div>`
+                        + `<div class="sd-desc">${item.desc}</div>`
+                        + statusHtml + `</div>`;
+                });
+            } else {
+                SD_COSMETIC_SLOTS.forEach((slotDef, si) => {
+                    html += `<div class="sd-section">${slotDef.label}</div>`;
+                    const equipped = activeProfile ? activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] : slotDef.items[0].id;
+                    slotDef.items.forEach((item, ii) => {
+                        const globalIdx = si * 100 + ii;
+                        const isOwned = item.cost === 0 || (activeProfile && activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] === item.id) || (activeProfile && activeProfile.stardustUnlocks?.ownedCosmetics?.includes(item.id));
+                        const isEquipped = equipped === item.id;
+                        const isSelected = globalIdx === sdShopIndex;
+                        const canAfford = balance >= item.cost;
+                        const selClass = isSelected ? ' selected' : '';
+                        const equipClass = isEquipped ? ' equipped' : '';
+                        const affordClass = !isOwned && !canAfford ? ' cant-afford' : '';
+                        let statusHtml = '';
+                        if (isEquipped) statusHtml = '<span class="sd-equipped">EQUIPPED</span>';
+                        else if (isOwned) statusHtml = '<span class="sd-owned">OWNED — ENTER to equip</span>';
+                        else statusHtml = `<span class="sd-cost">${item.cost} ✦</span>`;
+                        html += `<div class="sd-item${selClass}${equipClass}${affordClass}" data-tap-action="sd_cosmetic" data-tap-slot="${slotDef.slot}" data-tap-index="${ii}">`
+                            + `<div class="sd-name">${item.name}</div>`
+                            + `<div class="sd-desc">${item.desc}</div>`
+                            + statusHtml + `</div>`;
+                    });
+                });
+            }
+            stardustListEl.innerHTML = html;
+        }
+
+        function buyStardustUnlock(category, id) {
+            if (!activeProfile) return false;
+            if (category === 'loadouts') {
+                const item = SD_LOADOUTS.find(x => x.id === id);
+                if (!item || item.cost === 0) return false;
+                const owned = activeProfile.stardustUnlocks?.loadouts || [];
+                if (owned.includes(id)) {
+                    // Already owned — equip it
+                    activeProfile.selectedLoadout = id;
+                    saveProfile(activeProfile);
+                    return true;
+                }
+                if (activeProfile.stardust < item.cost) return false;
+                activeProfile.stardust -= item.cost;
+                if (!activeProfile.stardustUnlocks) activeProfile.stardustUnlocks = { loadouts: [], cosmetics: {}, ownedCosmetics: [] };
+                if (!activeProfile.stardustUnlocks.loadouts) activeProfile.stardustUnlocks.loadouts = [];
+                activeProfile.stardustUnlocks.loadouts.push(id);
+                activeProfile.selectedLoadout = id;
+                saveProfile(activeProfile);
+                return true;
+            }
+            return false;
+        }
+
+        function buyOrEquipCosmetic(slotId, itemId) {
+            if (!activeProfile) return false;
+            const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slotId);
+            if (!slotDef) return false;
+            const item = slotDef.items.find(i => i.id === itemId);
+            if (!item) return false;
+            if (!activeProfile.stardustUnlocks) activeProfile.stardustUnlocks = { loadouts: [], cosmetics: {}, ownedCosmetics: [] };
+            if (!activeProfile.stardustUnlocks.ownedCosmetics) activeProfile.stardustUnlocks.ownedCosmetics = [];
+            const isOwned = item.cost === 0 || activeProfile.stardustUnlocks.ownedCosmetics.includes(itemId);
+            if (isOwned) {
+                // Equip it
+                activeProfile.stardustUnlocks.cosmetics[slotId] = itemId;
+                saveProfile(activeProfile);
+                return true;
+            }
+            // Try to buy
+            if (activeProfile.stardust < item.cost) return false;
+            activeProfile.stardust -= item.cost;
+            activeProfile.stardustUnlocks.ownedCosmetics.push(itemId);
+            activeProfile.stardustUnlocks.cosmetics[slotId] = itemId;
+            saveProfile(activeProfile);
+            return true;
+        }
+
         // GO button for profile creation
         profileNameGoEl.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1623,6 +2030,30 @@
                     deserializeRun(activeProfile.activeRun);
                     activeProfile.activeRun = null;
                     saveProfile(activeProfile);
+                    return;
+                }
+            }
+
+            // Menu - U to open Stardust shop
+            if (e.code === 'KeyU') {
+                e.preventDefault();
+                if (gameState === 'menu' && activeProfile) {
+                    gameState = 'stardust_shop';
+                    sdShopTab = 0;
+                    sdShopIndex = 0;
+                    updateUI();
+                    return;
+                }
+            }
+
+            // Menu - S to open Star Bits shop
+            if (e.code === 'KeyS') {
+                e.preventDefault();
+                if (gameState === 'menu' && activeProfile) {
+                    gameState = 'shop';
+                    shopReturnState = 'menu';
+                    shopMenuIndex = 0;
+                    updateUI();
                     return;
                 }
             }
@@ -1868,8 +2299,59 @@
                     e.preventDefault();
                     const upg = UPGRADES[shopMenuIndex];
                     if (buyUpgrade(upg.id)) {
-                        renderShopList();
+                renderShopList();
+            }
+
+            // Stardust Shop
+            if (gameState === 'stardust_shop') {
+                const tabName = SD_TAB_NAMES[sdShopTab];
+                let items = [];
+                if (tabName === 'loadouts') {
+                    items = SD_LOADOUTS;
+                } else {
+                    SD_COSMETIC_SLOTS.forEach(slot => {
+                        slot.items.forEach(item => items.push(item));
+                    });
+                }
+                const total = items.length;
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                    e.preventDefault();
+                    sdShopTab = (sdShopTab - 1 + SD_TAB_NAMES.length) % SD_TAB_NAMES.length;
+                    sdShopIndex = 0;
+                } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                    e.preventDefault();
+                    sdShopTab = (sdShopTab + 1) % SD_TAB_NAMES.length;
+                    sdShopIndex = 0;
+                } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+                    e.preventDefault();
+                    sdShopIndex = (sdShopIndex - 1 + total) % total;
+                } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+                    e.preventDefault();
+                    sdShopIndex = (sdShopIndex + 1) % total;
+                } else if (e.code === 'Enter' || e.code === 'Space') {
+                    e.preventDefault();
+                    if (tabName === 'loadouts') {
+                        const item = SD_LOADOUTS[sdShopIndex];
+                        if (item) buyStardustUnlock('loadouts', item.id);
+                    } else {
+                        // Find which cosmetic slot and item
+                        let globalIdx = sdShopIndex;
+                        for (const slotDef of SD_COSMETIC_SLOTS) {
+                            if (globalIdx < slotDef.items.length) {
+                                buyOrEquipCosmetic(slotDef.slot, slotDef.items[globalIdx].id);
+                                break;
+                            }
+                            globalIdx -= slotDef.items.length;
+                        }
                     }
+                } else if (e.code === 'Escape') {
+                    e.preventDefault();
+                    gameState = 'menu';
+                    updateUI();
+                    return;
+                }
+                renderStardustShop();
+            }
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
                     gameState = shopReturnState;
@@ -1968,6 +2450,50 @@
             };
         }
 
+        // Create Golden Lure asteroid (spawns at screen edges)
+        function createGoldenLure() {
+            const edge = Math.floor(Math.random() * 4);
+            const margin = sc(60);
+            let x, y;
+            if (edge === 0) { x = Math.random() * canvas.width; y = -margin; }
+            else if (edge === 1) { x = canvas.width + margin; y = Math.random() * canvas.height; }
+            else if (edge === 2) { x = Math.random() * canvas.width; y = canvas.height + margin; }
+            else { x = -margin; y = Math.random() * canvas.height; }
+            const levelSpeed = getLevelSpeedMult();
+            const speed = 2 * GOLDEN_LURE.speedMult * levelSpeed;
+            const dx = ship.x - x;
+            const dy = ship.y - y;
+            const angleToShip = Math.atan2(dy, dx);
+            const tangential = (Math.random() - 0.5) * 1.5;
+            const vx = Math.cos(angleToShip) * speed * 0.6 + Math.cos(angleToShip + Math.PI / 2) * tangential;
+            const vy = Math.sin(angleToShip) * speed * 0.6 + Math.sin(angleToShip + Math.PI / 2) * tangential;
+            const vertices = Math.floor(Math.random() * 5) + 7;
+            const shape = [];
+            for (let i = 0; i < vertices; i++) {
+                const angle = (i / vertices) * Math.PI * 2;
+                const r = 0.8 + Math.random() * 0.4;
+                shape.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
+            }
+            return {
+                x, y,
+                velocity: { x: vx, y: vy },
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.04,
+                size: 1,
+                radius: sc(15 * GOLDEN_LURE.radiusMult),
+                shape,
+                color: GOLDEN_LURE,
+                hp: GOLDEN_LURE.health + getLevelHealthBonus(),
+                maxHp: GOLDEN_LURE.health + getLevelHealthBonus(),
+                erraticTimer: 0,
+                scoreMult: GOLDEN_LURE.scoreMult,
+                basePoints: GOLDEN_LURE.basePoints,
+                isGoldenLure: true,
+                trailTimer: 0,
+                lurePulse: 0
+            };
+        }
+
         // Create particle
         function createParticle(x, y, color, speed) {
             return {
@@ -2048,6 +2574,7 @@
 
         // Draw star bits
         function drawStarBits() {
+            const starbitShape = getCosmeticShape('starbits');
             starBits.forEach(sb => {
                 const alpha = sb.life < 120 ? sb.life / 120 : 1;
                 const pulseScale = 1 + Math.sin(sb.pulse) * 0.2;
@@ -2058,17 +2585,49 @@
                 ctx.fillStyle = '#ffd700';
                 ctx.shadowColor = '#ffd700';
                 ctx.shadowBlur = sc(8);
-                // 4-pointed star shape
                 ctx.beginPath();
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
-                    const rad = i % 2 === 0 ? r : r * 0.4;
-                    const px = Math.cos(angle) * rad;
-                    const py = Math.sin(angle) * rad;
-                    if (i === 0) ctx.moveTo(px, py);
-                    else ctx.lineTo(px, py);
+                if (starbitShape === 'heart') {
+                    ctx.moveTo(0, r * 0.3);
+                    ctx.bezierCurveTo(-r, -r * 0.3, -r * 0.5, -r, 0, -r * 0.5);
+                    ctx.bezierCurveTo(r * 0.5, -r, r, -r * 0.3, 0, r * 0.3);
+                } else if (starbitShape === 'diamond') {
+                    ctx.moveTo(0, -r);
+                    ctx.lineTo(r * 0.6, 0);
+                    ctx.lineTo(0, r);
+                    ctx.lineTo(-r * 0.6, 0);
+                    ctx.closePath();
+                } else if (starbitShape === 'moon') {
+                    ctx.arc(0, 0, r, -Math.PI * 0.8, Math.PI * 0.8);
+                    ctx.arc(r * 0.3, 0, r * 0.6, Math.PI * 0.8, -Math.PI * 0.8, true);
+                } else if (starbitShape === 'crystal') {
+                    ctx.moveTo(0, -r);
+                    ctx.lineTo(r * 0.4, -r * 0.2);
+                    ctx.lineTo(r * 0.3, r * 0.6);
+                    ctx.lineTo(-r * 0.3, r * 0.6);
+                    ctx.lineTo(-r * 0.4, -r * 0.2);
+                    ctx.closePath();
+                } else if (starbitShape === 'cube') {
+                    const t = Date.now() / 500;
+                    const cos = Math.cos(t), sin = Math.sin(t);
+                    ctx.moveTo(r * cos, -r * 0.5);
+                    ctx.lineTo(r * 0.5 * cos + r * 0.3 * sin, -r * 0.5 + r * 0.3);
+                    ctx.lineTo(r * 0.5 * cos + r * 0.3 * sin, r * 0.3);
+                    ctx.lineTo(r * cos, r * 0.5 + r * 0.3);
+                    ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, r * 0.5 + r * 0.3);
+                    ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, -r * 0.5 + r * 0.3);
+                    ctx.closePath();
+                } else {
+                    // Default: 4-pointed star
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                        const rad = i % 2 === 0 ? r : r * 0.4;
+                        const px = Math.cos(angle) * rad;
+                        const py = Math.sin(angle) * rad;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
                 }
-                ctx.closePath();
                 ctx.fill();
                 ctx.shadowBlur = 0;
                 ctx.restore();
@@ -2120,23 +2679,36 @@
 
         // Draw powerups
         function drawPowerups() {
+            const powerupShape = getCosmeticShape('powerups');
             powerups.forEach(p => {
                 const alpha = p.life < 120 ? p.life / 120 : 1;
                 const pulseScale = 1 + Math.sin(p.pulse) * 0.15;
                 ctx.save();
                 ctx.globalAlpha = alpha;
                 ctx.translate(p.x, p.y);
-                // Glow
                 ctx.shadowColor = p.type.color;
                 ctx.shadowBlur = sc(12);
-                // Diamond shape
                 const r = p.radius * pulseScale;
                 ctx.beginPath();
-                ctx.moveTo(0, -r);
-                ctx.lineTo(r * 0.7, 0);
-                ctx.lineTo(0, r);
-                ctx.lineTo(-r * 0.7, 0);
-                ctx.closePath();
+                if (powerupShape === 'orb' || powerupShape === 'core') {
+                    ctx.arc(0, 0, r, 0, Math.PI * 2);
+                } else if (powerupShape === 'polygon') {
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                        ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
+                    }
+                    ctx.closePath();
+                } else if (powerupShape === 'ring') {
+                    ctx.arc(0, 0, r, 0, Math.PI * 2);
+                    ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2, true);
+                } else {
+                    // Default: diamond
+                    ctx.moveTo(0, -r);
+                    ctx.lineTo(r * 0.7, 0);
+                    ctx.lineTo(0, r);
+                    ctx.lineTo(-r * 0.7, 0);
+                    ctx.closePath();
+                }
                 ctx.fillStyle = p.type.color;
                 ctx.fill();
                 ctx.shadowBlur = 0;
@@ -2201,6 +2773,7 @@
         function startGame() {
             gameState = 'playing';
             score = 0;
+            lastStardustEarned = 0;
             if (activeProfile) {
                 activeProfile.activeRun = null;
                 saveProfile(activeProfile);
@@ -2406,6 +2979,11 @@
                 } while (Math.hypot(x - ship.x, y - ship.y) < safeZone);
                 asteroids.push(createAsteroid(x, y, 3));
             }
+            // Golden Lure: 3% base, +0.1% per level, capped at 5%
+            const lureChance = Math.min(0.05, 0.03 + (getLevelCap() - 1) * 0.001);
+            if (Math.random() < lureChance) {
+                asteroids.push(createGoldenLure());
+            }
         }
 
         // Update UI
@@ -2423,16 +3001,19 @@
             pauseMenuEl.style.display = 'none';
             graphicsMenuEl.style.display = 'none';
             shopMenuEl.style.display = 'none';
+            stardustShopMenuEl.style.display = 'none';
             comboBarEl.style.display = 'none';
+            btnStardustShopEl.style.display = 'none';
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
                 if (activeProfile) {
-                    scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆`;
+                    scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆ · ${activeProfile.stardust ?? 0} ✦`;
                     scoreEl.style.display = 'block';
                     menuActionsEl.style.display = 'block';
                     const hasRun = activeProfile.activeRun != null;
                     btnResumeEl.style.display = hasRun ? 'inline' : 'none';
+                    btnStardustShopEl.style.display = 'inline';
                     if (hasRun) {
                         const runMod = activeProfile.activeRun.modifierId !== 'none' ? ` [${activeProfile.activeRun.modifierId}]` : '';
                         messageEl.textContent = `Resume: Lv.${activeProfile.activeRun.level}${runMod} — Score ${activeProfile.activeRun.score}`;
@@ -2441,6 +3022,7 @@
                     }
                 } else {
                     messageEl.textContent = 'Press SPACE to start';
+                    btnStardustShopEl.style.display = 'none';
                 }
                 messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
@@ -2471,6 +3053,11 @@
                 scoreEl.style.display = 'block';
                 shopMenuEl.style.display = 'block';
                 renderShopList();
+            } else if (gameState === 'stardust_shop') {
+                scoreEl.textContent = 'STARDUST UNLOCKS';
+                scoreEl.style.display = 'block';
+                stardustShopMenuEl.style.display = 'block';
+                renderStardustShop();
             } else if (gameState === 'playing') {
                 scoreEl.style.display = 'block';
             } else if (gameState === 'level_transition') {
@@ -2482,11 +3069,14 @@
                 const modLabel = currentModifier.id !== 'none' ? ` [${currentModifier.label}]` : '';
                 scoreEl.textContent = `Score: ${lastScore}${modLabel}`;
                 scoreEl.style.display = 'block';
+                let msg = '';
                 if (lastUnlockedModifier) {
                     const unlockedMod = MODIFIERS.find(m => m.id === lastUnlockedModifier);
-                    messageEl.textContent = `Unlocked: ${unlockedMod.label}!`;
-                    messageEl.style.display = 'block';
+                    msg += `Unlocked: ${unlockedMod.label}! `;
                 }
+                msg += `+${lastStardustEarned} ✦ Stardust`;
+                messageEl.textContent = msg.trim();
+                messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
             } else if (gameState === 'paused') {
                 scoreEl.textContent = `Score: ${score} | Lives: ${lives}`;
@@ -2542,10 +3132,11 @@
                 ship.velocity.y += Math.sin(ship.angle) * ship.thrust * thrustMult * dt;
                 // Thrust particles
                 if (Math.random() > 0.5) {
+                    const thrusterColor = getCosmeticColor('thruster', '#ff6600');
                     particles.push(createParticle(
                         ship.x - Math.cos(ship.angle) * sc(15),
                         ship.y - Math.sin(ship.angle) * sc(15),
-                        '#ff6600',
+                        thrusterColor,
                         2
                     ));
                 }
@@ -2688,6 +3279,22 @@
                         a.velocity.y = (Math.random() - 0.5) * 3;
                     }
                 }
+                // Golden Lure particle trail
+                if (a.isGoldenLure) {
+                    a.trailTimer = (a.trailTimer || 0) - dt;
+                    if (a.trailTimer <= 0) {
+                        particles.push({
+                            x: a.x,
+                            y: a.y,
+                            velocity: { x: (Math.random() - 0.5) * 0.5, y: (Math.random() - 0.5) * 0.5 },
+                            life: 0.6 + Math.random() * 0.3,
+                            decay: 0.02 + Math.random() * 0.01,
+                            color: GOLDEN_LURE.trailHex,
+                            size: sc(Math.random() * 2 + 1)
+                        });
+                        a.trailTimer = 6;
+                    }
+                }
                 a.x += a.velocity.x * speedMult * dt;
                 a.y += a.velocity.y * speedMult * dt;
                 a.rotation += a.rotSpeed * dt;
@@ -2739,7 +3346,8 @@
                                         for (let p = 0; p < 10; p++) {
                                             particles.push(createParticle(ea.x, ea.y, ea.color ? ea.color.hex : '#fff', 3));
                                         }
-                                        const ePoints = ea.size === 3 ? 20 : ea.size === 2 ? 50 : 100;
+                                        const eBasePoints = ea.basePoints || (ea.size === 3 ? 20 : ea.size === 2 ? 50 : 100);
+                                        const ePoints = Math.floor(eBasePoints * (ea.scoreMult || 1));
                                         const eComboMult = 1 + combo * 0.5;
                                         score += Math.floor(ePoints * eComboMult * (scoreMultActive ? 2 : 1));
                                         combo = Math.min(5, combo + 1);
@@ -2772,7 +3380,8 @@
                             }
 
                             // Score based on size with combo and overdrive bonus
-                            const points = a.size === 3 ? 20 : a.size === 2 ? 50 : 100;
+                            const basePoints = a.basePoints || (a.size === 3 ? 20 : a.size === 2 ? 50 : 100);
+                            const points = Math.floor(basePoints * (a.scoreMult || 1));
                             const comboMult = 1 + combo * 0.5;
                             score += Math.floor(points * comboMult * (scoreMultActive ? 2 : 1));
 
@@ -2840,9 +3449,23 @@
                             break;
                         }
 
-                        // Ship hit
-                        for (let k = 0; k < 20; k++) {
-                            particles.push(createParticle(ship.x, ship.y, '#ff0000', 4));
+                        // Ship hit — death effect based on cosmetic
+                        const deathId = getCosmeticDeathId();
+                        if (deathId === 'death_shockwave' || deathId === 'death_annihilation') {
+                            // Shockwave ring
+                            for (let k = 0; k < 30; k++) {
+                                particles.push(createParticle(ship.x, ship.y, getCosmeticColor('hull', '#ff0000'), 5));
+                            }
+                        } else if (deathId === 'death_supernova' || deathId === 'death_annihilation') {
+                            // Flash + particles
+                            for (let k = 0; k < 25; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#ffffff', 4));
+                            }
+                        } else {
+                            // Standard burst
+                            for (let k = 0; k < 20; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#ff0000', 4));
+                            }
                         }
                         combo = 0;
                         comboTimer = 0;
@@ -2932,14 +3555,15 @@
             ctx.rotate(ship.angle);
             ctx.scale(s, s);
 
-            // Draw ship
+            // Draw ship with cosmetic hull color
+            const hullColor = getCosmeticColor('hull', '#ffffff');
             ctx.beginPath();
             ctx.moveTo(20, 0);
             ctx.lineTo(-15, -12);
             ctx.lineTo(-10, 0);
             ctx.lineTo(-15, 12);
             ctx.closePath();
-            ctx.strokeStyle = '#fff';
+            ctx.strokeStyle = hullColor;
             ctx.lineWidth = sc(2);
             ctx.stroke();
 
@@ -3012,17 +3636,40 @@
                 ctx.save();
                 ctx.translate(a.x, a.y);
                 ctx.rotate(a.rotation);
-                ctx.beginPath();
-                ctx.moveTo(a.shape[0].x * a.radius, a.shape[0].y * a.radius);
-                for (let i = 1; i < a.shape.length; i++) {
-                    ctx.lineTo(a.shape[i].x * a.radius, a.shape[i].y * a.radius);
+                if (a.isGoldenLure) {
+                    // Golden Lure: shimmer + white core
+                    a.lurePulse = (a.lurePulse || 0) + 0.2;
+                    const shimmer = 0.7 + Math.sin(a.lurePulse) * 0.3;
+                    ctx.shadowColor = GOLDEN_LURE.trailHex;
+                    ctx.shadowBlur = sc(14 + shimmer * 6);
+                    ctx.strokeStyle = GOLDEN_LURE.hex;
+                    ctx.lineWidth = sc(3);
+                    ctx.beginPath();
+                    ctx.moveTo(a.shape[0].x * a.radius, a.shape[0].y * a.radius);
+                    for (let i = 1; i < a.shape.length; i++) {
+                        ctx.lineTo(a.shape[i].x * a.radius, a.shape[i].y * a.radius);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                    // Inner white core
+                    ctx.beginPath();
+                    ctx.arc(0, 0, a.radius * 0.35, 0, Math.PI * 2);
+                    ctx.fillStyle = GOLDEN_LURE.coreHex;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(a.shape[0].x * a.radius, a.shape[0].y * a.radius);
+                    for (let i = 1; i < a.shape.length; i++) {
+                        ctx.lineTo(a.shape[i].x * a.radius, a.shape[i].y * a.radius);
+                    }
+                    ctx.closePath();
+                    ctx.strokeStyle = a.color ? a.color.hex : '#888';
+                    ctx.lineWidth = sc(2);
+                    ctx.stroke();
                 }
-                ctx.closePath();
-                ctx.strokeStyle = a.color ? a.color.hex : '#888';
-                ctx.lineWidth = sc(2);
-                ctx.stroke();
                 // Health indicator for tough asteroids
-                if (a.color && a.maxHp > 1 && a.hp < a.maxHp) {
+                if (a.color && a.maxHp > 1 && a.hp < a.maxHp && !a.isGoldenLure) {
                     ctx.fillStyle = '#fff';
                     ctx.font = `${sc(10)}px Courier New`;
                     ctx.textAlign = 'center';
@@ -3034,10 +3681,34 @@
         }
 
         function drawBullets() {
-            ctx.fillStyle = '#fff';
+            const bulletColor = getCosmeticColor('bullets', '#ffffff');
+            const bulletShape = getCosmeticShape('bullets');
+            ctx.fillStyle = bulletColor;
             bullets.forEach(b => {
                 ctx.beginPath();
-                ctx.arc(b.x, b.y, sc(2), 0, Math.PI * 2);
+                if (bulletShape === 'diamond') {
+                    ctx.moveTo(b.x, b.y - sc(3));
+                    ctx.lineTo(b.x + sc(2), b.y);
+                    ctx.lineTo(b.x, b.y + sc(3));
+                    ctx.lineTo(b.x - sc(2), b.y);
+                    ctx.closePath();
+                } else if (bulletShape === 'triangle') {
+                    ctx.moveTo(b.x, b.y - sc(3));
+                    ctx.lineTo(b.x + sc(3), b.y + sc(2));
+                    ctx.lineTo(b.x - sc(3), b.y + sc(2));
+                    ctx.closePath();
+                } else if (bulletShape === 'square') {
+                    ctx.rect(b.x - sc(2), b.y - sc(2), sc(4), sc(4));
+                } else if (bulletShape === 'star') {
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                        const r = i === 0 ? sc(3) : sc(3);
+                        ctx.lineTo(b.x + Math.cos(angle) * r, b.y + Math.sin(angle) * r);
+                    }
+                    ctx.closePath();
+                } else {
+                    ctx.arc(b.x, b.y, sc(2), 0, Math.PI * 2);
+                }
                 ctx.fill();
             });
         }
@@ -3529,6 +4200,24 @@
                     const upg = UPGRADES[shopMenuIndex];
                     buyUpgrade(upg.id);
                     renderShopList();
+                } else if (gameState === 'stardust_shop') {
+                    if (action === 'sd_tab' && idx !== null) {
+                        sdShopTab = parseInt(idx);
+                        sdShopIndex = 0;
+                        renderStardustShop();
+                    } else if (action === 'sd_item' && idx !== null) {
+                        sdShopIndex = parseInt(idx);
+                        buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopIndex].id);
+                        renderStardustShop();
+                    } else if (action === 'sd_cosmetic' && idx !== null) {
+                        const slot = el.getAttribute('data-tap-slot');
+                        const itemIdx = parseInt(idx);
+                        const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
+                        if (slotDef && slotDef.items[itemIdx]) {
+                            buyOrEquipCosmetic(slot, slotDef.items[itemIdx].id);
+                        }
+                        renderStardustShop();
+                    }
                 } else if (gameState === 'paused' && idx !== null) {
                     pauseMenuIndex = parseInt(idx);
                     if (pauseMenuIndex === 0) {
@@ -3584,6 +4273,8 @@
             } else if (action === 'back') {
                 if (gameState === 'shop') {
                     gameState = shopReturnState;
+                } else if (gameState === 'stardust_shop') {
+                    gameState = 'menu';
                 } else if (gameState === 'modifier_select') {
                     gameState = 'menu';
                 } else if (gameState === 'graphics_menu') {
@@ -3616,6 +4307,11 @@
                     gameState = 'shop';
                     shopReturnState = 'menu';
                     shopMenuIndex = 0;
+                    updateUI();
+                } else if (action === 'stardust_shop') {
+                    gameState = 'stardust_shop';
+                    sdShopTab = 0;
+                    sdShopIndex = 0;
                     updateUI();
                 } else if (action === 'export') {
                     if (activeProfile) exportProfile(activeProfile);

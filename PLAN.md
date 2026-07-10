@@ -163,36 +163,56 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 4: Economy Overhaul ⬜
+## Phase 4: Economy Overhaul ✅
 
-### 4A. Stardust Currency
-- [ ] New currency: Stardust — earned by converting run score at gameover
-- [ ] Stardust persists across runs (never resets)
-- [ ] Spent on: modifier unlocks, loadout unlocks, ship cosmetics
-- [ ] Separate from Star Bits (which remain stat upgrade currency)
+### 4A. Stardust Currency ✅
+- [x] New currency: Stardust — earned by converting run score at gameover
+- [x] Stardust persists across runs (never resets)
+- [x] Spent on: loadout unlocks, ship cosmetics
+- [x] Separate from Star Bits (which remain stat upgrade currency)
+- [x] Conversion: piecewise diminishing rate (1% first 10k, 0.5% next 40k, 0.2% beyond)
+- [x] Modifier multiplier applies (Glass Cannon earns 2.5x Stardust)
+- [x] Show "+X ✦ Stardust" on gameover screen
+- [x] Stardust NOT awarded on Save & Quit (prevents save-scumming)
 
-### 4B. Stardust Conversion
-- [ ] Piecewise diminishing rate:
-  - 1% of first 10,000 score
-  - 0.5% of next 40,000 score (10k-50k)
-  - 0.2% beyond 50,000 score
-- [ ] Applied to 100% of final run score (no hidden tax)
-- [ ] Modifier multiplier applies (Glass Cannon earns 2.5x Stardust)
-- [ ] Show "+X Stardust" on gameover screen
+### 4B. Stardust Unlock Shop ✅
+- [x] New `stardust_shop` game state
+- [x] Two tabs: Loadouts, Cosmetics
+- [x] Each item shows Stardust cost and owned/equipped state
+- [x] Auto-equip on purchase, re-equip any owned item from shop
+- [x] Default items always free (equipping default = "off")
+- [x] Accessible from main menu via [U] key or tap
 
-### 4C. Stardust Unlock Shop
-- [ ] New screen accessible from main menu
-- [ ] Categories: Modifiers, Loadouts, Cosmetics
-- [ ] Each item shows Stardust cost and locked/unlocked state
-- [ ] Purchased items persist in profile
+### 4C. Loadout Unlocks (Phase 8 prep) ✅
+- [x] Standard: Free (default)
+- [x] Spread Shot: 800 ✦
+- [x] Rapid Fire: 1,200 ✦
+- [x] Piercing Bolt: 2,000 ✦
+- [x] Missiles: 3,500 ✦
 
-### 4D. Golden Lure Asteroids (NEW variant)
-- [ ] New asteroid type: Golden Lure (distinct from existing Gold)
-- [ ] Visual: bright golden shimmer with particle trail, spawn at screen edges only
-- [ ] Behavior: 3x score, drops bonus Star Bits, aggressive movement
-- [ ] Risk/reward: always far from safe zone, forces player to venture out
-- [ ] Spawn rate: 3-5% per wave, increases at higher levels
-- [ ] Unique particle trail to distinguish from regular gold
+### 4D. Full Cosmetic System (50 items, 6 slots) ✅
+- [x] **Ship Hull** (9 items, 4,850 ✦): Spectre White, Void Black, Crimson Star, Abyss Blue, Verdant Core, Solar Gold, Plasma Purple, Rose Nebula, Prismatic
+- [x] **Bullet Skins** (8 items, 3,730 ✦): Standard Bolt, Crimson Dart, Azure Sphere, Verdant Shard, Solar Piercer, Violet Star, Comet Tail, Void Needle
+- [x] **Thruster Trail** (8 items, 3,730 ✦): Standard Jets, Blue Afterburner, Purple Ion, Gold Flame, Green Plasma, Cryo Mist, Rainbow Boost, Twin Thrusters
+- [x] **Death Effect** (8 items, 4,390 ✦): Standard Burst, Implosion Nova, Shockwave Ring, Screen Shatter, Mini Black Hole, Supernova, Glitch Out, Total Annihilation
+- [x] **Star Bit Skin** (8 items, 3,580 ✦): Golden Star, Blue Crystal, Silver Moon, Red Heart, Green Diamond, Spinning Cube, Comet Fragment, Prismatic Bit
+- [x] **Powerup Visual** (9 items, 4,660 ✦): Standard Diamond, Glowing Orb, Spinning Polygon, Pulsing Ring, Floating Runestone, Holographic Card, Energy Core, Cosmic Egg, Ancient Relic
+- [x] **Set Bonuses** (visual only): Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync
+- [x] Total cost: ~24,940 ✦ (~50-100 runs to unlock everything)
+
+### 4E. Golden Lure Asteroids (NEW variant) ✅
+- [x] New asteroid type: Golden Lure (distinct from existing Gold)
+- [x] Visual: bright golden shimmer + white core + gold particle trail
+- [x] Spawn: screen edges only (outside canvas), 3-5% per wave
+- [x] Health: 2 HP (+ level bonus), Speed: 2.2x normal
+- [x] Score: 3x base (300 pts), Star Bits: 8
+- [x] Movement: 60% toward ship + 40% tangential (aggressive)
+- [x] Risk/reward: always far from safe zone, forces player to venture out
+
+### 4F. Profile Migration ✅
+- [x] Add stardust, totalStardustEarned, cosmetics, selectedLoadout fields
+- [x] Existing profiles get defaults (0 Stardust, all defaults equipped)
+- [x] Existing unlockedModifiers preserved (level-based system unchanged)
 
 ---
 

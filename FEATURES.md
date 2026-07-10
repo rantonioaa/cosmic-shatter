@@ -308,6 +308,32 @@
 - Color-coded timer bar below score: green (>60%), yellow (30-60%), red (<30%)
 - Combo bar hidden during pause, gameover, and level transitions
 
+### Stardust Currency
+- Earned by converting run score at gameover (piecewise diminishing rate)
+- 1% of first 10,000 score, 0.5% of next 40,000, 0.2% beyond 50,000
+- Modifier multiplier applies (Glass Cannon earns 2.5x Stardust)
+- NOT awarded on Save & Quit (prevents save-scumming)
+- Spent in Stardust Unlock Shop on loadouts and cosmetics
+
+### Stardust Unlock Shop
+- Accessible from main menu via [U] key
+- Two tabs: Loadouts, Cosmetics
+- Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦)
+- Cosmetics: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
+- Total cost to unlock everything: ~24,940 ✦
+
+---
+
+## Asteroid Types
+
+### Golden Lure (NEW)
+- Spawns at screen edges only (outside canvas)
+- Visual: bright golden shimmer + white core + gold particle trail
+- Health: 2 HP (+ level bonus), Speed: 2.2x normal
+- Score: 3x base (300 pts), Star Bits: 8
+- Movement: 60% toward ship + 40% tangential (aggressive)
+- Risk/reward: always far from safe zone, forces player to venture out
+
 ---
 
 ## Visuals
