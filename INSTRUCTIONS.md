@@ -178,16 +178,16 @@ Configured in `opencode.json`. All subagents, only run when explicitly invoked v
 
 | Agent | Model | Purpose | Monthly budget |
 |-------|-------|---------|----------------|
-| `bug-hunter` | opencode-go/qwen3.7-plus | Reviews code for undefined refs, null derefs, CSS mismatches | 21,600 req |
-| `qa-tester` | opencode-go/deepseek-v4-flash | QA: logic bugs, edge cases, mobile compat, memory leaks | 158,150 req |
-| `doc-keeper` | opencode-go/mimo-v2.5 | Updates FEATURES.md, PLAN.md, INSTRUCTIONS.md, save file | 150,400 req |
-| `game-design` | opencode-go/kimi-k2.7-code | Designs mechanics, progression, balance for roguelite systems | 9,250 req |
+| `code-reviewer` | opencode-go/qwen3.7-plus | Reviews code for bugs, undefined refs, null derefs, CSS mismatches, performance, browser compat, UI/UX | 21,600 req |
+| `qa-tester` | opencode-go/deepseek-v4-flash | QA: logic bugs, collision, timing, mobile compat, memory leaks, test case generation, regression testing | 158,150 req |
+| `docs-maintainer` | opencode-go/mimo-v2.5 | Maintains FEATURES.md, PLAN.md, INSTRUCTIONS.md, master save file, and changelog | 150,400 req |
+| `game-designer` | opencode-go/kimi-k2.7-code | Game design: mechanics, progression, balance, player retention, competitive analysis for roguelite games | 9,250 req |
 
 ### Usage
-- `bug-hunter`: invoke before commits to catch obvious bugs
-- `qa-tester`: invoke after non-trivial changes for comprehensive testing
-- `doc-keeper`: invoke when user says "update docs" or after feature additions
-- `game-design`: invoke when planning new features or balancing existing ones
+- `code-reviewer`: invoke before commits to catch bugs, performance issues, and UI/UX problems
+- `qa-tester`: invoke after non-trivial changes for comprehensive testing with formal test cases
+- `docs-maintainer`: invoke when user says "update docs" or after feature additions
+- `game-designer`: invoke when planning new features, balancing existing ones, or analyzing player retention
 
 Agent files live in `.opencode/agents/` — each has a focused prompt with project-specific context.
 

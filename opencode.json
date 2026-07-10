@@ -2,25 +2,25 @@
   "$schema": "https://opencode.ai/config.json",
   "instructions": ["INSTRUCTIONS.md"],
   "agent": {
-    "bug-hunter": {
+    "code-reviewer": {
       "mode": "subagent",
       "model": "opencode-go/qwen3.7-plus",
-      "description": "Reviews code changes for undefined references, null dereferences, and CSS mismatches before commits"
+      "description": "Reviews code for bugs, undefined refs, null derefs, CSS mismatches, performance issues, browser compat, and UI/UX quality"
     },
     "qa-tester": {
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
-      "description": "QA engineer that reviews game code for logic bugs, collision issues, timing bugs, mobile compat, and memory leaks"
+      "description": "QA engineer: logic bugs, collision, timing, mobile compat, memory leaks, test case generation, regression testing"
     },
-    "doc-keeper": {
+    "docs-maintainer": {
       "mode": "subagent",
       "model": "opencode-go/mimo-v2.5",
-      "description": "Updates FEATURES.md, PLAN.md, INSTRUCTIONS.md, and master save file after code changes"
+      "description": "Maintains FEATURES.md, PLAN.md, INSTRUCTIONS.md, master save file, and changelog"
     },
-    "game-design": {
+    "game-designer": {
       "mode": "subagent",
       "model": "opencode-go/kimi-k2.7-code",
-      "description": "Game design specialist for roguelite survivors-like games; designs mechanics, progression, and balance"
+      "description": "Game design: mechanics, progression, balance, player retention, competitive analysis for roguelite games"
     }
   }
 }
