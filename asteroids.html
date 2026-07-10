@@ -531,7 +531,10 @@
         }
         .sd-tab {
             font-size: 12px;
-            padding: 6px 12px;
+            padding: 12px 16px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
             border: 1px solid #444;
             border-radius: 3px;
             opacity: 0.6;
@@ -561,12 +564,16 @@
         }
         .sd-item {
             font-size: 13px;
-            padding: 8px 10px;
+            padding: 12px 10px;
+            min-height: 48px;
             margin: 4px 0;
             border: 1px solid #333;
             border-radius: 3px;
             opacity: 0.9;
             pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .sd-item.selected {
             border-color: #ffcc00;
@@ -1846,14 +1853,14 @@
                         + statusHtml + `</div>`;
                 });
             } else {
+                let flatIdx = 0;
                 SD_COSMETIC_SLOTS.forEach((slotDef, si) => {
                     html += `<div class="sd-section">${slotDef.label}</div>`;
                     const equipped = activeProfile ? activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] : slotDef.items[0].id;
                     slotDef.items.forEach((item, ii) => {
-                        const globalIdx = si * 100 + ii;
+                        const isSelected = flatIdx === sdShopIndex;
                         const isOwned = item.cost === 0 || (activeProfile && activeProfile.stardustUnlocks?.cosmetics?.[slotDef.slot] === item.id) || (activeProfile && activeProfile.stardustUnlocks?.ownedCosmetics?.includes(item.id));
                         const isEquipped = equipped === item.id;
-                        const isSelected = globalIdx === sdShopIndex;
                         const canAfford = balance >= item.cost;
                         const selClass = isSelected ? ' selected' : '';
                         const equipClass = isEquipped ? ' equipped' : '';
@@ -1866,6 +1873,7 @@
                             + `<div class="sd-name">${item.name}</div>`
                             + `<div class="sd-desc">${item.desc}</div>`
                             + statusHtml + `</div>`;
+                        flatIdx++;
                     });
                 });
             }
@@ -1876,10 +1884,10 @@
             if (!activeProfile) return false;
             if (category === 'loadouts') {
                 const item = SD_LOADOUTS.find(x => x.id === id);
-                if (!item || item.cost === 0) return false;
+                if (!item) return false;
                 const owned = activeProfile.stardustUnlocks?.loadouts || [];
-                if (owned.includes(id)) {
-                    // Already owned — equip it
+                if (owned.includes(id) || item.cost === 0) {
+                    // Already owned or free — equip it
                     activeProfile.selectedLoadout = id;
                     saveProfile(activeProfile);
                     return true;
@@ -1903,6 +1911,7 @@
             const item = slotDef.items.find(i => i.id === itemId);
             if (!item) return false;
             if (!activeProfile.stardustUnlocks) activeProfile.stardustUnlocks = { loadouts: [], cosmetics: {}, ownedCosmetics: [] };
+            if (!activeProfile.stardustUnlocks.cosmetics) activeProfile.stardustUnlocks.cosmetics = {};
             if (!activeProfile.stardustUnlocks.ownedCosmetics) activeProfile.stardustUnlocks.ownedCosmetics = [];
             const isOwned = item.cost === 0 || activeProfile.stardustUnlocks.ownedCosmetics.includes(itemId);
             if (isOwned) {
@@ -2616,6 +2625,24 @@
                     ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, r * 0.5 + r * 0.3);
                     ctx.lineTo(-r * 0.3 * cos + r * 0.3 * sin, -r * 0.5 + r * 0.3);
                     ctx.closePath();
+                } else if (starbitShape === 'comet') {
+                    // Glowing bit with tail
+                    ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2);
+                    ctx.moveTo(r * 0.6, 0);
+                    ctx.lineTo(r * 1.5, -r * 0.2);
+                    ctx.lineTo(r * 1.5, r * 0.2);
+                    ctx.closePath();
+                } else if (starbitShape === 'prismatic') {
+                    // Color-changing star
+                    const hue = (Date.now() / 10 + sb.x * 10 + sb.y * 10) % 360;
+                    ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+                    ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                        const rad = i % 2 === 0 ? r : r * 0.4;
+                        ctx.lineTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
+                    }
+                    ctx.closePath();
                 } else {
                     // Default: 4-pointed star
                     for (let i = 0; i < 8; i++) {
@@ -2701,6 +2728,23 @@
                 } else if (powerupShape === 'ring') {
                     ctx.arc(0, 0, r, 0, Math.PI * 2);
                     ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2, true);
+                } else if (powerupShape === 'runestone') {
+                    // Rune-etched slab
+                    ctx.rect(-r * 0.5, -r * 0.7, r, r * 1.4);
+                    ctx.moveTo(-r * 0.3, -r * 0.4);
+                    ctx.lineTo(r * 0.3, -r * 0.4);
+                    ctx.moveTo(0, -r * 0.4);
+                    ctx.lineTo(0, r * 0.4);
+                } else if (powerupShape === 'card') {
+                    // Rectangular card
+                    ctx.rect(-r * 0.6, -r * 0.8, r * 1.2, r * 1.6);
+                } else if (powerupShape === 'egg') {
+                    // Egg shape
+                    ctx.ellipse(0, 0, r * 0.6, r, 0, 0, Math.PI * 2);
+                } else if (powerupShape === 'relic') {
+                    // Ornate frame
+                    ctx.rect(-r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
+                    ctx.rect(-r * 0.5, -r * 0.5, r, r);
                 } else {
                     // Default: diamond
                     ctx.moveTo(0, -r);
@@ -3074,7 +3118,9 @@
                     const unlockedMod = MODIFIERS.find(m => m.id === lastUnlockedModifier);
                     msg += `Unlocked: ${unlockedMod.label}! `;
                 }
-                msg += `+${lastStardustEarned} ✦ Stardust`;
+                if (lastStardustEarned > 0) {
+                    msg += `+${lastStardustEarned} ✦ Stardust`;
+                }
                 messageEl.textContent = msg.trim();
                 messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
@@ -3451,15 +3497,52 @@
 
                         // Ship hit — death effect based on cosmetic
                         const deathId = getCosmeticDeathId();
-                        if (deathId === 'death_shockwave' || deathId === 'death_annihilation') {
+                        if (deathId === 'death_annihilation') {
+                            // All effects combined: shockwave + flash + particles
+                            for (let k = 0; k < 35; k++) {
+                                particles.push(createParticle(ship.x, ship.y, getCosmeticColor('hull', '#ff0000'), 5));
+                            }
+                            for (let k = 0; k < 15; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#ffffff', 3));
+                            }
+                        } else if (deathId === 'death_shockwave') {
                             // Shockwave ring
                             for (let k = 0; k < 30; k++) {
                                 particles.push(createParticle(ship.x, ship.y, getCosmeticColor('hull', '#ff0000'), 5));
                             }
-                        } else if (deathId === 'death_supernova' || deathId === 'death_annihilation') {
+                        } else if (deathId === 'death_supernova') {
                             // Flash + particles
                             for (let k = 0; k < 25; k++) {
                                 particles.push(createParticle(ship.x, ship.y, '#ffffff', 4));
+                            }
+                        } else if (deathId === 'death_implosion') {
+                            // Implosion: particles pull inward then burst
+                            for (let k = 0; k < 15; k++) {
+                                const angle = Math.random() * Math.PI * 2;
+                                particles.push(createParticle(ship.x + Math.cos(angle) * 60, ship.y + Math.sin(angle) * 60, getCosmeticColor('hull', '#ff4444'), 3));
+                            }
+                            for (let k = 0; k < 20; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#ff6600', 4));
+                            }
+                        } else if (deathId === 'death_shatter') {
+                            // Screen shatter: angular particles
+                            for (let k = 0; k < 25; k++) {
+                                const angle = (k / 25) * Math.PI * 2;
+                                particles.push(createParticle(ship.x + Math.cos(angle) * 10, ship.y + Math.sin(angle) * 10, '#ffffff', 4));
+                            }
+                        } else if (deathId === 'death_blackhole') {
+                            // Black hole: dark particles + bright burst
+                            for (let k = 0; k < 20; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#220044', 2));
+                            }
+                            for (let k = 0; k < 15; k++) {
+                                particles.push(createParticle(ship.x, ship.y, '#cc66ff', 5));
+                            }
+                        } else if (deathId === 'death_glitch') {
+                            // Glitch: scattered colored particles
+                            const glitchColors = ['#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#00ffff'];
+                            for (let k = 0; k < 30; k++) {
+                                particles.push(createParticle(ship.x + (Math.random() - 0.5) * 40, ship.y + (Math.random() - 0.5) * 40, glitchColors[k % 5], 3));
                             }
                         } else {
                             // Standard burst
@@ -3702,7 +3785,7 @@
                 } else if (bulletShape === 'star') {
                     for (let i = 0; i < 5; i++) {
                         const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-                        const r = i === 0 ? sc(3) : sc(3);
+                        const r = sc(3);
                         ctx.lineTo(b.x + Math.cos(angle) * r, b.y + Math.sin(angle) * r);
                     }
                     ctx.closePath();
@@ -4027,6 +4110,8 @@
                 } else if (action === 'back') {
                     if (gameState === 'shop') {
                         gameState = shopReturnState;
+                    } else if (gameState === 'stardust_shop') {
+                        gameState = 'menu';
                     } else if (gameState === 'modifier_select') {
                         gameState = 'menu';
                     } else if (gameState === 'graphics_menu') {
@@ -4059,6 +4144,11 @@
                         gameState = 'shop';
                         shopReturnState = 'menu';
                         shopMenuIndex = 0;
+                        updateUI();
+                    } else if (action === 'stardust_shop') {
+                        gameState = 'stardust_shop';
+                        sdShopTab = 0;
+                        sdShopIndex = 0;
                         updateUI();
                     } else if (action === 'export') {
                         if (activeProfile) exportProfile(activeProfile);
@@ -4212,6 +4302,15 @@
                     } else if (action === 'sd_cosmetic' && idx !== null) {
                         const slot = el.getAttribute('data-tap-slot');
                         const itemIdx = parseInt(idx);
+                        // Compute flat index for sdShopIndex
+                        let flatIdx = 0;
+                        for (const slotDef of SD_COSMETIC_SLOTS) {
+                            if (slotDef.slot === slot) {
+                                sdShopIndex = flatIdx + itemIdx;
+                                break;
+                            }
+                            flatIdx += slotDef.items.length;
+                        }
                         const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
                         if (slotDef && slotDef.items[itemIdx]) {
                             buyOrEquipCosmetic(slot, slotDef.items[itemIdx].id);
