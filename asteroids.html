@@ -32,7 +32,7 @@
             text-align: center;
             pointer-events: none;
             width: 50%;
-            max-width: 800px;
+            max-width: 640px;
         }
         #gameTitle {
             display: none;
@@ -78,7 +78,7 @@
             margin-top: 15px;
             font-size: 13px;
             opacity: 0.6;
-            max-width: 400px;
+            max-width: 340px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -403,7 +403,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-            max-width: 520px;
+            max-width: 420px;
             margin: 0 auto;
         }
         #shopMenu .shop-card {
@@ -553,7 +553,7 @@
             text-align: left;
             display: inline-block;
             min-width: 280px;
-            max-width: 400px;
+            max-width: 340px;
         }
         .sd-section {
             font-size: 11px;
@@ -4549,6 +4549,32 @@
                 const upg = UPGRADES[shopMenuIndex];
                 buyUpgrade(upg.id);
                 renderShopList();
+            } else if (gameState === 'stardust_shop') {
+                if (action === 'sd_tab' && idx !== null) {
+                    sdShopTab = parseInt(idx);
+                    sdShopIndex = 0;
+                    renderStardustShop();
+                } else if (action === 'sd_item' && idx !== null) {
+                    sdShopIndex = parseInt(idx);
+                    buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopIndex].id);
+                    renderStardustShop();
+                } else if (action === 'sd_cosmetic' && idx !== null) {
+                    const slot = target.getAttribute('data-tap-slot');
+                    const itemIdx = parseInt(idx);
+                    let flatIdx = 0;
+                    for (const slotDef of SD_COSMETIC_SLOTS) {
+                        if (slotDef.slot === slot) {
+                            sdShopIndex = flatIdx + itemIdx;
+                            break;
+                        }
+                        flatIdx += slotDef.items.length;
+                    }
+                    const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
+                    if (slotDef && slotDef.items[itemIdx]) {
+                        buyOrEquipCosmetic(slot, slotDef.items[itemIdx].id);
+                    }
+                    renderStardustShop();
+                }
             } else if (gameState === 'paused' && idx !== null) {
                 pauseMenuIndex = parseInt(idx);
                 if (pauseMenuIndex === 0) {
