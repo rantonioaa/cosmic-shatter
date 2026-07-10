@@ -172,6 +172,17 @@ cd /mnt/c/Users/cazbo/Proyectos/Test
 git push
 ```
 
+### If git push fails (SSH key not loaded)
+
+When the user says "git push is not working", give them these lines to run:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/cosmic-shatter
+```
+
+Then they can run `git push` again.
+
 ## Agents
 
 Configured in `opencode.json`. All subagents, only run when explicitly invoked via the Task tool.
