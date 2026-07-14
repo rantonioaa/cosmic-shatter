@@ -538,29 +538,37 @@
         #stardustShopMenu {
             display: none;
             margin-top: 10px;
-            height: calc(100vh - 40px);
-            flex-direction: column;
-            overflow: hidden;
+            max-height: calc(100vh - 30px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #stardustShopMenu::-webkit-scrollbar {
+            width: 6px;
+        }
+        #stardustShopMenu::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        #stardustShopMenu::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
         }
         .sd-title {
             font-size: 16px;
             letter-spacing: 2px;
             margin-bottom: 6px;
-            flex-shrink: 0;
         }
         .sd-balance {
             font-size: 13px;
             opacity: 0.9;
             margin-bottom: 10px;
             color: #ffcc00;
-            flex-shrink: 0;
         }
         .sd-tabs {
             display: flex;
             justify-content: center;
             gap: 8px;
             margin-bottom: 10px;
-            flex-shrink: 0;
         }
         .sd-tab {
             font-size: 12px;
@@ -588,7 +596,6 @@
             gap: 6px;
             margin-bottom: 10px;
             flex-wrap: wrap;
-            flex-shrink: 0;
         }
         .sd-slot-tab {
             font-size: 9px;
@@ -621,7 +628,6 @@
             border: 1px solid #333;
             border-radius: 4px;
             background: rgba(0, 0, 0, 0.35);
-            flex-shrink: 0;
         }
         #sdPreviewSvg {
             width: 120px;
@@ -647,23 +653,9 @@
             gap: 8px;
             max-width: 440px;
             margin: 0 auto;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
             padding-right: 4px;
             text-align: left;
             pointer-events: auto;
-        }
-        .sd-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .sd-list::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-        }
-        .sd-list::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
         }
         .sd-list.loadouts {
             grid-template-columns: 1fr;
@@ -730,7 +722,6 @@
             opacity: 0.4;
             margin-top: 12px;
             letter-spacing: 1px;
-            flex-shrink: 0;
         }
         @media (max-width: 600px) {
             .sd-list {
@@ -838,7 +829,6 @@
             opacity: 0.4;
             margin-top: 10px;
             letter-spacing: 1px;
-            flex-shrink: 0;
         }
         .back-btn {
             margin-top: 12px;
@@ -854,7 +844,6 @@
             justify-content: center;
             border-radius: 4px;
             transition: background 0.15s;
-            flex-shrink: 0;
         }
         .back-btn:hover {
             color: #fff;
@@ -3703,7 +3692,7 @@
             } else if (gameState === 'stardust_shop') {
                 scoreEl.textContent = 'STARDUST UNLOCKS';
                 scoreEl.style.display = 'block';
-                stardustShopMenuEl.style.display = 'flex';
+                stardustShopMenuEl.style.display = 'block';
                 renderStardustShop();
             } else if (gameState === 'playing') {
                 scoreEl.style.display = 'block';
