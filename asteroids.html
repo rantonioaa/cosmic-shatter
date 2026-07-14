@@ -615,7 +615,7 @@
             border-radius: 4px;
             background: rgba(0, 0, 0, 0.35);
         }
-        #sdPreviewCanvas {
+        #sdPreviewSvg {
             width: 120px;
             height: 80px;
             background: #000;
@@ -719,7 +719,7 @@
                 max-width: 180px;
                 padding: 8px;
             }
-            #sdPreviewCanvas {
+            #sdPreviewSvg {
                 width: 100px;
                 height: 66px;
             }
@@ -733,7 +733,7 @@
             .sd-list {
                 max-height: calc(100vh - 300px);
             }
-            #sdPreviewCanvas {
+            #sdPreviewSvg {
                 width: 90px;
                 height: 60px;
             }
@@ -1044,7 +1044,18 @@
             </div>
             <div class="sd-slot-tabs" id="stardustSlotTabs"></div>
             <div class="sd-preview" id="stardustPreview">
-                <canvas id="sdPreviewCanvas" width="120" height="80"></canvas>
+                <svg id="sdPreviewSvg" width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="svgGlow">
+                            <feGaussianBlur stdDeviation="2" result="blur"/>
+                            <feMerge>
+                                <feMergeNode in="blur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <rect width="120" height="80" fill="#000"/>
+                </svg>
                 <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
                 <div class="sd-preview-action" id="sdPreviewAction"></div>
             </div>
@@ -1100,7 +1111,7 @@
         const stardustListEl = document.getElementById('stardustList');
         const stardustTabsEl = document.getElementById('stardustTabs');
         const stardustSlotTabsEl = document.getElementById('stardustSlotTabs');
-        const sdPreviewCanvas = document.getElementById('sdPreviewCanvas');
+        const sdPreviewSvg = document.getElementById('sdPreviewSvg');
         const sdPreviewLabelEl = document.getElementById('sdPreviewLabel');
         const sdPreviewActionEl = document.getElementById('sdPreviewAction');
         const sdHintEl = document.getElementById('sdHint');
@@ -1671,15 +1682,26 @@
 
         // 120x80 composite preview
         function updateStardustPreview(slot, itemId, balance) {
-            const ctx = sdPreviewCanvas.getContext('2d');
-            const w = sdPreviewCanvas.width, h = sdPreviewCanvas.height;
-            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+            // Clear SVG and rebuild
+            sdPreviewSvg.innerHTML = `
+                <defs>
+                    <filter id="svgGlow">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feMerge>
+                            <feMergeNode in="blur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <rect width="120" height="80" fill="#000"/>
+            `;
 
             if (slot === 'loadout' || !itemId) {
                 const item = SD_LOADOUTS.find(l => l.id === itemId);
                 sdPreviewLabelEl.textContent = item ? item.name : '';
                 sdPreviewActionEl.textContent = item ? item.desc : '';
                 sdPreviewActionEl.style.color = '#aaa';
+                if (item) drawLoadoutPreview(item.id);
                 return;
             }
 
@@ -1702,31 +1724,191 @@
                 sdPreviewActionEl.style.color = '#ff4444';
             }
 
+            drawCosmeticPreview(slot, itemId);
+        }
+
+        // Ship polygon points (centered at 60,40, pointing right)
+        const SHIP_POINTS = '78,40 46,29 51,40 46,51';
+
+        function drawLoadoutPreview(loadoutId) {
+            const ship = `<polygon points="${SHIP_POINTS}" stroke="white" stroke-width="2" fill="none"/>`;
+            let bullets = '';
+
+            switch (loadoutId) {
+                case 'standard':
+                    bullets = `<circle cx="90" cy="40" r="4" fill="white" filter="url(#svgGlow)"/>`;
+                    break;
+                case 'spread_shot':
+                    bullets = `
+                        <circle cx="88" cy="32" r="3" fill="#ffcc00" filter="url(#svgGlow)"/>
+                        <circle cx="94" cy="40" r="3" fill="#ffcc00" filter="url(#svgGlow)"/>
+                        <circle cx="88" cy="48" r="3" fill="#ffcc00" filter="url(#svgGlow)"/>
+                    `;
+                    break;
+                case 'rapid_fire':
+                    bullets = `
+                        <circle cx="86" cy="40" r="3" fill="#00ffff" filter="url(#svgGlow)"/>
+                        <circle cx="94" cy="40" r="3" fill="#00ffff" filter="url(#svgGlow)"/>
+                        <circle cx="102" cy="40" r="3" fill="#00ffff" filter="url(#svgGlow)"/>
+                    `;
+                    break;
+                case 'piercing_bolt':
+                    bullets = `
+                        <line x1="82" y1="40" x2="110" y2="40" stroke="#3366ff" stroke-width="1" opacity="0.5"/>
+                        <circle cx="90" cy="40" r="4" fill="#3366ff" filter="url(#svgGlow)"/>
+                    `;
+                    break;
+                case 'missiles':
+                    bullets = `
+                        <polygon points="94,36 102,40 94,44" fill="#ff6600" filter="url(#svgGlow)"/>
+                        <circle cx="88" cy="40" r="5" fill="#ff4400" opacity="0.6"/>
+                    `;
+                    break;
+            }
+
+            sdPreviewSvg.insertAdjacentHTML('beforeend', ship + bullets);
+        }
+
+        function drawCosmeticPreview(slot, itemId) {
             const hullId = activeProfile?.stardustUnlocks?.cosmetics?.hull || 'hull_spectre';
             const hullItem = SD_COSMETIC_SLOTS[0].items.find(i => i.id === (slot === 'hull' ? itemId : hullId));
             const hullColor = cosmeticColor(hullItem);
 
-            ctx.save(); ctx.translate(w / 2, h / 2);
-            // Ship
-            ctx.strokeStyle = hullColor; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(-14, -11); ctx.lineTo(-9, 0); ctx.lineTo(-14, 11); ctx.closePath(); ctx.stroke();
-            // Slot overlay
+            let ship = `<polygon points="${SHIP_POINTS}" stroke="${hullColor}" stroke-width="2" fill="none"/>`;
+            let overlay = '';
+
+            const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
+            const item = slotDef?.items.find(i => i.id === itemId);
+            if (!item) { sdPreviewSvg.insertAdjacentHTML('beforeend', ship); return; }
+            const color = cosmeticColor(item);
+
             if (slot === 'bullets') {
-                ctx.fillStyle = cosmeticColor(item); ctx.shadowColor = cosmeticColor(item); ctx.shadowBlur = 6;
-                drawBulletShape(ctx, item.shape, 8); ctx.fill(); ctx.shadowBlur = 0;
+                overlay = drawSvgBulletShape(color, item.shape, 60, 40, 8);
             } else if (slot === 'thruster') {
-                ctx.strokeStyle = cosmeticColor(item); ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(-22, 0); ctx.lineTo(-10, 5); ctx.stroke();
+                overlay = `<line x1="50" y1="35" x2="38" y2="40" stroke="${color}" stroke-width="2"/>
+                          <line x1="38" y1="40" x2="50" y2="45" stroke="${color}" stroke-width="2"/>`;
             } else if (slot === 'death') {
-                ctx.save(); ctx.translate(24, 0); drawDeathPreview(ctx, item.id, 14); ctx.restore();
+                overlay = drawSvgDeathEffect(item.id, 84, 40, 14);
             } else if (slot === 'starbits') {
-                ctx.save(); ctx.translate(22, -18); ctx.fillStyle = '#ffd700'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 5;
-                drawStarbitShape(ctx, item.shape, 10); ctx.fill(); ctx.restore();
+                overlay = `<g transform="translate(82,22)" filter="url(#svgGlow)">
+                    ${drawSvgStarbitShape(color, item.shape, 10)}
+                </g>`;
             } else if (slot === 'powerups') {
-                ctx.save(); ctx.translate(-22, 18); ctx.fillStyle = '#00ffff'; ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 6;
-                drawPowerupShape(ctx, item.shape, 12); ctx.fill(); ctx.restore();
+                overlay = `<g transform="translate(38,58)" filter="url(#svgGlow)">
+                    ${drawSvgPowerupShape(color, item.shape, 12)}
+                </g>`;
             }
-            ctx.restore();
+
+            sdPreviewSvg.insertAdjacentHTML('beforeend', ship + overlay);
+        }
+
+        function drawSvgBulletShape(color, shape, cx, cy, r) {
+            const filter = 'filter="url(#svgGlow)"';
+            switch (shape) {
+                case 'diamond':
+                    return `<polygon points="${cx},${cy-r} ${cx+r*0.6},${cy} ${cx},${cy+r} ${cx-r*0.6},${cy}" fill="${color}" ${filter}/>`;
+                case 'triangle':
+                    return `<polygon points="${cx},${cy-r} ${cx+r},${cy+r*0.7} ${cx-r},${cy+r*0.7}" fill="${color}" ${filter}/>`;
+                case 'square':
+                    return `<rect x="${cx-r*0.6}" y="${cy-r*0.6}" width="${r*1.2}" height="${r*1.2}" fill="${color}" ${filter}/>`;
+                case 'star':
+                    let points = '';
+                    for (let i = 0; i < 5; i++) {
+                        const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                        points += `${cx + Math.cos(a) * r},${cy + Math.sin(a) * r} `;
+                    }
+                    return `<polygon points="${points.trim()}" fill="${color}" ${filter}/>`;
+                default: // circle
+                    return `<circle cx="${cx}" cy="${cy}" r="${r*0.6}" fill="${color}" ${filter}/>`;
+            }
+        }
+
+        function drawSvgDeathEffect(id, cx, cy, r) {
+            let svg = '';
+            if (id === 'death_shockwave' || id === 'death_annihilation') {
+                svg = `<circle cx="${cx}" cy="${cy}" r="${r}" stroke="#ff4444" stroke-width="1.5" fill="none"/>
+                       <circle cx="${cx}" cy="${cy}" r="${r*0.6}" stroke="#ff4444" stroke-width="1.5" fill="none"/>`;
+            } else if (id === 'death_supernova') {
+                svg = `<circle cx="${cx}" cy="${cy}" r="${r*0.3}" fill="white"/>`;
+                for (let i = 0; i < 8; i++) {
+                    const a = (i / 8) * Math.PI * 2;
+                    const x2 = cx + Math.cos(a) * r;
+                    const y2 = cy + Math.sin(a) * r;
+                    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#ffcc00" stroke-width="1.5"/>`;
+                }
+            } else if (id === 'death_blackhole') {
+                svg = `<circle cx="${cx}" cy="${cy}" r="${r*0.8}" fill="#220044"/>
+                       <circle cx="${cx}" cy="${cy}" r="${r}" stroke="#cc66ff" stroke-width="1.5" fill="none"/>`;
+            } else if (id === 'death_glitch') {
+                const colors = ['#ff0000', '#00ff00', '#0000ff'];
+                for (let i = 0; i < 6; i++) {
+                    const x = cx - r + Math.random() * r * 2;
+                    const y = cy - r + Math.random() * r * 2;
+                    svg += `<rect x="${x}" y="${y}" width="4" height="4" fill="${colors[i % 3]}"/>`;
+                }
+            } else {
+                // Default explosion
+                for (let i = 0; i < 8; i++) {
+                    const a = (i / 8) * Math.PI * 2;
+                    const x2 = cx + Math.cos(a) * r;
+                    const y2 = cy + Math.sin(a) * r;
+                    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#ff4444" stroke-width="1.5"/>`;
+                }
+            }
+            return svg;
+        }
+
+        function drawSvgStarbitShape(color, shape, r) {
+            const filter = 'filter="url(#svgGlow)"';
+            if (shape === 'heart') {
+                return `<path d="M 0,${r*0.3} C ${-r},${-r*0.3} ${-r*0.5},${-r} 0,${-r*0.5} C ${r*0.5},${-r} ${r},${-r*0.3} 0,${r*0.3}" fill="${color}" ${filter}/>`;
+            } else if (shape === 'diamond') {
+                return `<polygon points="0,${-r} ${r*0.6},0 0,${r} ${-r*0.6},0" fill="${color}" ${filter}/>`;
+            } else if (shape === 'cube') {
+                return `<rect x="${-r*0.5}" y="${-r*0.5}" width="${r}" height="${r}" fill="${color}" ${filter}/>`;
+            } else if (shape === 'moon') {
+                return `<circle cx="0" cy="0" r="${r*0.6}" fill="${color}" ${filter}/>
+                        <circle cx="${r*0.3}" cy="0" r="${r*0.5}" fill="#000"/>`;
+            } else if (shape === 'diamond_spinning') {
+                return `<polygon points="0,${-r} ${r*0.5},0 0,${r} ${-r*0.5},0" fill="${color}" ${filter} transform="rotate(45)"/>`;
+            } else if (shape === 'fragment') {
+                return `<polygon points="${-r*0.3},${-r} ${r*0.3},${-r*0.6} ${r*0.6},${-r*0.2} ${r*0.4},${r*0.5} ${-r*0.2},${r*0.7} ${-r*0.6},${r*0.2}" fill="${color}" ${filter}/>`;
+            } else if (shape === 'prismatic') {
+                return `<polygon points="0,${-r} ${r*0.3},${-r*0.3} ${r},0 ${r*0.3},${r*0.3} 0,${r} ${-r*0.3},${r*0.3} ${-r},0 ${-r*0.3},${-r*0.3}" fill="${color}" ${filter}/>`;
+            }
+            // Default: 4-pointed star
+            return `<polygon points="0,${-r} ${r*0.3},${-r*0.3} ${r},0 ${r*0.3},${r*0.3} 0,${r} ${-r*0.3},${r*0.3} ${-r},0 ${-r*0.3},${-r*0.3}" fill="${color}" ${filter}/>`;
+        }
+
+        function drawSvgPowerupShape(color, shape, r) {
+            const filter = 'filter="url(#svgGlow)"';
+            if (shape === 'ring') {
+                return `<circle cx="0" cy="0" r="${r*0.7}" stroke="${color}" stroke-width="2" fill="none" ${filter}/>`;
+            } else if (shape === 'polygon') {
+                let points = '';
+                for (let i = 0; i < 6; i++) {
+                    const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                    points += `${Math.cos(a) * r},${Math.sin(a) * r} `;
+                }
+                return `<polygon points="${points.trim()}" fill="${color}" ${filter}/>`;
+            } else if (shape === 'rune') {
+                return `<circle cx="0" cy="0" r="${r*0.7}" fill="${color}" opacity="0.8" ${filter}/>
+                        <polygon points="0,${-r*0.4} ${r*0.35},0 0,${r*0.4} ${-r*0.35},0" fill="#000"/>`;
+            } else if (shape === 'card') {
+                return `<rect x="${-r*0.6}" y="${-r*0.8}" width="${r*1.2}" height="${r*1.6}" rx="2" fill="${color}" opacity="0.9" ${filter}/>
+                        <rect x="${-r*0.35}" y="${-r*0.5}" width="${r*0.7}" height="${r*0.7}" fill="#000" opacity="0.5"/>`;
+            } else if (shape === 'core') {
+                return `<circle cx="0" cy="0" r="${r*0.8}" fill="${color}" ${filter}/>
+                        <circle cx="0" cy="0" r="${r*0.4}" fill="white" opacity="0.8"/>`;
+            } else if (shape === 'egg') {
+                return `<ellipse cx="0" cy="0" rx="${r*0.6}" ry="${r*0.8}" fill="${color}" ${filter}/>
+                        <ellipse cx="0" cy="${-r*0.2}" rx="${r*0.3}" ry="${r*0.4}" fill="white" opacity="0.4"/>`;
+            } else if (shape === 'relic') {
+                return `<polygon points="0,${-r} ${r*0.5},${-r*0.3} ${r*0.3},${r*0.5} ${-r*0.3},${r*0.5} ${-r*0.5},${-r*0.3}" fill="${color}" ${filter}/>
+                        <circle cx="0" cy="0" r="${r*0.2}" fill="white"/>`;
+            }
+            // Default: diamond
+            return `<polygon points="0,${-r} ${r*0.7},0 0,${r} ${-r*0.7},0" fill="${color}" ${filter}/>`;
         }
 
         let currentModifier = MODIFIERS[0];
