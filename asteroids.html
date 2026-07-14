@@ -538,6 +538,19 @@
         #stardustShopMenu {
             display: none;
             margin-top: 10px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        #stardustShopMenu::-webkit-scrollbar {
+            width: 6px;
+        }
+        #stardustShopMenu::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        #stardustShopMenu::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
         }
         .sd-title {
             font-size: 16px;
