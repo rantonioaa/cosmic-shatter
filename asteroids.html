@@ -542,17 +542,20 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             pointer-events: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcc00 rgba(255,255,255,0.1);
         }
         #stardustShopMenu::-webkit-scrollbar {
-            width: 6px;
+            width: 10px;
         }
         #stardustShopMenu::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 5px;
         }
         #stardustShopMenu::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
+            background: #ffcc00;
+            border-radius: 5px;
+            border: 2px solid rgba(0,0,0,0.3);
         }
         .sd-title {
             font-size: 16px;
