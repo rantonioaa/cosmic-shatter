@@ -541,6 +541,7 @@
             max-height: calc(100vh - 30px);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            pointer-events: auto;
         }
         #stardustShopMenu::-webkit-scrollbar {
             width: 6px;
@@ -5200,6 +5201,13 @@
                 }
             }
         });
+
+        // Stardust shop wheel/touchpad scrolling fallback
+        stardustShopMenuEl.addEventListener('wheel', (e) => {
+            if (gameState !== 'stardust_shop') return;
+            e.preventDefault();
+            stardustShopMenuEl.scrollTop += e.deltaY;
+        }, { passive: false });
     </script>
 </body>
 </html>
