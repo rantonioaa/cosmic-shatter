@@ -236,38 +236,39 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 6: Juice, Audio & Onboarding ⬜
+## Phase 6: Juice, Audio & Onboarding 🔶
 
-### 6A. Audio System
-- [ ] Web Audio API AudioContext with lazy init on first interaction
-- [ ] `AUDIO` namespace with `play(name, opts?)` dispatcher
-- [ ] Master gain limiter (DynamicsCompressorNode) to prevent clipping
-- [ ] Audio toggle in profile (`audioEnabled`)
-- [ ] Mobile unlock: resume on every tap, silent oscillator primed
+### 6A. Audio System ✅
+- [x] Web Audio API AudioContext with lazy init on first interaction
+- [x] `playSfx(name, opts)` dispatcher with 8 procedural sounds
+- [x] Master gain limiter (DynamicsCompressorNode) to prevent clipping
+- [x] Audio controls in Graphics menu (Master, SFX, Music sliders)
+- [x] Mobile unlock: resume on every tap
 
-### 6B. Sound Effects (8 essential)
-- [ ] Shoot — sawtooth 880→220Hz pitch slide, 100ms
-- [ ] Asteroid break — square + noise burst, 200-350ms (scales by size)
-- [ ] Powerup pickup — sine arpeggio 523→784→1047Hz, 250ms
-- [ ] Player hit — square 300→100Hz dive, 250ms
-- [ ] Wave clear — triangle major triad ascent, 700ms
-- [ ] Shop buy — sine coin chime 988→1319Hz, 150ms
-- [ ] Low health — sine 220Hz beep, 100ms repeating every 600ms
-- [ ] Game over — sawtooth descending drone + filtered noise, 1.5s
+### 6B. Sound Effects (8 essential) ✅
+- [x] Shoot — sawtooth 880→220Hz pitch slide, 100ms
+- [x] Asteroid break — square + noise burst, 200-350ms (scales by size)
+- [x] Powerup pickup — sine arpeggio 523→784→1047Hz, 250ms
+- [x] Player hit — square 300→100Hz dive, 250ms
+- [x] Wave clear — triangle major triad ascent, 700ms
+- [x] Shop buy — sine coin chime 988→1319Hz, 150ms
+- [x] Low health — sine 220Hz beep, 100ms repeating every 600ms
+- [x] Game over — sawtooth descending drone + filtered noise, 1.5s
 
-### 6C. Visual Effects
-- [ ] Screen shake — canvas translate offset on death + big breaks
-- [ ] Muzzle flash — bright particle burst at ship nose on shoot
-- [ ] Asteroid hit-flash — white tint for 2-3 frames on damage
+### 6C. Visual Effects ✅
+- [x] Screen shake — canvas translate offset on death + big breaks
+- [x] Muzzle flash — brief white cone at ship nose on shoot (2-3 frames)
+- [x] Asteroid hit-flash — white tint for 2-3 frames on damage
 - [ ] Hit-stop — 3-6 frame update pause on player damage
-- [ ] Combo popups — floating score text from kill position
-- [ ] Death shockwave — expanding ring + particle burst on player death
+- [x] Combo popups — floating score text from kill position
+- [x] Death shockwave — expanding ring on player death
 
-### 6D. Procedural Ambient Music
-- [ ] Low sine/triangle drone (40-80Hz) with LFO filtering
-- [ ] Sparse pentatonic arpeggios every 2-4 seconds
-- [ ] Intensity layers: calm menu → active waves → low rumble at low health
-- [ ] Unobtrusive — space atmosphere through silence + punctuated sound
+### 6D. Procedural Ambient Music ✅
+- [x] Low sine drone (40-80Hz) with LFO filtering
+- [x] Texture pad (triangle 120-200Hz) for warmth
+- [x] Sparse pentatonic arpeggios every 4-6 seconds
+- [x] Intensity layers: combo boost, low health tension
+- [x] Unobtrusive — space atmosphere through silence + punctuated sound
 
 ### 6E. Onboarding
 - [ ] First-run tutorial overlay (rotate, thrust, shoot, collect)

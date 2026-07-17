@@ -428,6 +428,37 @@
 - `user-scalable=no` to prevent zoom issues
 - Prevents pull-to-refresh and bounce
 
+### Audio System (Pink Floyd-inspired)
+- Web Audio API with lazy initialization on first user gesture
+- 3 gain nodes: Master, SFX, Music (separate volume controls)
+- DynamicsCompressorNode to prevent clipping
+- **8 procedural sound effects:**
+  - Shoot — sawtooth 880→220Hz pitch slide, 100ms
+  - Explosion — square + noise burst, 200-350ms (scales by asteroid size)
+  - Powerup pickup — sine arpeggio 523→784→1047Hz, 250ms
+  - Player hit — square 300→100Hz dive, 250ms
+  - Wave clear — triangle major triad ascent, 700ms
+  - Shop buy — sine coin chime 988→1319Hz, 150ms
+  - Low health — sine 220Hz beep, 100ms repeating every 600ms
+  - Game over — sawtooth descending drone + filtered noise, 1.5s
+- **Procedural ambient music:**
+  - Base drone: sine wave 40-80Hz with LFO filter sweep
+  - Texture pad: triangle wave 120-200Hz for warmth
+  - Sparse arpeggios: pentatonic scale (C, D, E, G, A), every 4-6 seconds
+  - Intensity scaling: combo multiplier and low health add layers
+- **Audio controls in Graphics menu:**
+  - Master volume slider (0-100%)
+  - SFX volume slider (0-100%)
+  - Music volume slider (0-100%, capped at 50% to stay subtle)
+  - Settings saved to profile
+
+### Visual Effects
+- **Screen shake** — canvas translate offset on player death and big asteroid breaks
+- **Muzzle flash** — brief white cone at ship nose on every shot (2-3 frames)
+- **Hit-flash** — asteroids flash white briefly on bullet hit (2-3 frames)
+- **Death shockwave** — expanding ring on player death
+- **Combo popups** — floating score text from kill position on combo milestones
+
 ### Mobile UI/UX Standards
 - Touch targets meet Apple HIG (44px) and Material Design (48dp) minimums:
   - Menu items: 48px min-height, 12px 16px padding on mobile

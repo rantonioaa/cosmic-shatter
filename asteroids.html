@@ -399,6 +399,46 @@
             font-size: 12px;
             margin-left: 6px;
         }
+        #graphicsMenu .gfx-slider {
+            font-size: 13px;
+            margin: 6px 0;
+            padding: 6px 8px 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        #graphicsMenu .gfx-range {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #333;
+            border-radius: 2px;
+            outline: none;
+        }
+        #graphicsMenu .gfx-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #ffcc00;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #graphicsMenu .gfx-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #ffcc00;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        #graphicsMenu .gfx-vol-val {
+            min-width: 36px;
+            text-align: right;
+            color: #ffcc00;
+            font-size: 12px;
+        }
         #graphicsMenu .gfx-hint {
             font-size: 11px;
             opacity: 0.4;
@@ -1377,6 +1417,343 @@
         let lastLevel = 1;
         let lastStardustEarned = 0;
         let levelTransitionTimer = 0;
+
+        // Audio system (Pink Floyd-inspired)
+        let audioCtx = null;
+        let masterGain = null;
+        let sfxGain = null;
+        let musicGain = null;
+        let audioInitialized = false;
+        let musicPlaying = false;
+        let droneOsc = null;
+        let droneGain = null;
+        let textureOsc = null;
+        let textureGain = null;
+        let arpeggioTimer = 0;
+        const ARPEGGIO_INTERVAL = 300; // 5 seconds at 60fps
+        const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00]; // C4 D4 E4 G4 A4
+
+        function initAudio() {
+            if (audioInitialized) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain();
+                sfxGain = audioCtx.createGain();
+                musicGain = audioCtx.createGain();
+                const compressor = audioCtx.createDynamicsCompressor();
+                
+                sfxGain.connect(masterGain);
+                musicGain.connect(masterGain);
+                masterGain.connect(compressor);
+                compressor.connect(audioCtx.destination);
+                
+                masterGain.gain.value = 0.8;
+                sfxGain.gain.value = 0.8;
+                musicGain.gain.value = 0.15;
+                
+                audioInitialized = true;
+            } catch (e) {
+                console.warn('Audio not supported:', e);
+            }
+        }
+
+        function resumeAudio() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSfx(type, opts = {}) {
+            if (!audioCtx || !sfxGain) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(sfxGain);
+            
+            switch (type) {
+                case 'shoot':
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(880, now);
+                    osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                    break;
+                case 'explosion':
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(opts.size === 'large' ? 350 : 200, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                    // Add noise burst
+                    const noise = audioCtx.createBufferSource();
+                    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+                    const data = buf.getChannelData(0);
+                    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+                    noise.buffer = buf;
+                    const noiseGain = audioCtx.createGain();
+                    noise.connect(noiseGain);
+                    noiseGain.connect(sfxGain);
+                    noiseGain.gain.setValueAtTime(0.2, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    noise.start(now);
+                    noise.stop(now + 0.15);
+                    break;
+                case 'powerup':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523, now);
+                    osc.frequency.setValueAtTime(784, now + 0.08);
+                    osc.frequency.setValueAtTime(1047, now + 0.16);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                    break;
+                case 'hit':
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.25);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                    break;
+                case 'levelup':
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523, now);
+                    osc.frequency.setValueAtTime(659, now + 0.15);
+                    osc.frequency.setValueAtTime(784, now + 0.3);
+                    osc.frequency.setValueAtTime(1047, now + 0.45);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                    osc.start(now);
+                    osc.stop(now + 0.7);
+                    break;
+                case 'shop':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(988, now);
+                    osc.frequency.setValueAtTime(1319, now + 0.08);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                    break;
+                case 'lowhealth':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.setValueAtTime(0.2, now + 0.05);
+                    gain.gain.setValueAtTime(0, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                    break;
+                case 'gameover':
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(55, now + 1.5);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                    osc.start(now);
+                    osc.stop(now + 1.5);
+                    break;
+            }
+        }
+
+        function startMusic() {
+            if (!audioCtx || !musicGain || musicPlaying) return;
+            musicPlaying = true;
+            
+            // Base drone (40-80Hz sine)
+            droneOsc = audioCtx.createOscillator();
+            droneGain = audioCtx.createGain();
+            droneOsc.type = 'sine';
+            droneOsc.frequency.value = 55;
+            droneGain.gain.value = 0.15;
+            droneOsc.connect(droneGain);
+            droneGain.connect(musicGain);
+            droneOsc.start();
+            
+            // LFO for filter sweep
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.type = 'sine';
+            lfo.frequency.value = 0.2;
+            lfoGain.gain.value = 20;
+            lfo.connect(lfoGain);
+            lfoGain.connect(droneOsc.frequency);
+            lfo.start();
+            
+            // Texture pad (triangle, 120-200Hz)
+            textureOsc = audioCtx.createOscillator();
+            textureGain = audioCtx.createGain();
+            textureOsc.type = 'triangle';
+            textureOsc.frequency.value = 150;
+            textureGain.gain.value = 0.08;
+            textureOsc.connect(textureGain);
+            textureGain.connect(musicGain);
+            textureOsc.start();
+            
+            arpeggioTimer = ARPEGGIO_INTERVAL;
+        }
+
+        function stopMusic() {
+            if (!audioCtx) return;
+            musicPlaying = false;
+            if (droneOsc) { try { droneOsc.stop(); } catch(e) {} droneOsc = null; }
+            if (textureOsc) { try { textureOsc.stop(); } catch(e) {} textureOsc = null; }
+        }
+
+        function updateMusic(dt) {
+            if (!musicPlaying || !audioCtx) return;
+            
+            // Spawn arpeggios periodically
+            arpeggioTimer -= dt;
+            if (arpeggioTimer <= 0) {
+                arpeggioTimer = ARPEGGIO_INTERVAL + Math.random() * 120; // 5-7 seconds
+                playArpeggio();
+            }
+            
+            // Intensity scaling based on combo
+            if (droneGain) {
+                const comboBoost = Math.min(combo * 0.02, 0.1);
+                droneGain.gain.value = 0.15 + comboBoost;
+            }
+            if (textureGain) {
+                const healthBoost = lives <= 1 ? 0.05 : 0;
+                textureGain.gain.value = 0.08 + healthBoost;
+            }
+        }
+
+        function playArpeggio() {
+            if (!audioCtx || !musicGain) return;
+            const now = audioCtx.currentTime;
+            const note = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = note;
+            osc.connect(gain);
+            gain.connect(musicGain);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            osc.start(now);
+            osc.stop(now + 1.5);
+        }
+
+        // Visual effects system
+        let screenShakeTimer = 0;
+        let screenShakeIntensity = 0;
+        let muzzleFlashTimer = 0;
+        let hitFlashTargets = []; // [{obj, timer}]
+        let deathShockwave = null; // {x, y, radius, maxRadius, timer}
+        let comboPopups = []; // [{x, y, text, color, timer, vy}]
+
+        function triggerScreenShake(duration, intensity) {
+            screenShakeTimer = duration;
+            screenShakeIntensity = intensity;
+        }
+
+        function triggerMuzzleFlash() {
+            muzzleFlashTimer = 3; // 3 frames
+        }
+
+        function triggerHitFlash(obj) {
+            hitFlashTargets.push({ obj, timer: 3 });
+        }
+
+        function triggerDeathShockwave(x, y) {
+            deathShockwave = { x, y, radius: 0, maxRadius: sc(100), timer: 30 };
+        }
+
+        function triggerComboPopup(x, y, text, color) {
+            comboPopups.push({ x, y, text, color, timer: 60, vy: -1.5 });
+        }
+
+        function updateVisualEffects(dt) {
+            // Screen shake
+            if (screenShakeTimer > 0) {
+                screenShakeTimer -= dt;
+            }
+            
+            // Muzzle flash
+            if (muzzleFlashTimer > 0) {
+                muzzleFlashTimer -= dt;
+            }
+            
+            // Hit flash
+            hitFlashTargets = hitFlashTargets.filter(h => {
+                h.timer -= dt;
+                return h.timer > 0;
+            });
+            
+            // Death shockwave
+            if (deathShockwave) {
+                deathShockwave.timer -= dt;
+                deathShockwave.radius += (deathShockwave.maxRadius / 30) * dt;
+                if (deathShockwave.timer <= 0) deathShockwave = null;
+            }
+            
+            // Combo popups
+            comboPopups = comboPopups.filter(p => {
+                p.timer -= dt;
+                p.y += p.vy * dt;
+                return p.timer > 0;
+            });
+        }
+
+        function drawVisualEffects() {
+            // Screen shake offset
+            if (screenShakeTimer > 0) {
+                const shakeX = (Math.random() - 0.5) * screenShakeIntensity * 2;
+                const shakeY = (Math.random() - 0.5) * screenShakeIntensity * 2;
+                ctx.translate(shakeX, shakeY);
+            }
+            
+            // Muzzle flash
+            if (muzzleFlashTimer > 0 && ship.alive) {
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                ctx.rotate(ship.angle);
+                ctx.fillStyle = 'rgba(255, 255, 200, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(sc(18), 0);
+                ctx.lineTo(sc(28), -sc(4));
+                ctx.lineTo(sc(28), sc(4));
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            // Hit flash
+            hitFlashTargets.forEach(h => {
+                if (h.obj && h.obj.flash !== undefined) {
+                    h.obj.flash = true;
+                }
+            });
+            
+            // Death shockwave
+            if (deathShockwave) {
+                const alpha = deathShockwave.timer / 30;
+                ctx.strokeStyle = `rgba(255, 100, 100, ${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(deathShockwave.x, deathShockwave.y, deathShockwave.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Combo popups
+            comboPopups.forEach(p => {
+                const alpha = p.timer / 60;
+                ctx.fillStyle = p.color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+                ctx.font = `bold ${sc(14)}px Courier New`;
+                ctx.textAlign = 'center';
+                ctx.fillText(p.text, p.x, p.y);
+            });
+        }
 
         // Heat system
         let heat = 0;
@@ -2427,7 +2804,49 @@
                     + `</div>`;
             }
 
+            // Section: Audio
+            html += '<div class="gfx-section">AUDIO</div>';
+            const masterVol = activeProfile?.audioMaster ?? 80;
+            const sfxVol = activeProfile?.audioSfx ?? 80;
+            const musicVol = activeProfile?.audioMusic ?? 15;
+            
+            html += `<div class="gfx-slider" data-tap-action="audio_master">`
+                + `Master: <input type="range" min="0" max="100" value="${masterVol}" class="gfx-range" data-audio="master">`
+                + `<span class="gfx-vol-val">${masterVol}%</span></div>`;
+            
+            html += `<div class="gfx-slider" data-tap-action="audio_sfx">`
+                + `SFX: <input type="range" min="0" max="100" value="${sfxVol}" class="gfx-range" data-audio="sfx">`
+                + `<span class="gfx-vol-val">${sfxVol}%</span></div>`;
+            
+            html += `<div class="gfx-slider" data-tap-action="audio_music">`
+                + `Music: <input type="range" min="0" max="100" value="${musicVol}" class="gfx-range" data-audio="music">`
+                + `<span class="gfx-vol-val">${musicVol}%</span></div>`;
+
             gfxListEl.innerHTML = html;
+            
+            // Attach range input listeners
+            gfxListEl.querySelectorAll('.gfx-range').forEach(range => {
+                range.addEventListener('input', (e) => {
+                    const type = e.target.dataset.audio;
+                    const val = parseInt(e.target.value);
+                    e.target.nextElementSibling.textContent = val + '%';
+                    applyAudioVolume(type, val);
+                });
+                range.addEventListener('click', (e) => e.stopPropagation());
+            });
+        }
+
+        function applyAudioVolume(type, val) {
+            const normalized = val / 100;
+            if (type === 'master' && masterGain) masterGain.gain.value = normalized;
+            if (type === 'sfx' && sfxGain) sfxGain.gain.value = normalized;
+            if (type === 'music' && musicGain) musicGain.gain.value = normalized * 0.5; // Music capped at 50%
+            if (activeProfile) {
+                if (type === 'master') activeProfile.audioMaster = val;
+                if (type === 'sfx') activeProfile.audioSfx = val;
+                if (type === 'music') activeProfile.audioMusic = val;
+                saveProfile(activeProfile);
+            }
         }
 
         function renderShopList() {
@@ -3447,6 +3866,9 @@
 
         // Start game
         function startGame() {
+            initAudio();
+            resumeAudio();
+            startMusic();
             gameState = 'playing';
             score = 0;
             lastStardustEarned = 0;
@@ -3848,6 +4270,8 @@
 
         // Shoot
         function shoot() {
+            playSfx('shoot');
+            triggerMuzzleFlash();
             const bx = ship.x + Math.cos(ship.angle) * sc(20);
             const by = ship.y + Math.sin(ship.angle) * sc(20);
             const bulletSpeedMult = activeProfile ? 1 + activeProfile.upgrades.bulletSpeed * 0.2 : 1;
@@ -4063,6 +4487,11 @@
                             const comboMult = 1 + combo * 0.5;
                             score += Math.floor(points * comboMult * (scoreMultActive ? 2 : 1));
 
+                            // Audio & VFX
+                            playSfx('explosion', { size: a.size >= 2 ? 'large' : 'small' });
+                            if (a.size >= 2) triggerScreenShake(5, sc(3));
+                            if (combo >= 2) triggerComboPopup(a.x, a.y - sc(20), `x${(1 + combo * 0.5).toFixed(1)}`, 'rgb(255, 204, 0)');
+
                             // Build combo
                             combo = Math.min(5, combo + 1);
                             comboTimer = COMBO_TIMEOUT;
@@ -4184,6 +4613,12 @@
                         }
                         combo = 0;
                         comboTimer = 0;
+                        
+                        // Audio & VFX on player hit
+                        playSfx('hit');
+                        triggerScreenShake(10, sc(5));
+                        triggerDeathShockwave(ship.x, ship.y);
+                        
                         lives--;
                         // Reset magnet powerup on death
                         activePowerups.magnetboost = 0;
@@ -4194,6 +4629,8 @@
                             lastScore = score;
                             lastLevel = level;
                             gameState = 'gameover';
+                            playSfx('gameover');
+                            stopMusic();
                             submitScore();
                         } else {
                             ship.x = canvas.width / 2;
@@ -4216,6 +4653,7 @@
                 const dy = ship.y - p.y;
                 if (Math.sqrt(dx * dx + dy * dy) < p.radius + ship.radius) {
                     // Activate powerup
+                    playSfx('powerup');
                     if (p.type.id === 'shield') {
                         if (activePowerups.shield < 3) {
                             activePowerups.shield++;
@@ -4468,6 +4906,8 @@
                 updateActivePowerups(dt);
                 updateMagnet(dt);
                 checkCollisions();
+                updateVisualEffects(dt);
+                updateMusic(dt);
 
                 // Combo decay (runs every frame regardless of heat state)
                 if (comboTimer > 0) {
@@ -4502,6 +4942,7 @@
                 drawParticles();
                 drawPowerups();
                 drawStarBits();
+                drawVisualEffects();
 
                 // Dark mode overlay
                 if (currentModifier.id === 'dark_mode') {
@@ -4520,6 +4961,7 @@
                 levelTransitionTimer -= dt;
                 if (levelTransitionTimer <= 0) {
                     level++;
+                    playSfx('levelup');
                     spawnAsteroids();
                     gameState = 'playing';
                     updateUI();
