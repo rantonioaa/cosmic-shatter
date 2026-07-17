@@ -1656,6 +1656,10 @@
             osc.stop(now + 1.5);
         }
 
+        // Low health warning timer
+        let lowHealthTimer = 0;
+        const LOW_HEALTH_INTERVAL = 36; // 0.6 seconds at 60fps
+
         // Visual effects system
         let screenShakeTimer = 0;
         let screenShakeIntensity = 0;
@@ -1681,8 +1685,8 @@
             deathShockwave = { x, y, radius: 0, maxRadius: sc(100), timer: 30 };
         }
 
-        function triggerComboPopup(x, y, text, color) {
-            comboPopups.push({ x, y, text, color, timer: 60, vy: -1.5 });
+        function triggerComboPopup(x, y, text, r, g, b) {
+            comboPopups.push({ x, y, text, r, g, b, timer: 60, vy: -1.5 });
         }
 
         function updateVisualEffects(dt) {
@@ -1727,7 +1731,7 @@
             }
             
             // Muzzle flash
-            if (muzzleFlashTimer > 0 && ship.invulnerable) {
+            if (muzzleFlashTimer > 0 && typeof ship.x === 'number') {
                 ctx.save();
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
@@ -1761,7 +1765,7 @@
             // Combo popups
             comboPopups.forEach(p => {
                 const alpha = p.timer / 60;
-                ctx.fillStyle = p.color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+                ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${alpha})`;
                 ctx.font = `bold ${sc(14)}px Courier New`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
@@ -2921,6 +2925,7 @@
             if (activeProfile.starBits < cost) return false;
             activeProfile.starBits -= cost;
             activeProfile.upgrades[upgradeId]++;
+            playSfx('shop');
             saveProfile(activeProfile);
             return true;
         }
@@ -3489,13 +3494,16 @@
                             activeProfile.activeRun = serializeRun();
                             saveProfile(activeProfile);
                         }
+                        stopMusic();
                         gameState = 'menu';
                     } else {
+                        stopMusic();
                         gameState = 'menu';
                     }
                     updateUI();
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
+                    stopMusic();
                     gameState = 'menu';
                     updateUI();
                 }
@@ -4524,7 +4532,7 @@
                             // Audio & VFX
                             playSfx('explosion', { size: a.size >= 2 ? 'large' : 'small' });
                             if (a.size >= 2) triggerScreenShake(5, sc(3));
-                            if (combo >= 2) triggerComboPopup(a.x, a.y - sc(20), `x${(1 + combo * 0.5).toFixed(1)}`, 'rgb(255, 204, 0)');
+                            if (combo >= 2) triggerComboPopup(a.x, a.y - sc(20), `x${(1 + combo * 0.5).toFixed(1)}`, 255, 204, 0);
 
                             // Build combo
                             combo = Math.min(5, combo + 1);
@@ -4652,6 +4660,7 @@
                         playSfx('hit');
                         triggerScreenShake(10, sc(5));
                         triggerDeathShockwave(ship.x, ship.y);
+                        triggerHitFlash(ship);
                         
                         lives--;
                         // Reset magnet powerup on death
@@ -4742,8 +4751,9 @@
             ctx.rotate(ship.angle);
             ctx.scale(s, s);
 
-            // Draw ship with cosmetic hull color
-            const hullColor = getCosmeticColor('hull', '#ffffff');
+            // Draw ship with cosmetic hull color (white when flashing)
+            const hullColor = ship.flash ? '#ffffff' : getCosmeticColor('hull', '#ffffff');
+            if (ship.flash) ship.flash = false;
             ctx.beginPath();
             ctx.moveTo(20, 0);
             ctx.lineTo(-15, -12);
@@ -4950,6 +4960,17 @@
                         combo = 0;
                         comboTimer = 0;
                     }
+                }
+
+                // Low health warning sound
+                if (lives <= 1) {
+                    lowHealthTimer -= dt;
+                    if (lowHealthTimer <= 0) {
+                        playSfx('lowhealth');
+                        lowHealthTimer = LOW_HEALTH_INTERVAL;
+                    }
+                } else {
+                    lowHealthTimer = 0;
                 }
 
                 // Update score display with live combo (every frame)
@@ -5570,8 +5591,10 @@
                         activeProfile.activeRun = serializeRun();
                         saveProfile(activeProfile);
                     }
+                    stopMusic();
                     gameState = 'menu';
                 } else {
+                    stopMusic();
                     gameState = 'menu';
                 }
                 updateUI();
