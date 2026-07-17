@@ -182,6 +182,11 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Auto-equip on purchase, re-equip any owned item from shop
 - [x] Default items always free (equipping default = "off")
 - [x] Accessible from main menu via [U] key or tap
+- [x] Select-to-preview UX: click/tap item to preview (no purchase)
+- [x] Buy button: explicit "BUY — X ✦" button for confirmation
+- [x] SVG previews for all loadouts and cosmetics
+- [x] Scrollable list with yellow scrollbar (touchpad/mouse wheel supported)
+- [x] Dynamic scaling via `sc()` function (scales with resolution)
 
 ### 4C. Loadout Unlocks (Phase 8 prep) ✅
 - [x] Standard: Free (default)

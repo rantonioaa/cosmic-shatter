@@ -314,6 +314,14 @@
 ### Stardust Unlock Shop
 - Accessible from main menu via [U] key
 - Two tabs: Loadouts, Cosmetics
+- **Select-to-preview UX**: Click/tap an item to preview it (no purchase)
+- **Buy button**: Explicit "BUY — X ✦" button in preview area for confirmation
+- Button states: SELECT AN ITEM (default), BUY — X ✦ (affordable), EQUIP (owned), EQUIPPED (disabled), NEED X MORE (disabled)
+- Keyboard: W/S to browse, ENTER to buy/equip
+- Touch: Tap item to preview, tap BUY button to purchase
+- **SVG previews**: Crisp vector previews for all loadouts and cosmetics
+- **Scrollable list**: Yellow scrollbar, touchpad/mouse wheel supported
+- **Dynamic scaling**: All elements scale with device resolution via `sc()` function
 - Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦)
 - Cosmetics: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
 - Total cost to unlock everything: ~24,940 ✦
@@ -414,8 +422,9 @@
 - Saved per profile
 
 ### Performance
-- Auto resolution detects device screen and picks best matching resolution (typically 360p on mobile)
+- Resolution always auto-detected based on device screen and DPR (no manual selection)
 - Delta time normalization for consistent speed
+- Dynamic UI scaling via `sc()` function (Stardust shop scales with resolution)
 - `user-scalable=no` to prevent zoom issues
 - Prevents pull-to-refresh and bounce
 
