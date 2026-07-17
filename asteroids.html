@@ -1429,6 +1429,7 @@
         let droneGain = null;
         let textureOsc = null;
         let textureGain = null;
+        let lfoOsc = null;
         let arpeggioTimer = 0;
         const ARPEGGIO_INTERVAL = 300; // 5 seconds at 60fps
         const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00]; // C4 D4 E4 G4 A4
@@ -1447,9 +1448,16 @@
                 masterGain.connect(compressor);
                 compressor.connect(audioCtx.destination);
                 
-                masterGain.gain.value = 0.8;
-                sfxGain.gain.value = 0.8;
-                musicGain.gain.value = 0.15;
+                // Restore saved volume levels from profile
+                if (activeProfile) {
+                    masterGain.gain.value = (activeProfile.audioMaster ?? 80) / 100;
+                    sfxGain.gain.value = (activeProfile.audioSfx ?? 80) / 100;
+                    musicGain.gain.value = ((activeProfile.audioMusic ?? 15) / 100) * 0.5;
+                } else {
+                    masterGain.gain.value = 0.8;
+                    sfxGain.gain.value = 0.8;
+                    musicGain.gain.value = 0.075;
+                }
                 
                 audioInitialized = true;
             } catch (e) {
@@ -1578,14 +1586,14 @@
             droneOsc.start();
             
             // LFO for filter sweep
-            const lfo = audioCtx.createOscillator();
+            lfoOsc = audioCtx.createOscillator();
             const lfoGain = audioCtx.createGain();
-            lfo.type = 'sine';
-            lfo.frequency.value = 0.2;
+            lfoOsc.type = 'sine';
+            lfoOsc.frequency.value = 0.2;
             lfoGain.gain.value = 20;
-            lfo.connect(lfoGain);
+            lfoOsc.connect(lfoGain);
             lfoGain.connect(droneOsc.frequency);
-            lfo.start();
+            lfoOsc.start();
             
             // Texture pad (triangle, 120-200Hz)
             textureOsc = audioCtx.createOscillator();
@@ -1603,8 +1611,12 @@
         function stopMusic() {
             if (!audioCtx) return;
             musicPlaying = false;
+            if (lfoOsc) { try { lfoOsc.stop(); } catch(e) {} lfoOsc = null; }
             if (droneOsc) { try { droneOsc.stop(); } catch(e) {} droneOsc = null; }
             if (textureOsc) { try { textureOsc.stop(); } catch(e) {} textureOsc = null; }
+            droneGain = null;
+            textureGain = null;
+            arpeggioTimer = 0;
         }
 
         function updateMusic(dt) {
@@ -1708,13 +1720,14 @@
         function drawVisualEffects() {
             // Screen shake offset
             if (screenShakeTimer > 0) {
+                ctx.save();
                 const shakeX = (Math.random() - 0.5) * screenShakeIntensity * 2;
                 const shakeY = (Math.random() - 0.5) * screenShakeIntensity * 2;
                 ctx.translate(shakeX, shakeY);
             }
             
             // Muzzle flash
-            if (muzzleFlashTimer > 0 && ship.alive) {
+            if (muzzleFlashTimer > 0 && ship.invulnerable) {
                 ctx.save();
                 ctx.translate(ship.x, ship.y);
                 ctx.rotate(ship.angle);
@@ -1753,6 +1766,11 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
+            
+            // Restore context after screen shake
+            if (screenShakeTimer > 0) {
+                ctx.restore();
+            }
         }
 
         // Heat system
@@ -2486,6 +2504,9 @@
                 selectedLoadout: 'standard',
                 resolution: 'auto',
                 orientation: 'landscape',
+                audioMaster: 80,
+                audioSfx: 80,
+                audioMusic: 15,
                 activeRun: null
             };
         }
@@ -2576,6 +2597,19 @@
             }
             if (!profile.selectedLoadout) {
                 profile.selectedLoadout = 'standard';
+                changed = true;
+            }
+            // Audio fields (Phase 6)
+            if (profile.audioMaster === undefined) {
+                profile.audioMaster = 80;
+                changed = true;
+            }
+            if (profile.audioSfx === undefined) {
+                profile.audioSfx = 80;
+                changed = true;
+            }
+            if (profile.audioMusic === undefined) {
+                profile.audioMusic = 15;
                 changed = true;
             }
             if (changed) saveProfile(profile);
@@ -5157,6 +5191,8 @@
 
             // Menu tap-to-select: delegate taps on menu items
             document.addEventListener('touchstart', (e) => {
+                // Skip range inputs (audio sliders)
+                if (e.target.tagName === 'INPUT') return;
                 const target = e.target.closest('[data-tap-action]');
                 if (!target) return;
                 e.preventDefault();
