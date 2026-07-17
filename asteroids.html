@@ -1244,7 +1244,7 @@
         const sdScrollAreaEl = document.getElementById('sdScrollArea');
         const sdPreviewEl = document.getElementById('stardustPreview');
         function updateStardustShopSize() {
-            if (!sdScrollAreaEl || !sdPreviewEl) return;
+            if (!sdScrollAreaEl || !sdPreviewEl || !sdPreviewSvg) return;
             const vh = window.innerHeight;
             sdScrollAreaEl.style.maxHeight = (vh - sc(260)) + 'px';
             sdPreviewEl.style.maxWidth = sc(220) + 'px';
@@ -4700,7 +4700,6 @@
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
                         graphicsMenuIndex = 0;
-                        }
                         updateUI();
                     }
                 } else if (gameState === 'modifier_select' && idx !== null) {
@@ -5030,11 +5029,13 @@
         });
 
         // Stardust shop wheel/touchpad scrolling fallback
-        sdScrollAreaEl.addEventListener('wheel', (e) => {
-            if (gameState !== 'stardust_shop') return;
-            e.preventDefault();
-            sdScrollAreaEl.scrollTop += e.deltaY;
-        }, { passive: false });
+        if (sdScrollAreaEl) {
+            sdScrollAreaEl.addEventListener('wheel', (e) => {
+                if (gameState !== 'stardust_shop') return;
+                e.preventDefault();
+                sdScrollAreaEl.scrollTop += e.deltaY;
+            }, { passive: false });
+        }
     </script>
 </body>
 </html>
