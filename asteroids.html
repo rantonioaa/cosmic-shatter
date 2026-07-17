@@ -635,8 +635,6 @@
             background: rgba(0, 0, 0, 0.35);
         }
         #sdPreviewSvg {
-            width: 120px;
-            height: 80px;
             background: #000;
             border: 1px solid #444;
             border-radius: 3px;
@@ -736,20 +734,10 @@
                 max-width: 180px;
                 padding: 8px;
             }
-            #sdPreviewSvg {
-                width: 100px;
-                height: 66px;
-            }
             .sd-slot-tab {
                 font-size: 8px;
                 padding: 4px 6px;
                 min-height: 36px;
-            }
-        }
-        @media (max-height: 700px) {
-            #sdPreviewSvg {
-                width: 90px;
-                height: 60px;
             }
         }
 
@@ -1038,7 +1026,7 @@
             <div class="gfx-title">GRAPHICS</div>
             <div class="gfx-list" id="gfxList"></div>
             <div class="gfx-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
-            <div class="touch-hint">Tap a resolution · Tap Back to exit</div>
+            <div class="touch-hint">Tap an option · Tap Back to exit</div>
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
         <div id="shopMenu">
@@ -1223,7 +1211,6 @@
             document.documentElement.style.setProperty('--s', SCALE);
             document.documentElement.style.setProperty('--u', UI_SCALE);
             comboBarEl.style.width = (200 * SCALE / UI_SCALE) + 'px';
-            if (typeof updateStardustShopSize === 'function') updateStardustShopSize();
         }
         applyScale();
         applyCanvasStyle();
@@ -2731,14 +2718,7 @@
                     gameState = 'graphics_menu';
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
-                    const savedRes = activeProfile ? activeProfile.resolution : 'auto';
-                    if (savedRes === 'auto') {
-                        graphicsMenuIndex = 0;
-                    } else if (typeof savedRes === 'number') {
-                        graphicsMenuIndex = savedRes + 1;
-                    } else {
-                        graphicsMenuIndex = 1;
-                    }
+                    graphicsMenuIndex = 0;
                     renderGraphicsList();
                     updateUI();
                 } else if (e.key === 's' || e.key === 'S') {
@@ -4514,23 +4494,9 @@
                     currentOrientation = activeProfile.orientation;
                     RESOLUTIONS = getResolutions();
                 }
-                const resSetting = activeProfile.resolution ?? 'auto';
-                let res;
-                if (resSetting === 'auto') {
-                    res = getAutoResolution();
-                } else if (typeof resSetting === 'number' && RESOLUTIONS[resSetting]) {
-                    res = RESOLUTIONS[resSetting];
-                } else {
-                    res = getAutoResolution();
-                }
-                if (res) {
-                    currentResolution = res;
-                    canvas.width = currentResolution.width;
-                    canvas.height = currentResolution.height;
-                    SCALE = Math.min(canvas.width, canvas.height) / 720;
-                    applyScale();
+                // Always auto-detect resolution (ignore stored resolution field)
+                applyScale();
         applyCanvasStyle();
-                }
             } else {
                 setActiveProfileName(null);
             }
@@ -4733,13 +4699,7 @@
                         gameState = 'graphics_menu';
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
-                        const savedRes = activeProfile ? activeProfile.resolution : 'auto';
-                        if (savedRes === 'auto') {
-                            graphicsMenuIndex = 0;
-                        } else if (typeof savedRes === 'number') {
-                            graphicsMenuIndex = savedRes + 1;
-                        } else {
-                            graphicsMenuIndex = 1;
+                        graphicsMenuIndex = 0;
                         }
                         updateUI();
                     }
@@ -4948,14 +4908,7 @@
                     gameState = 'graphics_menu';
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
-                    const savedRes = activeProfile ? activeProfile.resolution : 'auto';
-                    if (savedRes === 'auto') {
-                        graphicsMenuIndex = 0;
-                    } else if (typeof savedRes === 'number') {
-                        graphicsMenuIndex = savedRes + 1;
-                    } else {
-                        graphicsMenuIndex = 1;
-                    }
+                    graphicsMenuIndex = 0;
                     updateUI();
                 }
             } else if (gameState === 'modifier_select' && idx !== null) {
@@ -4969,39 +4922,11 @@
                 updateUI();
             } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
                 const tapIdx = parseInt(idx);
-                const resList = getResolutions();
-                const oriIdx = resList.length + 1;
-                const fsIdx = resList.length + 2;
-                if (tapIdx === oriIdx) {
+                if (tapIdx === 0) {
+                    // Toggle orientation
                     currentOrientation = currentOrientation === 'landscape' ? 'portrait' : 'landscape';
                     RESOLUTIONS = getResolutions();
-                    const newResList = getResolutions();
-                    const autoRes = getAutoResolution();
-                    let res;
-                    if (activeProfile && activeProfile.resolution === 'auto') {
-                        res = autoRes;
-                    } else if (activeProfile && typeof activeProfile.resolution === 'number' && newResList[activeProfile.resolution]) {
-                        res = newResList[activeProfile.resolution];
-                    } else {
-                        res = autoRes;
-                    }
-                    canvas.width = res.width;
-                    canvas.height = res.height;
-                    currentResolution = res;
-                    SCALE = Math.min(canvas.width, canvas.height) / 720;
-                    applyScale();
-        applyCanvasStyle();
-                    if (activeProfile) {
-                        activeProfile.orientation = currentOrientation;
-                        saveProfile(activeProfile);
-                    }
-                    graphicsMenuIndex = oriIdx;
-                    renderGraphicsList();
-                } else if (tapIdx === fsIdx && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
-                    toggleFullscreen();
-                    graphicsMenuIndex = fsIdx;
-                    renderGraphicsList();
-                } else if (tapIdx === 0) {
+                    // Auto-detect resolution for new orientation
                     const autoRes = getAutoResolution();
                     canvas.width = autoRes.width;
                     canvas.height = autoRes.height;
@@ -5010,28 +4935,15 @@
                     applyScale();
         applyCanvasStyle();
                     if (activeProfile) {
-                        activeProfile.resolution = 'auto';
                         activeProfile.orientation = currentOrientation;
                         saveProfile(activeProfile);
                     }
-                    gameState = 'menu';
-                    updateUI();
-                } else {
-                    const resIdx = tapIdx - 1;
-                    const res = resList[resIdx];
-                    canvas.width = res.width;
-                    canvas.height = res.height;
-                    currentResolution = res;
-                    SCALE = Math.min(canvas.width, canvas.height) / 720;
-                    applyScale();
-        applyCanvasStyle();
-                    if (activeProfile) {
-                        activeProfile.resolution = resIdx;
-                        activeProfile.orientation = currentOrientation;
-                        saveProfile(activeProfile);
-                    }
-                    gameState = 'menu';
-                    updateUI();
+                    graphicsMenuIndex = 0;
+                    renderGraphicsList();
+                } else if (tapIdx === 1 && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+                    toggleFullscreen();
+                    graphicsMenuIndex = 1;
+                    renderGraphicsList();
                 }
             } else if (gameState === 'gameover' && idx !== null) {
                 gameoverMenuIndex = parseInt(idx);
@@ -5118,7 +5030,6 @@
         });
 
         // Stardust shop wheel/touchpad scrolling fallback
-        const sdScrollAreaEl = document.getElementById('sdScrollArea');
         sdScrollAreaEl.addEventListener('wheel', (e) => {
             if (gameState !== 'stardust_shop') return;
             e.preventDefault();
