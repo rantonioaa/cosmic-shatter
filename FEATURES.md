@@ -216,16 +216,12 @@
 - Locked modifiers show unlock condition
 
 ### Graphics Menu
-- Grouped sections with non-selectable headers (navigation skips headers):
-  - **Resolution**
-    - Auto — detects device screen size via `window.screen.width/height * devicePixelRatio`, picks best matching resolution (accounts for iOS dimension behavior)
-    - 640x360 / 1280x720 / 1920x1080 (Landscape)
-    - 360x640 / 720x1280 / 1080x1920 (Portrait)
+- Simplified menu with 2 options:
   - **Orientation** — Landscape / Portrait (applies immediately, resizes canvas on toggle)
   - **Fullscreen** — Toggle fullscreen mode (⛶/✖ button in top-left corner; also via F key)
 - Arrow key navigation or tap to select
-- Shows current resolution with indicator
-- Saves orientation, resolution (numeric index or `'auto'` string), and fullscreen preference per profile
+- Resolution is always auto-detected based on device screen and DPR
+- Saves orientation and fullscreen preference per profile
 
 ### Fullscreen Mode
 - Fullscreen button (⛶/✖) in top-left corner during menus; hidden if Fullscreen API not supported

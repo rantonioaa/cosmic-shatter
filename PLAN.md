@@ -335,9 +335,10 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Pause menu with arrow navigation
 - [x] High scores display (per-profile)
 - [x] Export/Import profiles
-- [x] Graphics menu with grouped sections (Resolution, Orientation, Fullscreen)
+- [x] Graphics menu with Orientation and Fullscreen (simplified from Resolution/Orientation/Fullscreen)
 - [x] Portrait/Landscape orientation toggle in graphics menu (applies immediately)
-- [x] Auto resolution — detects device screen size, picks best match (stores `'auto'` string in profile)
+- [x] Auto resolution — always auto-detects device screen size, no manual selection needed
+- [x] Dynamic UI scaling — Stardust shop scales with resolution
 - [x] Fullscreen toggle — Fullscreen API support, F key, ⛶/✖ button, `:fullscreen` CSS
 
 ### Gameplay ✅

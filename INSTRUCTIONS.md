@@ -54,9 +54,9 @@ menu → modifier_select → playing → gameover → shop → ↑
 ### Resolution System
 - Landscape: `LANDSCAPE_RESOLUTIONS` (640x360, 1280x720, 1920x1080)
 - Portrait: `PORTRAIT_RESOLUTIONS` (360x640, 720x1280, 1080x1920)
-- Auto resolution: detects device screen via `window.screen.width/height * devicePixelRatio`, picks best match; normalized for iOS (doesn't swap dimensions on rotation); profile stores `'auto'` string or numeric index
+- Resolution is always auto-detected based on device screen and DPR via `getAutoResolution()`
 - `SCALE = Math.min(width, height) / 720` — same scale at 1280x720 and 720x1280
-- Profile stores `orientation`, `resolution` (index or `'auto'`), and `fullscreen` preference
+- Profile stores `orientation` and `fullscreen` preference (resolution is always auto-detected)
 
 ### CSS Layout
 - `#ui` — absolutely positioned, `pointer-events: none`, scaled by `--s` CSS var
@@ -92,8 +92,9 @@ menu → modifier_select → playing → gameover → shop → ↑
 ## Gotchas
 
 ### Resolution Index
-- Use `??` not `||` for resolution index (index 0 is valid, `||` treats it as falsy)
-- Default resolution is now `'auto'` (string) — stored as `'auto'` or a numeric index in the profile
+- Resolution is always auto-detected — no manual selection or profile storage
+- `getAutoResolution()` picks best match based on device screen and DPR
+- Profile only stores `orientation` and `fullscreen` preference
 
 ### Gameover Menu
 - Menu options injected into `highscoresEl` AFTER `renderHighScores()` to prevent overwrite
@@ -101,16 +102,17 @@ menu → modifier_select → playing → gameover → shop → ↑
 ### Profile Loading
 - `loadProfile()` can return `null` if data is corrupted — always null-check before accessing `.name`, `.orientation`, or `.resolution`
 - Must null-check in both keyboard AND touch profile select handlers
+- Resolution is always auto-detected — ignore stored `resolution` field
 
 ### Blink/Erratic Timers
 - Use crossing detection: `Math.floor(timer) % N === 0 && Math.floor(timer - dt) % N !== 0`
 - Simple modulo won't work with dt > 1
 
 ### Graphics Menu
-- Grouped sections with non-selectable headers; navigation skips headers
-- Resolution section: Auto option + numeric resolutions; `graphicsMenuIndex` maps across sections with header offsets
-- Orientation toggle applies immediately (canvas resizes on toggle, not just on resolution select)
+- Simplified menu with 2 options: Orientation and Fullscreen
+- Orientation toggle applies immediately (canvas resizes on toggle, auto-detects new resolution)
 - Fullscreen toggle: hidden if Fullscreen API not supported; also toggleable via F key
+- Resolution is always auto-detected based on device screen and DPR
 
 ### Fullscreen Mode
 - Fullscreen button (⛶/✖) in top-left corner; hidden via CSS if Fullscreen API not supported
