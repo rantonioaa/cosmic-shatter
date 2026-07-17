@@ -650,6 +650,53 @@
             color: #ffcc00;
             min-height: 16px;
         }
+        .sd-buy-btn {
+            font-size: 12px;
+            letter-spacing: 1px;
+            padding: 8px 18px;
+            min-height: 36px;
+            min-width: 140px;
+            border: 1px solid #444;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #aaa;
+            text-align: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: border-color 0.12s, background 0.12s, color 0.12s;
+            user-select: none;
+        }
+        .sd-buy-btn.active {
+            border-color: #ffcc00;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.08);
+        }
+        .sd-buy-btn.active:hover {
+            background: rgba(255, 204, 0, 0.15);
+        }
+        .sd-buy-btn.active:active {
+            background: rgba(255, 204, 0, 0.25);
+        }
+        .sd-buy-btn.equip {
+            border-color: #44cc44;
+            color: #44cc44;
+            background: rgba(68, 204, 68, 0.08);
+        }
+        .sd-buy-btn.equip:hover {
+            background: rgba(68, 204, 68, 0.15);
+        }
+        .sd-buy-btn.owned {
+            border-color: #44cc44;
+            color: #44cc44;
+            opacity: 0.7;
+            cursor: default;
+        }
+        .sd-buy-btn.disabled {
+            border-color: #553333;
+            color: #ff4444;
+            opacity: 0.7;
+            cursor: default;
+        }
         .sd-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1061,11 +1108,12 @@
                     </svg>
                     <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
                     <div class="sd-preview-action" id="sdPreviewAction"></div>
+                    <div class="sd-buy-btn" id="sdBuyBtn" data-tap-action="sd_buy">SELECT AN ITEM</div>
                 </div>
                 <div class="sd-list" id="stardustList"></div>
             </div>
             <div class="sd-hint" id="sdHint">W/S browse · Q/E tab · ENTER buy · ESC back</div>
-            <div class="touch-hint">Tap tab, slot, or item · Tap Back to exit</div>
+            <div class="touch-hint">Tap item to preview · Tap BUY to unlock</div>
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
     </div>
@@ -1118,6 +1166,7 @@
         const sdPreviewSvg = document.getElementById('sdPreviewSvg');
         const sdPreviewLabelEl = document.getElementById('sdPreviewLabel');
         const sdPreviewActionEl = document.getElementById('sdPreviewAction');
+        const sdBuyBtnEl = document.getElementById('sdBuyBtn');
         const sdHintEl = document.getElementById('sdHint');
 
         // Resolution options
@@ -1261,6 +1310,62 @@
         }
         updateStardustShopSize();
         window.addEventListener('resize', () => { applyScale(); updateStardustShopSize(); });
+
+        // Stardust shop buy button
+        function updateBuyButton(slot, item, balance) {
+            if (!item) {
+                sdBuyBtnEl.textContent = 'SELECT AN ITEM';
+                sdBuyBtnEl.className = 'sd-buy-btn';
+                sdBuyBtnEl.dataset.locked = 'true';
+                return;
+            }
+
+            let owned = false;
+            let equipped = false;
+
+            if (slot === 'loadout') {
+                owned = item.cost === 0 || activeProfile?.stardustUnlocks?.loadouts?.includes(item.id);
+                equipped = activeProfile?.selectedLoadout === item.id;
+            } else {
+                owned = item.cost === 0 || activeProfile?.stardustUnlocks?.ownedCosmetics?.includes(item.id);
+                equipped = activeProfile?.stardustUnlocks?.cosmetics?.[slot] === item.id;
+            }
+
+            sdBuyBtnEl.className = 'sd-buy-btn';
+            sdBuyBtnEl.dataset.locked = 'false';
+
+            if (equipped) {
+                sdBuyBtnEl.textContent = 'EQUIPPED';
+                sdBuyBtnEl.classList.add('owned');
+                sdBuyBtnEl.dataset.locked = 'true';
+            } else if (owned) {
+                sdBuyBtnEl.textContent = 'EQUIP';
+                sdBuyBtnEl.classList.add('equip');
+            } else if (balance >= item.cost) {
+                sdBuyBtnEl.textContent = `BUY — ${item.cost} ✦`;
+                sdBuyBtnEl.classList.add('active');
+            } else {
+                sdBuyBtnEl.textContent = `NEED ${item.cost - balance} MORE`;
+                sdBuyBtnEl.classList.add('disabled');
+                sdBuyBtnEl.dataset.locked = 'true';
+            }
+        }
+
+        function confirmStardustPurchase() {
+            if (!activeProfile) return;
+            if (sdBuyBtnEl.dataset.locked === 'true') return;
+
+            if (sdShopTab === 0) {
+                const item = SD_LOADOUTS[sdShopItem];
+                if (item) buyStardustUnlock('loadouts', item.id);
+            } else {
+                const slotDef = SD_COSMETIC_SLOTS[sdShopSlot];
+                const item = slotDef.items[sdShopItem];
+                if (item) buyOrEquipCosmetic(slotDef.slot, item.id);
+            }
+
+            renderStardustShop();
+        }
 
         // Game state
         let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop
@@ -1729,9 +1834,10 @@
 
             if (slot === 'loadout' || !itemId) {
                 const item = SD_LOADOUTS.find(l => l.id === itemId);
-                sdPreviewLabelEl.textContent = item ? item.name : '';
+                sdPreviewLabelEl.textContent = item ? item.name : 'Select an item';
                 sdPreviewActionEl.textContent = item ? item.desc : '';
                 sdPreviewActionEl.style.color = '#aaa';
+                updateBuyButton(slot, item, balance);
                 if (item) drawLoadoutPreview(item.id);
                 return;
             }
@@ -1755,6 +1861,7 @@
                 sdPreviewActionEl.style.color = '#ff4444';
             }
 
+            updateBuyButton(slot, item, balance);
             drawCosmeticPreview(slot, itemId);
         }
 
@@ -2875,16 +2982,9 @@
                     const items = sdShopTab === 0 ? SD_LOADOUTS : SD_COSMETIC_SLOTS[sdShopSlot].items;
                     sdShopItem = (sdShopItem + 1) % items.length;
                 } else if (e.code === 'Enter' || e.code === 'Space') {
-                    // Buy or equip
+                    // Buy or equip via buy button
                     e.preventDefault();
-                    if (sdShopTab === 0) {
-                        const item = SD_LOADOUTS[sdShopItem];
-                        if (item) buyStardustUnlock('loadouts', item.id);
-                    } else {
-                        const slotDef = SD_COSMETIC_SLOTS[sdShopSlot];
-                        const item = slotDef.items[sdShopItem];
-                        if (item) buyOrEquipCosmetic(slotDef.slot, item.id);
-                    }
+                    confirmStardustPurchase();
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
                     gameState = 'menu';
@@ -4770,16 +4870,13 @@
                         renderStardustShop();
                     } else if (action === 'sd_item' && idx !== null) {
                         sdShopItem = parseInt(idx);
-                        buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopItem].id);
                         renderStardustShop();
                     } else if (action === 'sd_cosmetic' && idx !== null) {
                         const slot = el.getAttribute('data-tap-slot');
                         sdShopItem = parseInt(idx);
-                        const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
-                        if (slotDef && slotDef.items[sdShopItem]) {
-                            buyOrEquipCosmetic(slot, slotDef.items[sdShopItem].id);
-                        }
                         renderStardustShop();
+                    } else if (action === 'sd_buy') {
+                        confirmStardustPurchase();
                     }
                 } else if (gameState === 'paused' && idx !== null) {
                     pauseMenuIndex = parseInt(idx);
@@ -4978,16 +5075,13 @@
                     renderStardustShop();
                 } else if (action === 'sd_item' && idx !== null) {
                     sdShopItem = parseInt(idx);
-                    buyStardustUnlock('loadouts', SD_LOADOUTS[sdShopItem].id);
                     renderStardustShop();
                 } else if (action === 'sd_cosmetic' && idx !== null) {
                     const slot = target.getAttribute('data-tap-slot');
                     sdShopItem = parseInt(idx);
-                    const slotDef = SD_COSMETIC_SLOTS.find(s => s.slot === slot);
-                    if (slotDef && slotDef.items[sdShopItem]) {
-                        buyOrEquipCosmetic(slot, slotDef.items[sdShopItem].id);
-                    }
                     renderStardustShop();
+                } else if (action === 'sd_buy') {
+                    confirmStardustPurchase();
                 }
             } else if (gameState === 'paused' && idx !== null) {
                 pauseMenuIndex = parseInt(idx);
