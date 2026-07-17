@@ -538,21 +538,23 @@
         #stardustShopMenu {
             display: none;
             margin-top: 10px;
-            max-height: calc(100vh - 80px);
+            pointer-events: auto;
+        }
+        #sdScrollArea {
+            max-height: calc(100vh - 260px);
             overflow-y: scroll;
             -webkit-overflow-scrolling: touch;
-            pointer-events: auto;
             scrollbar-width: thin;
             scrollbar-color: #ffcc00 rgba(255,255,255,0.1);
         }
-        #stardustShopMenu::-webkit-scrollbar {
+        #sdScrollArea::-webkit-scrollbar {
             width: 10px;
         }
-        #stardustShopMenu::-webkit-scrollbar-track {
+        #sdScrollArea::-webkit-scrollbar-track {
             background: rgba(255,255,255,0.08);
             border-radius: 5px;
         }
-        #stardustShopMenu::-webkit-scrollbar-thumb {
+        #sdScrollArea::-webkit-scrollbar-thumb {
             background: #ffcc00;
             border-radius: 5px;
             border: 2px solid rgba(0,0,0,0.3);
@@ -1056,23 +1058,25 @@
                 <div class="sd-tab" data-tap-action="sd_tab" data-tap-index="1">Cosmetics</div>
             </div>
             <div class="sd-slot-tabs" id="stardustSlotTabs"></div>
-            <div class="sd-preview" id="stardustPreview">
-                <svg id="sdPreviewSvg" width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="svgGlow">
-                            <feGaussianBlur stdDeviation="2" result="blur"/>
-                            <feMerge>
-                                <feMergeNode in="blur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    <rect width="120" height="80" fill="#000"/>
-                </svg>
-                <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
-                <div class="sd-preview-action" id="sdPreviewAction"></div>
+            <div id="sdScrollArea">
+                <div class="sd-preview" id="stardustPreview">
+                    <svg id="sdPreviewSvg" width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="svgGlow">
+                                <feGaussianBlur stdDeviation="2" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <rect width="120" height="80" fill="#000"/>
+                    </svg>
+                    <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
+                    <div class="sd-preview-action" id="sdPreviewAction"></div>
+                </div>
+                <div class="sd-list" id="stardustList"></div>
             </div>
-            <div class="sd-list" id="stardustList"></div>
             <div class="sd-hint" id="sdHint">W/S browse · Q/E tab · ENTER buy · ESC back</div>
             <div class="touch-hint">Tap tab, slot, or item · Tap Back to exit</div>
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
@@ -5206,10 +5210,11 @@
         });
 
         // Stardust shop wheel/touchpad scrolling fallback
-        stardustShopMenuEl.addEventListener('wheel', (e) => {
+        const sdScrollAreaEl = document.getElementById('sdScrollArea');
+        sdScrollAreaEl.addEventListener('wheel', (e) => {
             if (gameState !== 'stardust_shop') return;
             e.preventDefault();
-            stardustShopMenuEl.scrollTop += e.deltaY;
+            sdScrollAreaEl.scrollTop += e.deltaY;
         }, { passive: false });
     </script>
 </body>
