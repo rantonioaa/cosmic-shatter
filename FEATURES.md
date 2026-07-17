@@ -489,6 +489,7 @@
 - `URL.revokeObjectURL()` called too early in export — now delayed by 1000ms
 - `coolingSystem || 0` used `||` instead of `??` — now uses `??` for correctness
 - Redundant `renderShopList()` calls in keyboard handler — removed, `updateUI()` handles it
+- No audio on Resume Run — `deserializeRun()` now calls `initAudio()`, `resumeAudio()`, `startMusic()`
 
 ---
 
