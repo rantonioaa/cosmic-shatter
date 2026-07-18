@@ -633,15 +633,15 @@
         #shopMenu .shop-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            max-width: 420px;
+            gap: 6px;
+            max-width: 360px;
             margin: 0 auto;
         }
         #shopMenu .shop-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 6px;
-            padding: 10px 8px 8px;
+            padding: 8px 6px 6px;
             text-align: center;
             transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
             cursor: pointer;
@@ -673,8 +673,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 40px;
-            margin-bottom: 6px;
+            height: 30px;
+            margin-bottom: 4px;
         }
         #shopMenu .shop-icon svg {
             display: block;
@@ -683,7 +683,7 @@
             font-size: 11px;
             font-weight: bold;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             color: #ddd;
         }
         #shopMenu .shop-card.selected .shop-name {
@@ -696,11 +696,11 @@
             display: flex;
             justify-content: center;
             gap: 3px;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         #shopMenu .shop-pip {
-            width: 16px;
-            height: 5px;
+            width: 12px;
+            height: 4px;
             border-radius: 2px;
             background: rgba(255,255,255,0.1);
             transition: background 0.15s;
@@ -781,8 +781,8 @@
         }
         .sd-tab {
             font-size: 12px;
-            padding: 8px 14px;
-            min-height: 38px;
+            padding: 6px 12px;
+            min-height: 32px;
             display: flex;
             align-items: center;
             border: 1px solid #444;
@@ -810,8 +810,8 @@
             font-size: 9px;
             letter-spacing: 1px;
             text-transform: uppercase;
-            padding: 5px 8px;
-            min-height: 30px;
+            padding: 4px 6px;
+            min-height: 26px;
             display: flex;
             align-items: center;
             border: 1px solid #444;
@@ -830,10 +830,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            margin: 0 auto 12px;
-            padding: 10px;
-            max-width: 220px;
+            gap: 4px;
+            margin: 0 auto 8px;
+            padding: 8px;
+            max-width: 180px;
             border: 1px solid #333;
             border-radius: 4px;
             background: rgba(0, 0, 0, 0.35);
@@ -857,9 +857,9 @@
         .sd-buy-btn {
             font-size: 12px;
             letter-spacing: 1px;
-            padding: 8px 18px;
-            min-height: 36px;
-            min-width: 140px;
+            padding: 6px 14px;
+            min-height: 30px;
+            min-width: 120px;
             border: 1px solid #444;
             border-radius: 3px;
             background: rgba(255, 255, 255, 0.05);
@@ -904,7 +904,7 @@
         .sd-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 6px;
             max-width: 440px;
             margin: 0 auto;
             padding-right: 4px;
@@ -1518,18 +1518,17 @@
         function updateStardustShopSize() {
             if (!sdScrollAreaEl || !sdPreviewEl || !sdPreviewSvg) return;
             const vh = window.innerHeight;
-            sdScrollAreaEl.style.maxHeight = (vh - sc(260)) + 'px';
-            sdPreviewEl.style.maxWidth = sc(220) + 'px';
-            sdPreviewEl.style.padding = sc(10) + 'px';
-            sdPreviewEl.style.gap = sc(6) + 'px';
-            sdPreviewEl.style.marginBottom = sc(12) + 'px';
-            // Keep viewBox at 120x80, just scale the display size
-            sdPreviewSvg.setAttribute('width', sc(120));
-            sdPreviewSvg.setAttribute('height', sc(80));
-            document.documentElement.style.setProperty('--sd-item-h', sc(56) + 'px');
-            document.documentElement.style.setProperty('--sd-item-pad', sc(8) + 'px');
-            document.documentElement.style.setProperty('--sd-item-gap', sc(8) + 'px');
-            document.documentElement.style.setProperty('--sd-thumb', sc(36) + 'px');
+            sdScrollAreaEl.style.maxHeight = (vh - sc(220)) + 'px';
+            sdPreviewEl.style.maxWidth = sc(180) + 'px';
+            sdPreviewEl.style.padding = sc(8) + 'px';
+            sdPreviewEl.style.gap = sc(4) + 'px';
+            sdPreviewEl.style.marginBottom = sc(8) + 'px';
+            sdPreviewSvg.setAttribute('width', sc(100));
+            sdPreviewSvg.setAttribute('height', sc(60));
+            document.documentElement.style.setProperty('--sd-item-h', sc(44) + 'px');
+            document.documentElement.style.setProperty('--sd-item-pad', sc(6) + 'px');
+            document.documentElement.style.setProperty('--sd-item-gap', sc(6) + 'px');
+            document.documentElement.style.setProperty('--sd-thumb', sc(28) + 'px');
         }
         updateStardustShopSize();
         window.addEventListener('resize', () => { applyScale(); updateStardustShopSize(); });
