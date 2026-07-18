@@ -232,15 +232,18 @@
 - Back button returns to main menu
 
 ### High Scores Sub-Screen
-- Arcade-style tabular layout with column headers (RANK, NAME, SCORE, LEVEL, DATE)
-- Grid-aligned rows with consistent column widths
+- Arcade-style tabular layout with column headers (RK, SCORE, LVL, DATE)
+- Profile name displayed once above the table
+- Grid-aligned rows with clip-path octagonal corners
+- Alternating row backgrounds for visual depth
+- Decorative title with gold glow and flanking lines
+- Enhanced frame with 4 corner markers (+)
+- Medal SVG icons for top 3 ranks: gold crown (#1), silver chevron (#2), bronze diamond (#3)
+- Modifier SVG icons inline with scores: ship, lightning bolt, moon, bullets, crosshair
 - Scores formatted with comma separators (e.g., 52,430)
-- Shows profile name (or "GUEST" for guest mode)
-- Gold glow highlight for rank #1
-- Top 3 ranks with progressive brightness
-- Modifier badges: colored dots with legend (cyan=Tiny Ship, red=Speed Demon, purple=Dark Mode, gold=Bullet Storm, white=Glass Cannon)
+- Gold glow highlight for rank #1 row
 - Gold highlight for newly submitted high scores
-- Decorative frame with corner markers
+- Modifier legend with SVG icons + labels below the table
 - Mobile: date column hidden for compact layout
 - Back button returns to main menu
 
@@ -250,7 +253,7 @@
   - Restart → modifier select
   - Shop → upgrade shop
   - Quit to Menu
-- High scores list shown with profile names, modifier badges, and dates
+- High scores list shown with medal icons, modifier SVG icons, and levels
 - Clears any active saved run (`activeRun`)
 
 ### Upgrade Shop (Card Grid)

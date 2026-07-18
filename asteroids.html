@@ -86,7 +86,7 @@
             margin-top: 15px;
             font-size: 13px;
             opacity: 0.6;
-            max-width: 380px;
+            max-width: 400px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -102,35 +102,38 @@
             justify-content: space-between;
             align-items: center;
             margin: 2px 0;
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.06);
+            padding: 3px 6px;
             gap: 8px;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+            background: rgba(79, 195, 247, 0.03);
         }
         #highscores .hs-left {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         #highscores .hs-rank {
             opacity: 0.4;
-            font-size: 12px;
-            width: 20px;
+            font-size: 11px;
+            width: 18px;
             text-align: right;
         }
-        #highscores .hs-name {
-            font-size: 11px;
-            opacity: 0.5;
+        #highscores .hs-medal {
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        #highscores .hs-medal svg {
+            display: block;
+        }
+        #highscores .hs-mod-icon {
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        #highscores .hs-mod-icon svg {
+            display: block;
         }
         #highscores .hs-score {
             font-variant-numeric: tabular-nums;
-        }
-        #highscores .hs-mod-badge {
-            display: inline-block;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            margin-left: 4px;
-            vertical-align: middle;
         }
         #highscores .hs-right {
             display: flex;
@@ -144,7 +147,6 @@
             opacity: 1;
         }
         #highscores .hs-new .hs-rank,
-        #highscores .hs-new .hs-name,
         #highscores .hs-new .hs-score {
             color: #ffcc00;
             opacity: 1;
@@ -465,9 +467,24 @@
             font-size: 22px;
             font-weight: bold;
             letter-spacing: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: #ffcc00;
-            text-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.4), 0 0 40px rgba(255, 204, 0, 0.15);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #highscoresMenu .hs-title-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 204, 0, 0.3), transparent);
+        }
+        #highscoresMenu .hs-profile {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(79, 195, 247, 0.4);
+            margin-bottom: 10px;
             text-align: center;
         }
         #highscoresMenu .hs-frame {
@@ -483,25 +500,32 @@
             position: absolute;
             color: rgba(79, 195, 247, 0.3);
             font-size: 10px;
+            line-height: 1;
         }
-        #highscoresMenu .hs-frame::before { top: -7px; left: -1px; }
-        #highscoresMenu .hs-frame::after { bottom: -7px; right: -1px; }
+        #highscoresMenu .hs-frame::before { top: -8px; left: -1px; }
+        #highscoresMenu .hs-frame::after { bottom: -8px; right: -1px; }
+        #highscoresMenu .hs-frame-corner-tr,
+        #highscoresMenu .hs-frame-corner-bl {
+            position: absolute;
+            color: rgba(79, 195, 247, 0.3);
+            font-size: 10px;
+            line-height: 1;
+        }
+        #highscoresMenu .hs-frame-corner-tr { top: -8px; right: -1px; }
+        #highscoresMenu .hs-frame-corner-bl { bottom: -8px; left: -1px; }
         #highscoresMenu .hs-headers {
             display: grid;
-            grid-template-columns: 36px 1fr auto 52px 70px;
+            grid-template-columns: 38px 18px 1fr auto 56px;
             gap: 4px;
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-size: 10px;
             letter-spacing: 1.5px;
-            color: rgba(79, 195, 247, 0.4);
-            border-bottom: 1px solid rgba(79, 195, 247, 0.12);
+            color: rgba(255, 204, 0, 0.45);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.12);
             text-transform: uppercase;
         }
         #highscoresMenu .hs-h-score,
         #highscoresMenu .hs-h-level {
-            text-align: right;
-        }
-        #highscoresMenu .hs-h-date {
             text-align: right;
         }
         #highscoresList {
@@ -510,39 +534,59 @@
         }
         #highscoresList .hs-entry {
             display: grid;
-            grid-template-columns: 36px 1fr auto 52px 70px;
+            grid-template-columns: 38px 18px 1fr auto 56px;
             gap: 4px;
             font-size: 13px;
-            padding: 7px 12px;
+            padding: 8px 14px;
             color: rgba(79, 195, 247, 0.7);
-            border-bottom: 1px solid rgba(79, 195, 247, 0.06);
+            border-bottom: 1px solid rgba(79, 195, 247, 0.05);
             align-items: center;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+        }
+        #highscoresList .hs-entry:nth-child(even) {
+            background: rgba(79, 195, 247, 0.03);
         }
         #highscoresList .hs-entry:last-child {
             border-bottom: none;
         }
         #highscoresList .hs-rank {
             font-size: 12px;
-            opacity: 0.45;
+            opacity: 0.4;
             font-variant-numeric: tabular-nums;
+        }
+        #highscoresList .hs-medal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #highscoresList .hs-medal svg {
+            display: block;
         }
         #highscoresList .hs-rank-1 {
             color: #ffcc00;
             opacity: 1;
             text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
         }
+        #highscoresList .hs-entry.hs-rank-1-row {
+            background: rgba(255, 204, 0, 0.04);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.1);
+        }
         #highscoresList .hs-rank-2 {
-            opacity: 0.7;
+            opacity: 0.65;
         }
         #highscoresList .hs-rank-3 {
-            opacity: 0.6;
+            opacity: 0.55;
         }
-        #highscoresList .hs-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 12px;
-            letter-spacing: 0.5px;
+        #highscoresList .hs-mod-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #highscoresList .hs-mod-icon:empty {
+            width: 16px;
+        }
+        #highscoresList .hs-mod-icon svg {
+            display: block;
         }
         #highscoresList .hs-score {
             text-align: right;
@@ -552,30 +596,15 @@
         #highscoresList .hs-level {
             text-align: right;
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.55;
         }
         #highscoresList .hs-date {
             text-align: right;
             font-size: 10px;
-            opacity: 0.35;
+            opacity: 0.3;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-        #highscoresList .hs-mod-badge {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            margin-right: 4px;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-        #highscoresList .hs-mod-label {
-            font-size: 9px;
-            opacity: 0.5;
-            letter-spacing: 0.5px;
-            vertical-align: middle;
         }
         #highscoresList .hs-new {
             color: #ffcc00;
@@ -585,7 +614,6 @@
             color: #ffcc00;
             opacity: 1;
         }
-        #highscoresList .hs-new .hs-name,
         #highscoresList .hs-new .hs-score {
             color: #ffcc00;
         }
@@ -598,7 +626,7 @@
             text-align: center;
             color: #4fc3f7;
             opacity: 0.3;
-            padding: 24px 0;
+            padding: 28px 0;
             font-size: 13px;
         }
         .hs-mod-legend {
@@ -607,20 +635,18 @@
             color: rgba(79, 195, 247, 0.35);
             text-align: center;
             letter-spacing: 0.5px;
-            line-height: 1.6;
+            line-height: 1.8;
             max-width: 480px;
         }
         .hs-mod-legend .hs-leg-item {
-            display: inline-block;
-            margin: 0 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin: 0 7px;
         }
-        .hs-mod-legend .hs-leg-dot {
-            display: inline-block;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            margin-right: 3px;
-            vertical-align: middle;
+        .hs-mod-legend .hs-leg-item svg {
+            display: block;
+            flex-shrink: 0;
         }
         #pauseMenu {
             display: none;
@@ -1438,7 +1464,9 @@
             }
             #highscoresMenu .hs-headers,
             #highscoresList .hs-entry {
-                grid-template-columns: 28px 1fr auto 40px 0;
+                grid-template-columns: 30px 16px 1fr auto 0;
+                padding-left: 10px;
+                padding-right: 10px;
             }
             #highscoresMenu .hs-h-date,
             #highscoresList .hs-date {
@@ -1490,11 +1518,18 @@
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="highscoresMenu">
-            <div class="hs-title">HIGH SCORES</div>
+            <div class="hs-title">
+                <span class="hs-title-line"></span>
+                HIGH SCORES
+                <span class="hs-title-line"></span>
+            </div>
+            <div class="hs-profile" id="hsProfile"></div>
             <div class="hs-frame">
+                <span class="hs-frame-corner-tr">+</span>
+                <span class="hs-frame-corner-bl">+</span>
                 <div class="hs-headers">
                     <span class="hs-h-rank">RK</span>
-                    <span class="hs-h-name">NAME</span>
+                    <span></span>
                     <span class="hs-h-score">SCORE</span>
                     <span class="hs-h-level">LVL</span>
                     <span class="hs-h-date">DATE</span>
@@ -1618,6 +1653,7 @@
         const highscoresMenuEl = document.getElementById('highscoresMenu');
         const highscoresListEl = document.getElementById('highscoresList');
         const hsLegendEl = document.getElementById('hsLegend');
+        const hsProfileEl = document.getElementById('hsProfile');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
@@ -4901,14 +4937,25 @@
             return n.toLocaleString();
         }
 
-        const MOD_BADGE_COLORS = {
-            none: null,
-            tiny_ship: '#4fc3f7',
-            speed_demon: '#ff4444',
-            dark_mode: '#aa66ff',
-            bullet_storm: '#ffcc00',
-            glass_cannon: '#ffffff'
+        const MOD_ICON_SVGS = {
+            tiny_ship: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4fc3f7" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"><polygon points="8,2 12,12 8,9 4,12"/></svg>',
+            speed_demon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ff4444" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"><polyline points="10,1 5,8 9,8 6,15"/></svg>',
+            dark_mode: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#aa66ff" stroke-width="1.2"><path d="M10,2 A6,6 0 1,0 10,14 A4,4 0 1,1 10,2"/></svg>',
+            bullet_storm: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ffcc00" stroke-width="1.2" stroke-linecap="round"><line x1="4" y1="3" x2="4" y2="13"/><line x1="8" y1="1" x2="8" y2="15"/><line x1="12" y1="3" x2="12" y2="13"/></svg>',
+            glass_cannon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"><polygon points="8,1 14,8 8,15 2,8"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg>'
         };
+
+        function getModIconHtml(modId) {
+            if (!modId || modId === 'none' || !MOD_ICON_SVGS[modId]) return '';
+            return `<span class="hs-mod-icon">${MOD_ICON_SVGS[modId]}</span>`;
+        }
+
+        function getMedalHtml(rank) {
+            if (rank === 1) return '<span class="hs-medal"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#ffcc00" stroke-width="1.2" stroke-linejoin="round"><polygon points="2,10 2,5 5,8 7,3 9,8 12,5 12,10"/></svg></span>';
+            if (rank === 2) return '<span class="hs-medal"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#81d4fa" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"><polyline points="3,9 7,4 11,9"/></svg></span>';
+            if (rank === 3) return '<span class="hs-medal"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#81d4fa" stroke-width="1.2" stroke-linejoin="round"><rect x="4.4" y="4.4" width="5.2" height="5.2" transform="rotate(45 7 7)"/></svg></span>';
+            return '';
+        }
 
         function renderHighScores() {
             const scores = getHighScores();
@@ -4919,11 +4966,12 @@
             let html = '<div class="hs-title">HIGH SCORES</div>';
             scores.slice(0, 8).forEach((entry, i) => {
                 const isNew = i === lastHighScoreRank;
-                const modBadge = entry.modifier && entry.modifier !== 'none' && MOD_BADGE_COLORS[entry.modifier]
-                    ? `<span class="hs-mod-badge" style="background:${MOD_BADGE_COLORS[entry.modifier]}"></span>` : '';
+                const medal = getMedalHtml(i + 1);
+                const modIcon = getModIconHtml(entry.modifier);
+                const rankDisplay = medal || `<span class="hs-rank">${i + 1}.</span>`;
                 html += `<div class="hs-entry${isNew ? ' hs-new' : ''}">`
-                    + `<span class="hs-left"><span class="hs-rank">${i + 1}.</span>${modBadge}<span class="hs-score">${formatScore(entry.score)}</span></span>`
-                    + `<span class="hs-right"><span>Lv.${entry.level}</span><span>${entry.date || ''}</span></span>`
+                    + `<span class="hs-left">${rankDisplay}${modIcon}<span class="hs-score">${formatScore(entry.score)}</span></span>`
+                    + `<span class="hs-right"><span>Lv.${entry.level}</span></span>`
                     + `</div>`;
             });
             highscoresEl.innerHTML = html;
@@ -4934,23 +4982,29 @@
             if (!scores || scores.length === 0) {
                 highscoresListEl.innerHTML = '<div class="hs-empty">No scores yet</div>';
                 hsLegendEl.innerHTML = '';
+                hsProfileEl.textContent = '';
                 return;
             }
+            hsProfileEl.textContent = activeProfile ? activeProfile.name : 'GUEST';
             const usedMods = new Set();
             let html = '';
             scores.slice(0, 10).forEach((entry, i) => {
                 const isNew = i === lastHighScoreRank;
-                const rankClass = i === 0 ? ' hs-rank-1' : i === 1 ? ' hs-rank-2' : i === 2 ? ' hs-rank-3' : '';
+                const rank = i + 1;
+                const rankClass = rank === 1 ? ' hs-rank-1' : rank === 2 ? ' hs-rank-2' : rank === 3 ? ' hs-rank-3' : '';
+                const rowClass = rank === 1 ? ' hs-rank-1-row' : '';
+                const medal = getMedalHtml(rank);
+                const rankDisplay = medal || `<span class="hs-rank${rankClass}">${String(rank).padStart(2, '0')}</span>`;
                 const modId = entry.modifier || 'none';
-                let modBadge = '';
-                if (modId !== 'none' && MOD_BADGE_COLORS[modId]) {
-                    modBadge = `<span class="hs-mod-badge" style="background:${MOD_BADGE_COLORS[modId]}"></span><span class="hs-mod-label">${modId.replace('_', ' ')}</span>`;
+                let modIcon = '<span class="hs-mod-icon"></span>';
+                if (modId !== 'none' && MOD_ICON_SVGS[modId]) {
+                    modIcon = getModIconHtml(modId);
                     usedMods.add(modId);
                 }
-                html += `<div class="hs-entry${isNew ? ' hs-new' : ''}">`
-                    + `<span class="hs-rank${rankClass}">${String(i + 1).padStart(2, '0')}</span>`
-                    + `<span class="hs-name">${activeProfile ? activeProfile.name : 'GUEST'}</span>`
-                    + `<span class="hs-score">${modBadge}${formatScore(entry.score)}</span>`
+                html += `<div class="hs-entry${isNew ? ' hs-new' : ''}${rowClass}">`
+                    + rankDisplay
+                    + modIcon
+                    + `<span class="hs-score">${formatScore(entry.score)}</span>`
                     + `<span class="hs-level">Lv.${entry.level}</span>`
                     + `<span class="hs-date">${entry.date || ''}</span>`
                     + `</div>`;
@@ -4961,7 +5015,7 @@
                 usedMods.forEach(modId => {
                     const mod = MODIFIERS.find(m => m.id === modId);
                     const label = mod ? mod.label : modId;
-                    legHtml += `<span class="hs-leg-item"><span class="hs-leg-dot" style="background:${MOD_BADGE_COLORS[modId]}"></span>${label}</span>`;
+                    legHtml += `<span class="hs-leg-item">${MOD_ICON_SVGS[modId]}<span>${label}</span></span>`;
                 });
                 hsLegendEl.innerHTML = legHtml;
             } else {
