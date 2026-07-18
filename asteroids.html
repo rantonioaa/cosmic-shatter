@@ -220,10 +220,21 @@
             font-size: 11px;
             color: #4fc3f7;
             opacity: 0.4;
-            margin-left: 22px;
+            margin-left: 44px;
             text-transform: none;
             letter-spacing: 0;
             font-weight: normal;
+        }
+        #modifierSelect .mod-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        #modifierSelect .mod-icon svg {
+            display: block;
+        }
+        #modifierSelect .mod-option.selected .mod-icon svg {
+            stroke: #1a1a2e;
         }
         #modifierSelect .mod-option.selected .mod-desc {
             color: #1a1a2e;
@@ -3464,6 +3475,7 @@
                 html += `<div class="mod-option${selClass}${lockClass}" data-tap-action="modifier" data-tap-index="${i}">`
                     + `<span class="mod-arrow">&#9654;</span>`
                     + `<span class="mod-lock">&#128274;</span>`
+                    + `<span class="mod-icon">${MOD_ICON_SVGS[mod.id] || ''}</span>`
                     + `${mod.label}`
                     + `<div class="mod-desc">${desc}</div>`
                     + `</div>`;
