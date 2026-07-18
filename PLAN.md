@@ -264,11 +264,12 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Death shockwave — expanding ring on player death
 
 ### 6D. Procedural Ambient Music ✅
-- [x] Low sine drone (40-80Hz) with LFO filtering
-- [x] Texture pad (triangle 120-200Hz) for warmth
-- [x] Sparse pentatonic arpeggios every 4-6 seconds
-- [x] Intensity layers: combo boost, low health tension
-- [x] Unobtrusive — space atmosphere through silence + punctuated sound
+- [x] Chord progression: Am → F → C → G (8s each, smooth glide)
+- [x] Pad voices: 3 triangle oscillators with ±2Hz detuning
+- [x] Sub-bass: sine following chord root (40-60Hz)
+- [x] Lowpass filter with slow LFO sweep (0.05Hz, 200-600Hz)
+- [x] Arpeggios: chord tones through delay feedback (0.4s, 0.3 fb)
+- [x] Intensity: combo opens filter, low health detunes pad
 
 ### 6E. Onboarding
 - [ ] First-run tutorial overlay (rotate, thrust, shoot, collect)

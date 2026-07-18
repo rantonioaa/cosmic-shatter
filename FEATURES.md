@@ -442,10 +442,13 @@
   - Low health — sine 220Hz beep, 100ms repeating every 600ms
   - Game over — sawtooth descending drone + filtered noise, 1.5s
 - **Procedural ambient music:**
-  - Base drone: sine wave 40-80Hz with LFO filter sweep
-  - Texture pad: triangle wave 120-200Hz for warmth
-  - Sparse arpeggios: pentatonic scale (C, D, E, G, A), every 4-6 seconds
-  - Intensity scaling: combo multiplier and low health add layers
+  - Chord progression: Am → F → C → G (8 seconds each, smooth frequency glide)
+  - Pad voices: 3 triangle oscillators (root, 3rd, 5th) with ±2Hz detuning for warmth
+  - Sub-bass: sine wave following chord root (40-60Hz)
+  - Lowpass filter with slow LFO sweep (0.05Hz, 200-600Hz range)
+  - Arpeggios: chord tones in root→3rd→5th→3rd pattern, 1.5s interval
+  - Delay feedback (0.4s, 0.3 feedback) for echo tails
+  - Intensity: combo opens filter (+50Hz/combo), low health detunes pad (+4Hz)
 - **Audio controls in Graphics menu:**
   - Master volume slider (0-100%)
   - SFX volume slider (0-100%)

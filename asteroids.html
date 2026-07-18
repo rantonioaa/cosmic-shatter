@@ -1425,14 +1425,37 @@
         let musicGain = null;
         let audioInitialized = false;
         let musicPlaying = false;
-        let droneOsc = null;
-        let droneGain = null;
-        let textureOsc = null;
-        let textureGain = null;
-        let lfoOsc = null;
-        let arpeggioTimer = 0;
-        const ARPEGGIO_INTERVAL = 300; // 5 seconds at 60fps
-        const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00]; // C4 D4 E4 G4 A4
+        // Music system (Pink Floyd-inspired chord progression)
+        const CHORDS = [
+            { root: 220,   third: 261.63, fifth: 329.63 },  // Am (A3, C4, E4)
+            { root: 174.61, third: 220,   fifth: 261.63 },  // F  (F3, A3, C4)
+            { root: 130.81, third: 164.81, fifth: 196 },    // C  (C3, E3, G3)
+            { root: 196,   third: 246.94, fifth: 293.66 },  // G  (G3, B3, D4)
+        ];
+        const SUB_BASS_NOTES = [55, 43.65, 32.70, 49.00];
+        const CHORD_DURATION = 480;  // 8 seconds at 60fps
+        const ARP_INTERVAL = 90;     // 1.5 seconds between arpeggio notes
+        let chordIndex = 0;
+        let chordTimer = 0;
+        let arpTimer = 0;
+        let arpNoteIndex = 0;
+        // Pad voices
+        let padOscs = [];
+        let padGains = [];
+        let padBus = null;
+        // Sub-bass
+        let subBassOsc = null;
+        let subBassGain = null;
+        // Filter sweep
+        let filterNode = null;
+        let filterLFO = null;
+        let filterLFOGain = null;
+        // Arpeggio with delay
+        let arpOsc = null;
+        let arpGain = null;
+        let arpDelay = null;
+        let arpFeedback = null;
+        let arpDelayGain = null;
 
         function initAudio() {
             if (audioInitialized) return;
@@ -1574,86 +1597,157 @@
         function startMusic() {
             if (!audioCtx || !musicGain || musicPlaying) return;
             musicPlaying = true;
-            
-            // Base drone (40-80Hz sine)
-            droneOsc = audioCtx.createOscillator();
-            droneGain = audioCtx.createGain();
-            droneOsc.type = 'sine';
-            droneOsc.frequency.value = 55;
-            droneGain.gain.value = 0.15;
-            droneOsc.connect(droneGain);
-            droneGain.connect(musicGain);
-            droneOsc.start();
-            
-            // LFO for filter sweep
-            lfoOsc = audioCtx.createOscillator();
-            const lfoGain = audioCtx.createGain();
-            lfoOsc.type = 'sine';
-            lfoOsc.frequency.value = 0.2;
-            lfoGain.gain.value = 20;
-            lfoOsc.connect(lfoGain);
-            lfoGain.connect(droneOsc.frequency);
-            lfoOsc.start();
-            
-            // Texture pad (triangle, 120-200Hz)
-            textureOsc = audioCtx.createOscillator();
-            textureGain = audioCtx.createGain();
-            textureOsc.type = 'triangle';
-            textureOsc.frequency.value = 150;
-            textureGain.gain.value = 0.08;
-            textureOsc.connect(textureGain);
-            textureGain.connect(musicGain);
-            textureOsc.start();
-            
-            arpeggioTimer = ARPEGGIO_INTERVAL;
+
+            // Lowpass filter for slow sweep
+            filterNode = audioCtx.createBiquadFilter();
+            filterNode.type = 'lowpass';
+            filterNode.frequency.value = 400;
+            filterNode.Q.value = 2;
+            filterNode.connect(musicGain);
+
+            // Filter LFO (0.05Hz = 20s cycle, ±200Hz sweep)
+            filterLFO = audioCtx.createOscillator();
+            filterLFOGain = audioCtx.createGain();
+            filterLFO.type = 'sine';
+            filterLFO.frequency.value = 0.05;
+            filterLFOGain.gain.value = 200;
+            filterLFO.connect(filterLFOGain);
+            filterLFOGain.connect(filterNode.frequency);
+            filterLFO.start();
+
+            // Pad bus → filter
+            padBus = audioCtx.createGain();
+            padBus.gain.value = 0.12;
+            padBus.connect(filterNode);
+
+            // Pad voices (3 triangle oscillators, slight detuning for warmth)
+            const chord = CHORDS[chordIndex];
+            const freqs = [chord.root, chord.third, chord.fifth];
+            for (let i = 0; i < 3; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = freqs[i] + (i === 1 ? 2 : i === 2 ? -2 : 0);
+                gain.gain.value = 1;
+                osc.connect(gain);
+                gain.connect(padBus);
+                osc.start();
+                padOscs.push(osc);
+                padGains.push(gain);
+            }
+
+            // Sub-bass (sine, follows chord root)
+            subBassOsc = audioCtx.createOscillator();
+            subBassGain = audioCtx.createGain();
+            subBassOsc.type = 'sine';
+            subBassOsc.frequency.value = SUB_BASS_NOTES[chordIndex];
+            subBassGain.gain.value = 0.08;
+            subBassOsc.connect(subBassGain);
+            subBassGain.connect(musicGain);
+            subBassOsc.start();
+
+            // Arpeggio: osc → gain → musicGain + delay feedback loop
+            arpGain = audioCtx.createGain();
+            arpGain.gain.value = 0;
+            arpGain.connect(musicGain);
+
+            arpDelay = audioCtx.createDelay(2);
+            arpDelay.delayTime.value = 0.4;
+            arpFeedback = audioCtx.createGain();
+            arpFeedback.gain.value = 0.3;
+            arpDelayGain = audioCtx.createGain();
+            arpDelayGain.gain.value = 0.5;
+
+            arpGain.connect(arpDelay);
+            arpDelay.connect(arpFeedback);
+            arpFeedback.connect(arpDelay);
+            arpDelay.connect(arpDelayGain);
+            arpDelayGain.connect(musicGain);
+
+            arpOsc = audioCtx.createOscillator();
+            arpOsc.type = 'sine';
+            arpOsc.connect(arpGain);
+            arpOsc.start();
+
+            chordTimer = CHORD_DURATION;
+            arpTimer = 180;
         }
 
         function stopMusic() {
             if (!audioCtx) return;
             musicPlaying = false;
-            if (lfoOsc) { try { lfoOsc.stop(); } catch(e) {} lfoOsc = null; }
-            if (droneOsc) { try { droneOsc.stop(); } catch(e) {} droneOsc = null; }
-            if (textureOsc) { try { textureOsc.stop(); } catch(e) {} textureOsc = null; }
-            droneGain = null;
-            textureGain = null;
-            arpeggioTimer = 0;
+            [filterLFO, subBassOsc, arpOsc, ...padOscs].forEach(o => {
+                if (o) { try { o.stop(); } catch(e) {} }
+            });
+            filterLFO = null; filterLFOGain = null; filterNode = null;
+            subBassOsc = null; subBassGain = null;
+            padOscs = []; padGains = []; padBus = null;
+            arpOsc = null; arpGain = null; arpDelay = null;
+            arpFeedback = null; arpDelayGain = null;
+            chordIndex = 0; chordTimer = 0; arpTimer = 0; arpNoteIndex = 0;
+        }
+
+        function nextChord() {
+            if (!audioCtx) return;
+            chordIndex = (chordIndex + 1) % CHORDS.length;
+            const chord = CHORDS[chordIndex];
+            const now = audioCtx.currentTime;
+            const freqs = [chord.root, chord.third, chord.fifth];
+            for (let i = 0; i < 3; i++) {
+                if (padOscs[i]) padOscs[i].frequency.setTargetAtTime(freqs[i], now, 0.67);
+            }
+            if (subBassOsc) subBassOsc.frequency.setTargetAtTime(SUB_BASS_NOTES[chordIndex], now, 0.67);
         }
 
         function updateMusic(dt) {
             if (!musicPlaying || !audioCtx) return;
-            
-            // Spawn arpeggios periodically
-            arpeggioTimer -= dt;
-            if (arpeggioTimer <= 0) {
-                arpeggioTimer = ARPEGGIO_INTERVAL + Math.random() * 120; // 5-7 seconds
+
+            // Chord progression
+            chordTimer -= dt;
+            if (chordTimer <= 0) {
+                chordTimer = CHORD_DURATION;
+                nextChord();
+            }
+
+            // Arpeggio (chord tones through delay)
+            arpTimer -= dt;
+            if (arpTimer <= 0) {
+                arpTimer = ARP_INTERVAL + Math.random() * 60;
                 playArpeggio();
             }
-            
-            // Intensity scaling based on combo
-            if (droneGain) {
-                const comboBoost = Math.min(combo * 0.02, 0.1);
-                droneGain.gain.value = 0.15 + comboBoost;
+
+            // Intensity: filter opens with combo
+            if (filterNode) {
+                const comboOpen = Math.min(combo * 50, 250);
+                filterNode.frequency.setTargetAtTime(400 + comboOpen, audioCtx.currentTime, 0.5);
             }
-            if (textureGain) {
-                const healthBoost = lives <= 1 ? 0.05 : 0;
-                textureGain.gain.value = 0.08 + healthBoost;
+
+            // Pad volume boost on low health
+            if (padBus) {
+                const healthBoost = lives <= 1 ? 0.04 : 0;
+                padBus.gain.setTargetAtTime(0.12 + healthBoost, audioCtx.currentTime, 0.5);
+            }
+
+            // Tension: detune pad voices on low health
+            if (padOscs.length === 3) {
+                const tension = lives <= 1 ? 4 : 0;
+                if (padOscs[1]) padOscs[1].frequency.setTargetAtTime(CHORDS[chordIndex].third + 2 + tension, audioCtx.currentTime, 0.3);
+                if (padOscs[2]) padOscs[2].frequency.setTargetAtTime(CHORDS[chordIndex].fifth - 2 + tension, audioCtx.currentTime, 0.3);
             }
         }
 
         function playArpeggio() {
-            if (!audioCtx || !musicGain) return;
+            if (!audioCtx || !arpGain) return;
             const now = audioCtx.currentTime;
-            const note = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = note;
-            osc.connect(gain);
-            gain.connect(musicGain);
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-            osc.start(now);
-            osc.stop(now + 1.5);
+            const chord = CHORDS[chordIndex];
+            const arpNotes = [chord.root * 2, chord.third * 2, chord.fifth * 2, chord.third * 2];
+            const note = arpNotes[arpNoteIndex % arpNotes.length];
+            arpNoteIndex = (arpNoteIndex + 1) % arpNotes.length;
+
+            arpOsc.frequency.setValueAtTime(note, now);
+            arpGain.gain.cancelScheduledValues(now);
+            arpGain.gain.setValueAtTime(0.06, now);
+            arpGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
         }
 
         // Low health warning timer
