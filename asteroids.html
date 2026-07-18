@@ -3354,7 +3354,7 @@
                 if (checksum !== expectedChecksum) return null;
                 const minified = xorCrypt(encrypted, XOR_KEY);
                 const profile = JSON.parse(minified);
-                if (!profile.name || !profile.upgrades || !profile.highScores) return null;
+                if (!profile.name || !profile.upgrades) return null;
                 return migrateProfile(profile);
             } catch {
                 return null;
