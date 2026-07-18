@@ -45,8 +45,8 @@
             font-size: 42px;
             letter-spacing: 6px;
             margin-bottom: 8px;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            color: #ffcc00;
+            text-shadow: 0 0 20px rgba(255,204,0,0.4), 0 0 40px rgba(255,204,0,0.15);
         }
         #levelTransition {
             display: none;
@@ -57,8 +57,10 @@
             margin-top: 80px;
         }
         #score {
-            font-size: 22px;
-            margin-bottom: 10px;
+            font-size: 14px;
+            opacity: 0.6;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
         }
         #comboBar {
             display: none;
@@ -279,43 +281,98 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            margin-top: 12px;
+            margin-top: 8px;
+        }
+        .menu-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 6px;
+            width: 100%;
+            max-width: 280px;
         }
         .menu-item {
             font-size: 15px;
             letter-spacing: 1px;
-            padding: 10px 24px;
+            padding: 10px 16px;
             min-height: 44px;
             width: 100%;
-            max-width: 280px;
             text-align: center;
             border-radius: 4px;
+            border: 1px solid transparent;
             cursor: pointer;
             pointer-events: auto;
-            transition: color 0.15s, background 0.15s;
+            transition: color 0.15s, border-color 0.15s, background 0.15s, text-shadow 0.15s;
         }
-        .menu-item:hover { color: #ffcc00; }
-        .menu-item:active { background: rgba(255, 255, 255, 0.08); }
+        .menu-item:hover {
+            color: #ffcc00;
+            border-color: rgba(255, 204, 0, 0.3);
+            background: rgba(255, 204, 0, 0.05);
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+        }
+        .menu-item:active {
+            background: rgba(255, 204, 0, 0.1);
+        }
         .menu-divider {
-            width: 120px;
             height: 1px;
-            background: rgba(255, 255, 255, 0.15);
-            margin: 6px auto;
+            background: rgba(255, 204, 0, 0.15);
+            margin: 4px 16px;
         }
         .menu-section-label {
             font-size: 10px;
             letter-spacing: 3px;
-            opacity: 0.35;
+            color: #ffcc00;
+            opacity: 0.4;
             text-transform: uppercase;
-            margin-bottom: 2px;
+            text-align: center;
+            padding: 4px 0 2px;
         }
         @media (max-width: 600px) {
             .menu-item {
                 font-size: 16px;
-                padding: 12px 20px;
+                padding: 12px 16px;
                 min-height: 48px;
             }
+            .menu-panel {
+                max-width: 300px;
+            }
+        }
+        #savesMenu, #highscoresMenu {
+            display: none;
+            margin-top: 20px;
+        }
+        #savesMenu .pause-title, #highscoresMenu .pause-title {
+            font-size: 20px;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+        #highscoresList {
+            text-align: left;
+            padding: 8px 16px;
+        }
+        #highscoresList .hs-entry {
+            font-size: 14px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #highscoresList .hs-new {
+            color: #ffcc00;
+        }
+        #highscoresList .hs-rank {
+            display: inline-block;
+            width: 28px;
+            opacity: 0.5;
+        }
+        #highscoresList .hs-mod {
+            color: #ffcc00;
+            opacity: 0.7;
+        }
+        #highscoresList .hs-empty {
+            text-align: center;
+            opacity: 0.4;
+            padding: 20px 0;
         }
         #pauseMenu {
             display: none;
@@ -1075,16 +1132,31 @@
         <div id="message">Press SPACE to start</div>
         <div id="highscores"></div>
         <div id="menuActions">
-            <div id="btnStart" class="menu-item" data-tap-action="start">▶ Start Game</div>
-            <div id="btnResume" class="menu-item" data-tap-action="resume" style="display:none">▶ Resume Run</div>
-            <div id="btnShop" class="menu-item" data-tap-action="shop">▶ Shop</div>
-            <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">▶ Unlocks</div>
-            <div id="btnGraphics" class="menu-item" data-tap-action="settings">▶ Settings</div>
-            <div id="btnProfile" class="menu-item" data-tap-action="profile">▶ Profile</div>
-            <div class="menu-divider"></div>
-            <div class="menu-section-label">SAVES</div>
-            <div id="btnExport" class="menu-item" data-tap-action="export">▶ Export</div>
-            <div id="btnImport" class="menu-item" data-tap-action="import">▶ Import</div>
+            <div class="menu-panel">
+                <div id="btnStart" class="menu-item" data-tap-action="start">▶ Start Game</div>
+                <div id="btnResume" class="menu-item" data-tap-action="resume" style="display:none">▶ Resume Run</div>
+                <div id="btnShop" class="menu-item" data-tap-action="shop">▶ Shop</div>
+                <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">▶ Unlocks</div>
+                <div id="btnGraphics" class="menu-item" data-tap-action="settings">▶ Settings</div>
+                <div id="btnProfile" class="menu-item" data-tap-action="profile">▶ Profile</div>
+                <div class="menu-divider"></div>
+                <div class="menu-section-label">OTHER</div>
+                <div class="menu-item" data-tap-action="saves">▶ Saves</div>
+                <div class="menu-item" data-tap-action="highscores_menu">▶ High Scores</div>
+            </div>
+        </div>
+        <div id="savesMenu">
+            <div class="pause-title">SAVES</div>
+            <div class="menu-panel">
+                <div class="menu-item" data-tap-action="export">▶ Export Save</div>
+                <div class="menu-item" data-tap-action="import">▶ Import Save</div>
+            </div>
+            <div class="back-btn" data-tap-action="back">← Back</div>
+        </div>
+        <div id="highscoresMenu">
+            <div class="pause-title">HIGH SCORES</div>
+            <div class="menu-panel" id="highscoresList"></div>
+            <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="profileSelect">
             <div class="ps-title">SELECT PROFILE</div>
@@ -1191,6 +1263,9 @@
         const menuActionsEl = document.getElementById('menuActions');
         const btnResumeEl = document.getElementById('btnResume');
         const btnStartEl = document.getElementById('btnStart');
+        const savesMenuEl = document.getElementById('savesMenu');
+        const highscoresMenuEl = document.getElementById('highscoresMenu');
+        const highscoresListEl = document.getElementById('highscoresList');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
@@ -3575,6 +3650,16 @@
                 }
             }
 
+            // Saves / High Scores menu
+            if (gameState === 'saves_menu' || gameState === 'highscores_menu') {
+                if (e.code === 'Escape') {
+                    e.preventDefault();
+                    gameState = 'menu';
+                    updateUI();
+                    return;
+                }
+            }
+
             // Shop
             if (gameState === 'shop') {
                 const cols = 2;
@@ -4358,6 +4443,7 @@
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
                 messageEl.style.display = 'none';
+                highscoresEl.style.display = 'none';
                 if (activeProfile) {
                     scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆ · ${activeProfile.stardust ?? 0} ✦`;
                     scoreEl.style.display = 'block';
@@ -4377,13 +4463,20 @@
                     btnStartEl.style.display = 'block';
                     btnResumeEl.style.display = 'none';
                 }
-                highscoresEl.style.display = 'block';
-                lastHighScoreRank = -1;
             } else if (gameState === 'profile_select') {
                 scoreEl.textContent = 'SELECT PROFILE';
                 scoreEl.style.display = 'block';
                 profileSelectEl.style.display = 'block';
                 renderProfileList();
+            } else if (gameState === 'saves_menu') {
+                scoreEl.textContent = 'SAVES';
+                scoreEl.style.display = 'block';
+                savesMenuEl.style.display = 'block';
+            } else if (gameState === 'highscores_menu') {
+                scoreEl.textContent = 'HIGH SCORES';
+                scoreEl.style.display = 'block';
+                highscoresMenuEl.style.display = 'block';
+                renderHighscoresMenu();
             } else if (gameState === 'profile_create') {
                 scoreEl.textContent = 'NEW PROFILE';
                 scoreEl.style.display = 'block';
@@ -4470,6 +4563,23 @@
                     + `</div>`;
             });
             highscoresEl.innerHTML = html;
+        }
+
+        function renderHighscoresMenu() {
+            const scores = getHighScores();
+            if (!scores || scores.length === 0) {
+                highscoresListEl.innerHTML = '<div class="hs-empty">No scores yet</div>';
+                return;
+            }
+            let html = '';
+            scores.slice(0, 10).forEach((entry, i) => {
+                const modLabel = entry.modifier && entry.modifier !== 'none'
+                    ? ` <span class="hs-mod">[${entry.modifier}]</span>` : '';
+                html += `<div class="hs-entry">`
+                    + `<span class="hs-rank">${i + 1}.</span> ${entry.score}${modLabel} | Lv.${entry.level}`
+                    + `</div>`;
+            });
+            highscoresListEl.innerHTML = html;
         }
 
         // Update ship
@@ -5461,6 +5571,8 @@
                         gameState = graphicsReturnState;
                     } else if (gameState === 'profile_create') {
                         gameState = 'profile_select';
+                    } else if (gameState === 'saves_menu' || gameState === 'highscores_menu') {
+                        gameState = 'menu';
                     }
                     updateUI();
                     return;
@@ -5526,6 +5638,12 @@
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
                         graphicsMenuIndex = 0;
+                        updateUI();
+                    } else if (action === 'saves') {
+                        gameState = 'saves_menu';
+                        updateUI();
+                    } else if (action === 'highscores_menu') {
+                        gameState = 'highscores_menu';
                         updateUI();
                     }
                 } else if (gameState === 'modifier_select' && idx !== null) {
@@ -5678,6 +5796,8 @@
                     gameState = graphicsReturnState;
                 } else if (gameState === 'profile_create') {
                     gameState = 'profile_select';
+                } else if (gameState === 'saves_menu' || gameState === 'highscores_menu') {
+                    gameState = 'menu';
                 }
                 updateUI();
                 return;
@@ -5743,6 +5863,12 @@
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
                     graphicsMenuIndex = 0;
+                    updateUI();
+                } else if (action === 'saves') {
+                    gameState = 'saves_menu';
+                    updateUI();
+                } else if (action === 'highscores_menu') {
+                    gameState = 'highscores_menu';
                     updateUI();
                 }
             } else if (gameState === 'modifier_select' && idx !== null) {

@@ -33,10 +33,11 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 ### Game States
 ```
 menu → modifier_select → playing → gameover → shop → ↑
-  ↓           ↑              ↑
-  profile_select         paused → save_quit → settings
-  profile_create              ↓
-  settings               (activeRun saved)
+  ↓    ↓         ↑              ↑
+  saves_menu  profile_select  paused → save_quit → settings
+  highscores_menu                 ↓
+  profile_create            (activeRun saved)
+  settings
   resume_run → playing
 ```
 

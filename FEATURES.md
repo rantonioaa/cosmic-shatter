@@ -203,14 +203,15 @@
 - Guest mode option
 
 ### Main Menu
-- Game title "COSMIC SHATTER"
-- Profile name and Star Bits display
-- High scores list (top 8)
-- Vertical list layout with sections:
+- Game title "COSMIC SHATTER" with gold neon glow
+- Profile name and Star Bits display (dimmed, letter-spaced)
+- Panel-based vertical list with glass border aesthetic:
   - Start Game / Resume Run (with level/score preview)
   - Shop, Unlocks, Settings, Profile
-  - SAVES section: Export, Import
-- Keyboard shortcuts (R, S, U, G, P, E, I) still work, no visible hints
+  - OTHER section: Saves, High Scores
+- Menu items have hover glow (gold border + text-shadow)
+- Saves opens sub-screen with Export/Import
+- High Scores opens sub-screen with top 10 scores
 
 ### Modifier Select
 - 6 modifiers with descriptions
