@@ -34,9 +34,9 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 ```
 menu → modifier_select → playing → gameover → shop → ↑
   ↓           ↑              ↑
-  profile_select         paused → save_quit
+  profile_select         paused → save_quit → settings
   profile_create              ↓
-  graphics_menu          (activeRun saved)
+  settings               (activeRun saved)
   resume_run → playing
 ```
 
@@ -108,8 +108,9 @@ menu → modifier_select → playing → gameover → shop → ↑
 - Use crossing detection: `Math.floor(timer) % N === 0 && Math.floor(timer - dt) % N !== 0`
 - Simple modulo won't work with dt > 1
 
-### Graphics Menu
-- Simplified menu with 2 options: Orientation and Fullscreen
+### Settings Menu
+- Options: Orientation, Fullscreen (conditional), Audio sliders
+- Accessible from main menu (G key) and pause menu (Settings option)
 - Orientation toggle applies immediately (canvas resizes on toggle, auto-detects new resolution)
 - Fullscreen toggle: hidden if Fullscreen API not supported; also toggleable via F key
 - Resolution is always auto-detected based on device screen and DPR
@@ -154,7 +155,7 @@ menu → modifier_select → playing → gameover → shop → ↑
 
 ### Mobile Back Button
 - `data-tap-action="back"` on 4 menus: shop, modifier_select, graphics_menu, profile_create
-- Touch/click handler maps `back` action to: `shop → shopReturnState`, `modifier_select → menu`, `graphics_menu → menu`, `profile_create → profile_select`
+- Touch/click handler maps `back` action to: `shop → shopReturnState`, `modifier_select → menu`, `graphics_menu → graphicsReturnState`, `profile_create → profile_select`
 - Visible on all platforms (desktop and mobile)
 
 ## Git Workflow

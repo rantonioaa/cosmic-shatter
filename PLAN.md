@@ -264,11 +264,13 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Death shockwave — expanding ring on player death
 
 ### 6D. Procedural Ambient Music ✅
-- [x] Chord progression: Am → F → C → G (8s each, smooth glide)
+- [x] 10 chord progressions (Am Dark, Dm Mellow, Em Cold, Am Andalusian, Dm Deep, Gm Heavy, Em Circle, Cm Vast, Fm Ethereal, Am Tension)
+- [x] Randomly selected per new run, saved with mid-run saves
 - [x] Pad voices: 3 triangle oscillators with ±2Hz detuning
-- [x] Sub-bass: sine following chord root (40-60Hz)
+- [x] Sub-bass: sine following chord root
 - [x] Lowpass filter with slow LFO sweep (0.05Hz, 200-600Hz)
-- [x] Arpeggios: chord tones through delay feedback (0.4s, 0.3 fb)
+- [x] Arpeggios: progression-specific patterns through delay feedback
+- [x] Each progression has unique tempo, delay time, and feedback
 - [x] Intensity: combo opens filter, low health detunes pad
 
 ### 6E. Onboarding

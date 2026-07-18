@@ -234,7 +234,8 @@
 
 ### Pause Menu
 - Arrow key navigation or tap to select
-- 3 options: Resume, Quit to Menu, Save & Quit
+- 4 options: Resume, Quit to Menu, Save & Quit, Settings
+- Settings opens Settings menu (returns to pause on exit)
 - Dim overlay on frozen game
 
 ### Game Over
@@ -442,14 +443,15 @@
   - Low health — sine 220Hz beep, 100ms repeating every 600ms
   - Game over — sawtooth descending drone + filtered noise, 1.5s
 - **Procedural ambient music:**
-  - Chord progression: Am → F → C → G (8 seconds each, smooth frequency glide)
+  - 10 chord progressions (Am Dark, Dm Mellow, Em Cold, Am Andalusian, Dm Deep, Gm Heavy, Em Circle, Cm Vast, Fm Ethereal, Am Tension)
+  - Randomly selected per new run, saved with mid-run saves
   - Pad voices: 3 triangle oscillators (root, 3rd, 5th) with ±2Hz detuning for warmth
-  - Sub-bass: sine wave following chord root (40-60Hz)
+  - Sub-bass: sine wave following chord root
   - Lowpass filter with slow LFO sweep (0.05Hz, 200-600Hz range)
-  - Arpeggios: chord tones in root→3rd→5th→3rd pattern, 1.5s interval
-  - Delay feedback (0.4s, 0.3 feedback) for echo tails
+  - Arpeggios: progression-specific patterns through delay feedback for echo tails
+  - Each progression has unique tempo, delay time, and feedback character
   - Intensity: combo opens filter (+50Hz/combo), low health detunes pad (+4Hz)
-- **Audio controls in Graphics menu:**
+- **Audio controls in Settings menu:**
   - Master volume slider (0-100%)
   - SFX volume slider (0-100%)
   - Music volume slider (0-100%, capped at 50% to stay subtle)

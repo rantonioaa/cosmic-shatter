@@ -1082,7 +1082,7 @@
             <span id="btnExport" data-tap-action="export">[E] Export</span>
             <span id="btnImport" data-tap-action="import">[I] Import</span>
             <span id="btnProfile" data-tap-action="profile">[P] Profile</span>
-            <span id="btnGraphics" data-tap-action="graphics">[G] Graphics</span>
+            <span id="btnGraphics" data-tap-action="settings">[G] Settings</span>
             <span id="btnShop" data-tap-action="shop">[S] Shop</span>
             <span id="btnStardustShop" data-tap-action="stardust_shop">[U] Unlocks</span>
         </div>
@@ -1099,6 +1099,7 @@
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="1"><span class="pause-arrow">&#9654;</span>Quit to Menu</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="2"><span class="pause-arrow">&#9654;</span>Save & Quit</div>
+            <div class="pause-option" data-tap-action="pause" data-tap-index="3"><span class="pause-arrow">&#9654;</span>Settings</div>
             <div class="pause-hint">UP/DOWN to browse · ENTER to select · ESC quit</div>
             <div class="touch-hint">Tap to select</div>
         </div>
@@ -1110,7 +1111,7 @@
             <div class="back-btn" data-tap-action="back">&larr; Back</div>
         </div>
         <div id="graphicsMenu">
-            <div class="gfx-title">GRAPHICS</div>
+            <div class="gfx-title">SETTINGS</div>
             <div class="gfx-list" id="gfxList"></div>
             <div class="gfx-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
             <div class="touch-hint">Tap an option · Tap Back to exit</div>
@@ -1281,6 +1282,7 @@
         // Shop state
         let shopMenuIndex = 0;
         let shopReturnState = 'menu';
+        let graphicsReturnState = 'menu';
         let gameoverMenuIndex = 0;
 
         canvas.width = currentResolution.width;
@@ -1425,16 +1427,120 @@
         let musicGain = null;
         let audioInitialized = false;
         let musicPlaying = false;
-        // Music system (Pink Floyd-inspired chord progression)
-        const CHORDS = [
-            { root: 220,   third: 261.63, fifth: 329.63 },  // Am (A3, C4, E4)
-            { root: 174.61, third: 220,   fifth: 261.63 },  // F  (F3, A3, C4)
-            { root: 130.81, third: 164.81, fifth: 196 },    // C  (C3, E3, G3)
-            { root: 196,   third: 246.94, fifth: 293.66 },  // G  (G3, B3, D4)
+        // Music system (Pink Floyd-inspired, 10 progressions)
+        const PROGRESSIONS = [
+            { // 0: Am Dark — classic Floyd (Shine On)
+                chords: [
+                    { root: 220, third: 261.63, fifth: 329.63 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                    { root: 130.81, third: 164.81, fifth: 196 },
+                    { root: 196, third: 246.94, fifth: 293.66 },
+                ],
+                subBass: [55, 43.65, 32.70, 49.00],
+                arpPattern: [0, 1, 2, 1],
+                chordDuration: 480, arpInterval: 90, delayTime: 0.4, feedback: 0.3,
+            },
+            { // 1: Dm Mellow — warm, floating
+                chords: [
+                    { root: 293.66, third: 349.23, fifth: 440 },
+                    { root: 233.08, third: 293.66, fifth: 349.23 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                    { root: 130.81, third: 164.81, fifth: 196 },
+                ],
+                subBass: [73.42, 58.27, 43.65, 32.70],
+                arpPattern: [0, 2, 3, 2],
+                chordDuration: 540, arpInterval: 100, delayTime: 0.45, feedback: 0.35,
+            },
+            { // 2: Em Cold — spacious, lonely
+                chords: [
+                    { root: 164.81, third: 196, fifth: 246.94 },
+                    { root: 130.81, third: 164.81, fifth: 196 },
+                    { root: 98, third: 123.47, fifth: 146.83 },
+                    { root: 146.83, third: 185, fifth: 220 },
+                ],
+                subBass: [41.20, 32.70, 24.50, 36.71],
+                arpPattern: [0, 1, 2, 3],
+                chordDuration: 540, arpInterval: 110, delayTime: 0.5, feedback: 0.4,
+            },
+            { // 3: Am Andalusian — flamenco tension
+                chords: [
+                    { root: 220, third: 261.63, fifth: 329.63 },
+                    { root: 196, third: 246.94, fifth: 293.66 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                    { root: 164.81, third: 207.65, fifth: 246.94 },
+                ],
+                subBass: [55, 49, 43.65, 41.20],
+                arpPattern: [2, 1, 0, 1],
+                chordDuration: 420, arpInterval: 80, delayTime: 0.35, feedback: 0.25,
+            },
+            { // 4: Dm Deep — dark undertow
+                chords: [
+                    { root: 293.66, third: 349.23, fifth: 440 },
+                    { root: 220, third: 261.63, fifth: 329.63 },
+                    { root: 233.08, third: 293.66, fifth: 349.23 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                ],
+                subBass: [73.42, 55, 58.27, 43.65],
+                arpPattern: [0, 2, 1, 2],
+                chordDuration: 480, arpInterval: 85, delayTime: 0.4, feedback: 0.3,
+            },
+            { // 5: Gm Heavy — thick, brooding
+                chords: [
+                    { root: 196, third: 233.08, fifth: 293.66 },
+                    { root: 155.56, third: 196, fifth: 233.08 },
+                    { root: 116.54, third: 146.83, fifth: 174.61 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                ],
+                subBass: [49, 38.89, 29.16, 43.65],
+                arpPattern: [1, 0, 2, 0],
+                chordDuration: 480, arpInterval: 95, delayTime: 0.42, feedback: 0.32,
+            },
+            { // 6: Em Circle — flowing, hypnotic
+                chords: [
+                    { root: 164.81, third: 196, fifth: 246.94 },
+                    { root: 220, third: 261.63, fifth: 329.63 },
+                    { root: 146.83, third: 185, fifth: 220 },
+                    { root: 196, third: 246.94, fifth: 293.66 },
+                ],
+                subBass: [41.20, 55, 36.71, 49],
+                arpPattern: [0, 2, 3, 1],
+                chordDuration: 420, arpInterval: 80, delayTime: 0.38, feedback: 0.28,
+            },
+            { // 7: Cm Vast — cosmic, wide
+                chords: [
+                    { root: 130.81, third: 155.56, fifth: 196 },
+                    { root: 103.83, third: 130.81, fifth: 155.56 },
+                    { root: 77.78, third: 98, fifth: 116.54 },
+                    { root: 116.54, third: 146.83, fifth: 174.61 },
+                ],
+                subBass: [32.70, 25.96, 19.45, 29.16],
+                arpPattern: [0, 1, 2, 1],
+                chordDuration: 540, arpInterval: 100, delayTime: 0.5, feedback: 0.4,
+            },
+            { // 8: Fm Ethereal — floating, weightless
+                chords: [
+                    { root: 174.61, third: 207.65, fifth: 261.63 },
+                    { root: 138.59, third: 174.61, fifth: 207.65 },
+                    { root: 103.83, third: 130.81, fifth: 155.56 },
+                    { root: 155.56, third: 196, fifth: 233.08 },
+                ],
+                subBass: [43.65, 34.65, 25.96, 38.89],
+                arpPattern: [2, 0, 1, 0],
+                chordDuration: 540, arpInterval: 105, delayTime: 0.48, feedback: 0.38,
+            },
+            { // 9: Am Tension — dramatic build
+                chords: [
+                    { root: 220, third: 261.63, fifth: 329.63 },
+                    { root: 293.66, third: 349.23, fifth: 440 },
+                    { root: 174.61, third: 220, fifth: 261.63 },
+                    { root: 164.81, third: 207.65, fifth: 246.94 },
+                ],
+                subBass: [55, 73.42, 43.65, 41.20],
+                arpPattern: [0, 2, 1, 3],
+                chordDuration: 400, arpInterval: 75, delayTime: 0.35, feedback: 0.25,
+            },
         ];
-        const SUB_BASS_NOTES = [55, 43.65, 32.70, 49.00];
-        const CHORD_DURATION = 480;  // 8 seconds at 60fps
-        const ARP_INTERVAL = 90;     // 1.5 seconds between arpeggio notes
+        let runProgressionIndex = 0;
         let chordIndex = 0;
         let chordTimer = 0;
         let arpTimer = 0;
@@ -1597,6 +1703,7 @@
         function startMusic() {
             if (!audioCtx || !musicGain || musicPlaying) return;
             musicPlaying = true;
+            const prog = PROGRESSIONS[runProgressionIndex];
 
             // Lowpass filter for slow sweep
             filterNode = audioCtx.createBiquadFilter();
@@ -1621,7 +1728,7 @@
             padBus.connect(filterNode);
 
             // Pad voices (3 triangle oscillators, slight detuning for warmth)
-            const chord = CHORDS[chordIndex];
+            const chord = prog.chords[chordIndex];
             const freqs = [chord.root, chord.third, chord.fifth];
             for (let i = 0; i < 3; i++) {
                 const osc = audioCtx.createOscillator();
@@ -1640,7 +1747,7 @@
             subBassOsc = audioCtx.createOscillator();
             subBassGain = audioCtx.createGain();
             subBassOsc.type = 'sine';
-            subBassOsc.frequency.value = SUB_BASS_NOTES[chordIndex];
+            subBassOsc.frequency.value = prog.subBass[chordIndex];
             subBassGain.gain.value = 0.08;
             subBassOsc.connect(subBassGain);
             subBassGain.connect(musicGain);
@@ -1652,9 +1759,9 @@
             arpGain.connect(musicGain);
 
             arpDelay = audioCtx.createDelay(2);
-            arpDelay.delayTime.value = 0.4;
+            arpDelay.delayTime.value = prog.delayTime;
             arpFeedback = audioCtx.createGain();
-            arpFeedback.gain.value = 0.3;
+            arpFeedback.gain.value = prog.feedback;
             arpDelayGain = audioCtx.createGain();
             arpDelayGain.gain.value = 0.5;
 
@@ -1669,7 +1776,7 @@
             arpOsc.connect(arpGain);
             arpOsc.start();
 
-            chordTimer = CHORD_DURATION;
+            chordTimer = prog.chordDuration;
             arpTimer = 180;
         }
 
@@ -1689,30 +1796,32 @@
 
         function nextChord() {
             if (!audioCtx) return;
-            chordIndex = (chordIndex + 1) % CHORDS.length;
-            const chord = CHORDS[chordIndex];
+            const prog = PROGRESSIONS[runProgressionIndex];
+            chordIndex = (chordIndex + 1) % prog.chords.length;
+            const chord = prog.chords[chordIndex];
             const now = audioCtx.currentTime;
             const freqs = [chord.root, chord.third, chord.fifth];
             for (let i = 0; i < 3; i++) {
                 if (padOscs[i]) padOscs[i].frequency.setTargetAtTime(freqs[i], now, 0.67);
             }
-            if (subBassOsc) subBassOsc.frequency.setTargetAtTime(SUB_BASS_NOTES[chordIndex], now, 0.67);
+            if (subBassOsc) subBassOsc.frequency.setTargetAtTime(prog.subBass[chordIndex], now, 0.67);
         }
 
         function updateMusic(dt) {
             if (!musicPlaying || !audioCtx) return;
+            const prog = PROGRESSIONS[runProgressionIndex];
 
             // Chord progression
             chordTimer -= dt;
             if (chordTimer <= 0) {
-                chordTimer = CHORD_DURATION;
+                chordTimer = prog.chordDuration;
                 nextChord();
             }
 
             // Arpeggio (chord tones through delay)
             arpTimer -= dt;
             if (arpTimer <= 0) {
-                arpTimer = ARP_INTERVAL + Math.random() * 60;
+                arpTimer = prog.arpInterval + Math.random() * 60;
                 playArpeggio();
             }
 
@@ -1731,18 +1840,21 @@
             // Tension: detune pad voices on low health
             if (padOscs.length === 3) {
                 const tension = lives <= 1 ? 4 : 0;
-                if (padOscs[1]) padOscs[1].frequency.setTargetAtTime(CHORDS[chordIndex].third + 2 + tension, audioCtx.currentTime, 0.3);
-                if (padOscs[2]) padOscs[2].frequency.setTargetAtTime(CHORDS[chordIndex].fifth - 2 + tension, audioCtx.currentTime, 0.3);
+                if (padOscs[1]) padOscs[1].frequency.setTargetAtTime(prog.chords[chordIndex].third + 2 + tension, audioCtx.currentTime, 0.3);
+                if (padOscs[2]) padOscs[2].frequency.setTargetAtTime(prog.chords[chordIndex].fifth - 2 + tension, audioCtx.currentTime, 0.3);
             }
         }
 
         function playArpeggio() {
             if (!audioCtx || !arpGain) return;
             const now = audioCtx.currentTime;
-            const chord = CHORDS[chordIndex];
-            const arpNotes = [chord.root * 2, chord.third * 2, chord.fifth * 2, chord.third * 2];
-            const note = arpNotes[arpNoteIndex % arpNotes.length];
-            arpNoteIndex = (arpNoteIndex + 1) % arpNotes.length;
+            const prog = PROGRESSIONS[runProgressionIndex];
+            const chord = prog.chords[chordIndex];
+            const allNotes = [chord.root * 2, chord.third * 2, chord.fifth * 2, chord.fifth * 2];
+            const pattern = prog.arpPattern;
+            const noteIdx = pattern[arpNoteIndex % pattern.length];
+            const note = allNotes[noteIdx];
+            arpNoteIndex = (arpNoteIndex + 1) % pattern.length;
 
             arpOsc.frequency.setValueAtTime(note, now);
             arpGain.gain.cancelScheduledValues(now);
@@ -2919,7 +3031,7 @@
             const oriLabel = currentOrientation === 'landscape' ? 'Landscape' : 'Portrait';
             const oriSel = graphicsMenuIndex === 0 ? ' selected' : '';
             const oriCurrent = activeProfile && activeProfile.orientation === currentOrientation;
-            html += `<div class="gfx-option${oriSel}" data-tap-action="graphics" data-tap-index="0">`
+            html += `<div class="gfx-option${oriSel}" data-tap-action="settings" data-tap-index="0">`
                 + `<span class="gfx-arrow">&#9654;</span>`
                 + `Orientation: ${oriLabel}`
                 + (oriCurrent ? '<span class="gfx-active">&#10003;</span>' : '')
@@ -2930,7 +3042,7 @@
                 html += '<div class="gfx-section">DISPLAY</div>';
                 const fsSel = graphicsMenuIndex === 1 ? ' selected' : '';
                 const fsLabel = document.fullscreenElement ? 'Exit Fullscreen' : 'Fullscreen';
-                html += `<div class="gfx-option${fsSel}" data-tap-action="graphics" data-tap-index="1">`
+                html += `<div class="gfx-option${fsSel}" data-tap-action="settings" data-tap-index="1">`
                     + `<span class="gfx-arrow">&#9654;</span>`
                     + `${fsLabel} (F)`
                     + `</div>`;
@@ -3374,6 +3486,7 @@
                     updateUI();
                 } else if (e.key === 'g' || e.key === 'G') {
                     e.preventDefault();
+                    graphicsReturnState = 'menu';
                     gameState = 'graphics_menu';
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
@@ -3463,7 +3576,7 @@
                     }
                 } else if (e.code === 'Escape') {
                     e.preventDefault();
-                    gameState = 'menu';
+                    gameState = graphicsReturnState;
                     updateUI();
                 } else if (e.key === 'f' || e.key === 'F') {
                     e.preventDefault();
@@ -3572,11 +3685,11 @@
             if (gameState === 'paused') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex - 1 + 3) % 3;
+                    pauseMenuIndex = (pauseMenuIndex - 1 + 4) % 4;
                     updateUI();
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex + 1) % 3;
+                    pauseMenuIndex = (pauseMenuIndex + 1) % 4;
                     updateUI();
                 } else if (e.code === 'Enter' || e.code === 'Space') {
                     e.preventDefault();
@@ -3590,6 +3703,16 @@
                         }
                         stopMusic();
                         gameState = 'menu';
+                    } else if (pauseMenuIndex === 3) {
+                        // Settings
+                        graphicsReturnState = 'paused';
+                        gameState = 'graphics_menu';
+                        currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                        RESOLUTIONS = getResolutions();
+                        graphicsMenuIndex = 0;
+                        renderGraphicsList();
+                        updateUI();
+                        return;
                     } else {
                         stopMusic();
                         gameState = 'menu';
@@ -4004,6 +4127,7 @@
         function startGame() {
             initAudio();
             resumeAudio();
+            runProgressionIndex = Math.floor(Math.random() * PROGRESSIONS.length);
             startMusic();
             gameState = 'playing';
             score = 0;
@@ -4057,7 +4181,7 @@
             return {
                 score, lives, level, runStarBits, levelTransitionTimer,
                 heat, overheating, overheatTimer, shootCooldown, overdrive,
-                combo, comboTimer, shieldTimer,
+                combo, comboTimer, shieldTimer, progressionIndex: runProgressionIndex,
                 canvasWidth: canvas.width, canvasHeight: canvas.height,
                 ship: {
                     x: ship.x, y: ship.y, angle: ship.angle,
@@ -4104,6 +4228,7 @@
             score = data.score;
             lives = data.lives;
             level = data.level;
+            runProgressionIndex = data.progressionIndex ?? 0;
             runStarBits = data.runStarBits ?? 0;
             levelTransitionTimer = data.levelTransitionTimer ?? 0;
             heat = data.heat;
@@ -4281,7 +4406,7 @@
                 modifierSelectEl.style.display = 'block';
                 renderModifierList();
             } else if (gameState === 'graphics_menu') {
-                scoreEl.textContent = 'GRAPHICS SETTINGS';
+                scoreEl.textContent = 'SETTINGS';
                 scoreEl.style.display = 'block';
                 graphicsMenuEl.style.display = 'block';
                 renderGraphicsList();
@@ -5329,7 +5454,7 @@
                     } else if (gameState === 'modifier_select') {
                         gameState = 'menu';
                     } else if (gameState === 'graphics_menu') {
-                        gameState = 'menu';
+                        gameState = graphicsReturnState;
                     } else if (gameState === 'profile_create') {
                         gameState = 'profile_select';
                     }
@@ -5391,7 +5516,8 @@
                         gameState = 'profile_select';
                         profileSelectIndex = 0;
                         updateUI();
-                    } else if (action === 'graphics') {
+                    } else if (action === 'settings') {
+                        graphicsReturnState = 'menu';
                         gameState = 'graphics_menu';
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
@@ -5407,7 +5533,7 @@
                         startGame();
                     }
                     updateUI();
-                } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
+                } else if (gameState === 'graphics_menu' && action === 'settings' && idx !== null) {
                     const tapIdx = parseInt(idx);
                     if (tapIdx === 0) {
                         // Toggle orientation and apply immediately
@@ -5485,6 +5611,15 @@
                             saveProfile(activeProfile);
                         }
                         gameState = 'menu';
+                    } else if (pauseMenuIndex === 3) {
+                        // Settings
+                        graphicsReturnState = 'paused';
+                        gameState = 'graphics_menu';
+                        currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                        RESOLUTIONS = getResolutions();
+                        graphicsMenuIndex = 0;
+                        updateUI();
+                        return;
                     } else {
                         gameState = 'menu';
                     }
@@ -5534,7 +5669,7 @@
                 } else if (gameState === 'modifier_select') {
                     gameState = 'menu';
                 } else if (gameState === 'graphics_menu') {
-                    gameState = 'menu';
+                    gameState = graphicsReturnState;
                 } else if (gameState === 'profile_create') {
                     gameState = 'profile_select';
                 }
@@ -5596,7 +5731,8 @@
                     gameState = 'profile_select';
                     profileSelectIndex = 0;
                     updateUI();
-                } else if (action === 'graphics') {
+                } else if (action === 'settings') {
+                    graphicsReturnState = 'menu';
                     gameState = 'graphics_menu';
                     currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                     RESOLUTIONS = getResolutions();
@@ -5612,7 +5748,7 @@
                     startGame();
                 }
                 updateUI();
-            } else if (gameState === 'graphics_menu' && action === 'graphics' && idx !== null) {
+            } else if (gameState === 'graphics_menu' && action === 'settings' && idx !== null) {
                 const tapIdx = parseInt(idx);
                 if (tapIdx === 0) {
                     // Toggle orientation
@@ -5690,6 +5826,15 @@
                     }
                     stopMusic();
                     gameState = 'menu';
+                } else if (pauseMenuIndex === 3) {
+                    // Settings
+                    graphicsReturnState = 'paused';
+                    gameState = 'graphics_menu';
+                    currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
+                    RESOLUTIONS = getResolutions();
+                    graphicsMenuIndex = 0;
+                    updateUI();
+                    return;
                 } else {
                     stopMusic();
                     gameState = 'menu';
