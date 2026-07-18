@@ -205,19 +205,18 @@
 ### Main Menu
 - Game title "COSMIC SHATTER" with gold neon glow
 - Profile name and Star Bits display (dimmed, letter-spaced)
-- Panel-based vertical list with glass border aesthetic:
-  - Start Game / Resume Run (with level/score preview)
-  - Shop, Unlocks, Settings, Profile
-  - OTHER section: Saves, High Scores
-- Menu items have hover glow (gold border + text-shadow)
-- Saves opens sub-screen with Export/Import
-- High Scores opens sub-screen with top 10 scores
+- Sci-fi HUD aesthetic: angular panels with clip-path corner cuts
+- Teal/cyan color scheme for secondary items, gold for primary
+- Corner `+` markers via CSS pseudo-elements
+- Bold uppercase text with wide letter-spacing
+- Start Game / Resume Run highlighted as primary (gold background)
+- Saves and High Scores as sub-screens
 
 ### Modifier Select
-- 6 modifiers with descriptions
+- Angular panel options matching main menu aesthetic
 - Arrow key navigation or tap to select
 - Score multiplier shown
-- Locked modifiers show unlock condition
+- Locked modifiers dimmed
 
 ### Graphics Menu
 - Simplified menu with 2 options:
@@ -237,10 +236,12 @@
 - PowerupHud bottom position adjusts in fullscreen
 
 ### Pause Menu
-- Arrow key navigation or tap to select
+- Semi-transparent angular panels (distinctive overlay feel)
+- Resume highlighted as primary action (gold background)
 - 4 options: Resume, Quit to Menu, Save & Quit, Settings
 - Settings opens Settings menu (returns to pause on exit)
 - Dim overlay on frozen game
+- Same design family as main menu but more transparent
 
 ### Game Over
 - Score and modifier displayed

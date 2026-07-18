@@ -108,9 +108,12 @@
             margin-top: 15px;
         }
         #modifierSelect .mod-title {
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 3px;
             margin-bottom: 12px;
-            letter-spacing: 2px;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
         #modifierSelect .mod-list {
             text-align: left;
@@ -118,29 +121,37 @@
         }
         #modifierSelect .mod-option {
             font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             margin: 6px 0;
-            opacity: 0.5;
-            padding: 4px 8px;
-            transition: opacity 0.1s;
+            padding: 10px 16px;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.15s;
         }
         #modifierSelect .mod-option.selected {
-            opacity: 1;
-            color: #ffcc00;
+            color: #1a1a2e;
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
         }
         #modifierSelect .mod-option.locked {
-            opacity: 0.5;
+            opacity: 0.4;
         }
         #modifierSelect .mod-option.selected.locked {
-            opacity: 0.6;
             color: #888;
+            background: rgba(136, 136, 136, 0.1);
+            border-color: #888;
         }
         #modifierSelect .mod-option:active {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(79, 195, 247, 0.1);
         }
         #modifierSelect .mod-option .mod-arrow {
             display: none;
-            margin-right: 6px;
-            color: #ffcc00;
         }
         #modifierSelect .mod-option.selected .mod-arrow {
             display: inline;
@@ -158,15 +169,20 @@
         }
         #modifierSelect .mod-desc {
             font-size: 11px;
-            opacity: 0.5;
+            color: #4fc3f7;
+            opacity: 0.4;
             margin-left: 22px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: normal;
         }
         #modifierSelect .mod-option.selected .mod-desc {
-            opacity: 0.7;
+            opacity: 0.6;
         }
         #modifierSelect .mod-hint {
             font-size: 11px;
-            opacity: 0.4;
+            color: #4fc3f7;
+            opacity: 0.35;
             margin-top: 14px;
             letter-spacing: 1px;
         }
@@ -196,9 +212,12 @@
             margin-top: 15px;
         }
         #profileSelect .ps-title {
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 3px;
             margin-bottom: 12px;
-            letter-spacing: 2px;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
         #profileSelect .ps-list {
             text-align: left;
@@ -206,22 +225,29 @@
         }
         #profileSelect .ps-option {
             font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             margin: 6px 0;
-            opacity: 0.5;
-            padding: 4px 8px;
+            padding: 10px 16px;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
             cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.15s;
         }
         #profileSelect .ps-option.selected {
-            opacity: 1;
-            color: #ffcc00;
+            color: #1a1a2e;
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
         }
         #profileSelect .ps-option:active {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(79, 195, 247, 0.1);
         }
         #profileSelect .ps-option .ps-arrow {
             display: none;
-            margin-right: 6px;
-            color: #ffcc00;
         }
         #profileSelect .ps-option.selected .ps-arrow {
             display: inline;
@@ -243,86 +269,122 @@
         #profileNameInput {
             display: none;
             margin-top: 12px;
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-family: 'Courier New', monospace;
-            font-size: 18px;
-            color: #fff;
-            background: transparent;
-            border: 2px solid #fff;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.05);
+            border: 1px solid rgba(79, 195, 247, 0.3);
             outline: none;
             text-align: center;
             pointer-events: auto;
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
         }
         #profileNameInput::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(79, 195, 247, 0.3);
+        }
+        #profileNameInput:focus {
+            border-color: #4fc3f7;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
         }
         #profileNameGo {
             display: none;
             margin-top: 12px;
             margin-left: 8px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-family: 'Courier New', monospace;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            color: #000;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #1a1a2e;
             background: #ffcc00;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
             pointer-events: auto;
             vertical-align: middle;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+            transition: background 0.15s;
         }
         #profileNameGo:active {
-            background: #ff9900;
+            background: #ffd54f;
         }
         #menuActions {
             display: none;
             flex-direction: column;
             align-items: center;
-            margin-top: 8px;
-        }
-        .menu-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 6px;
-            width: 100%;
-            max-width: 280px;
+            gap: 10px;
+            margin-top: 16px;
         }
         .menu-item {
             font-size: 15px;
-            letter-spacing: 1px;
-            padding: 10px 16px;
-            min-height: 44px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 14px 24px;
+            min-height: 48px;
             width: 100%;
+            max-width: 300px;
             text-align: center;
-            border-radius: 4px;
-            border: 1px solid transparent;
+            color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.04);
+            border: 1px solid rgba(79, 195, 247, 0.25);
             cursor: pointer;
             pointer-events: auto;
-            transition: color 0.15s, border-color 0.15s, background 0.15s, text-shadow 0.15s;
+            position: relative;
+            clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+            transition: all 0.15s;
         }
+        .menu-item::before, .menu-item::after {
+            content: '+';
+            position: absolute;
+            font-size: 8px;
+            font-weight: normal;
+            color: rgba(79, 195, 247, 0.35);
+            line-height: 1;
+            pointer-events: none;
+        }
+        .menu-item::before { top: -5px; left: -1px; }
+        .menu-item::after { bottom: -5px; right: -1px; }
         .menu-item:hover {
-            color: #ffcc00;
-            border-color: rgba(255, 204, 0, 0.3);
-            background: rgba(255, 204, 0, 0.05);
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+            color: #81d4fa;
+            border-color: rgba(79, 195, 247, 0.5);
+            background: rgba(79, 195, 247, 0.08);
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
         }
         .menu-item:active {
-            background: rgba(255, 204, 0, 0.1);
+            background: rgba(79, 195, 247, 0.15);
+        }
+        .menu-item.primary {
+            color: #1a1a2e;
+            background: #ffcc00;
+            border-color: #ffcc00;
+            text-shadow: none;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .menu-item.primary::before, .menu-item.primary::after {
+            color: rgba(255, 204, 0, 0.5);
+        }
+        .menu-item.primary:hover {
+            background: #ffd54f;
+            border-color: #ffd54f;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            text-shadow: none;
         }
         .menu-divider {
             height: 1px;
-            background: rgba(255, 204, 0, 0.15);
+            background: rgba(79, 195, 247, 0.15);
             margin: 4px 16px;
         }
         .menu-section-label {
             font-size: 10px;
             letter-spacing: 3px;
-            color: #ffcc00;
-            opacity: 0.4;
+            color: #4fc3f7;
+            opacity: 0.35;
             text-transform: uppercase;
             text-align: center;
             padding: 4px 0 2px;
@@ -330,11 +392,9 @@
         @media (max-width: 600px) {
             .menu-item {
                 font-size: 16px;
-                padding: 12px 16px;
-                min-height: 48px;
-            }
-            .menu-panel {
-                max-width: 300px;
+                padding: 14px 20px;
+                min-height: 50px;
+                max-width: 320px;
             }
         }
         #savesMenu, #highscoresMenu {
@@ -343,7 +403,8 @@
         }
         #savesMenu .pause-title, #highscoresMenu .pause-title {
             font-size: 20px;
-            letter-spacing: 3px;
+            font-weight: bold;
+            letter-spacing: 4px;
             margin-bottom: 16px;
             color: #ffcc00;
             text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
@@ -354,8 +415,9 @@
         }
         #highscoresList .hs-entry {
             font-size: 14px;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 0;
+            color: rgba(79, 195, 247, 0.7);
+            border-bottom: 1px solid rgba(79, 195, 247, 0.08);
         }
         #highscoresList .hs-new {
             color: #ffcc00;
@@ -371,7 +433,8 @@
         }
         #highscoresList .hs-empty {
             text-align: center;
-            opacity: 0.4;
+            color: #4fc3f7;
+            opacity: 0.3;
             padding: 20px 0;
         }
         #pauseMenu {
@@ -380,35 +443,70 @@
         }
         #pauseMenu .pause-title {
             font-size: 20px;
-            letter-spacing: 3px;
-            margin-bottom: 16px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
         }
         #pauseMenu .pause-option {
-            font-size: 16px;
-            margin: 8px 0;
-            opacity: 0.5;
-            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            min-height: 44px;
+            margin: 6px auto;
+            max-width: 260px;
+            width: 100%;
+            text-align: center;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            transition: all 0.15s;
         }
+        #pauseMenu .pause-option::before, #pauseMenu .pause-option::after {
+            content: '+';
+            position: absolute;
+            font-size: 7px;
+            font-weight: normal;
+            color: rgba(79, 195, 247, 0.25);
+            line-height: 1;
+            pointer-events: none;
+        }
+        #pauseMenu .pause-option::before { top: -4px; left: -1px; }
+        #pauseMenu .pause-option::after { bottom: -4px; right: -1px; }
         #pauseMenu .pause-option.selected {
-            opacity: 1;
-            color: #ffcc00;
+            color: #1a1a2e;
+            background: #ffcc00;
+            border-color: #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+        #pauseMenu .pause-option.selected::before, #pauseMenu .pause-option.selected::after {
+            color: rgba(255, 204, 0, 0.5);
         }
         #pauseMenu .pause-option:active {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(79, 195, 247, 0.1);
+        }
+        #pauseMenu .pause-option.selected:active {
+            background: #ffd54f;
         }
         #pauseMenu .pause-arrow {
             display: none;
-            margin-right: 6px;
-            color: #ffcc00;
         }
         #pauseMenu .pause-option.selected .pause-arrow {
             display: inline;
         }
         #pauseMenu .pause-hint {
             font-size: 11px;
-            opacity: 0.4;
+            opacity: 0.35;
             margin-top: 16px;
             letter-spacing: 1px;
+            color: #4fc3f7;
         }
         #graphicsMenu {
             display: none;
@@ -416,34 +514,46 @@
         }
         #graphicsMenu .gfx-title {
             font-size: 20px;
-            letter-spacing: 3px;
+            font-weight: bold;
+            letter-spacing: 4px;
             margin-bottom: 16px;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
         #graphicsMenu .gfx-section {
             font-size: 11px;
-            opacity: 0.6;
-            letter-spacing: 2px;
+            color: #4fc3f7;
+            opacity: 0.4;
+            letter-spacing: 3px;
             margin-top: 14px;
             margin-bottom: 6px;
             text-transform: uppercase;
         }
         #graphicsMenu .gfx-option {
-            font-size: 16px;
-            margin: 4px 0;
-            opacity: 0.5;
-            padding: 4px 8px 4px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 6px 0;
+            padding: 10px 16px;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.15s;
         }
         #graphicsMenu .gfx-option.selected {
-            opacity: 1;
-            color: #ffcc00;
+            color: #1a1a2e;
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
         }
         #graphicsMenu .gfx-option:active {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(79, 195, 247, 0.1);
         }
         #graphicsMenu .gfx-arrow {
             display: none;
-            margin-right: 6px;
-            color: #ffcc00;
         }
         #graphicsMenu .gfx-option.selected .gfx-arrow {
             display: inline;
@@ -965,27 +1075,31 @@
             letter-spacing: 1px;
         }
         .back-btn {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #aaa;
+            margin-top: 16px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(79, 195, 247, 0.5);
             cursor: pointer;
             pointer-events: auto;
             text-align: center;
-            padding: 12px 16px;
+            padding: 10px 20px;
             min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            transition: background 0.15s;
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+            transition: all 0.15s;
         }
         .back-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
+            color: #81d4fa;
+            border-color: rgba(79, 195, 247, 0.4);
+            background: rgba(79, 195, 247, 0.05);
         }
         .back-btn:active {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(79, 195, 247, 0.1);
         }
         #touchPause {
             display: none;
@@ -1064,12 +1178,9 @@
             .ps-option, .mod-option, .pause-option, .gfx-option {
                 padding: 12px 16px !important;
                 min-height: 48px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
             }
             .gfx-option {
-                padding-left: 24px !important;
+                padding-left: 16px !important;
             }
             .ps-info {
                 font-size: 12px !important;
@@ -1132,28 +1243,24 @@
         <div id="message">Press SPACE to start</div>
         <div id="highscores"></div>
         <div id="menuActions">
-            <div class="menu-panel">
-                <div id="btnStart" class="menu-item" data-tap-action="start">▶ Start Game</div>
-                <div id="btnResume" class="menu-item" data-tap-action="resume" style="display:none">▶ Resume Run</div>
-                <div id="btnShop" class="menu-item" data-tap-action="shop">▶ Shop</div>
-                <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">▶ Unlocks</div>
-                <div id="btnGraphics" class="menu-item" data-tap-action="settings">▶ Settings</div>
-                <div id="btnProfile" class="menu-item" data-tap-action="profile">▶ Profile</div>
-                <div class="menu-item" data-tap-action="saves">▶ Saves</div>
-                <div class="menu-item" data-tap-action="highscores_menu">▶ High Scores</div>
-            </div>
+            <div id="btnStart" class="menu-item primary" data-tap-action="start">Start Game</div>
+            <div id="btnResume" class="menu-item primary" data-tap-action="resume" style="display:none">Resume Run</div>
+            <div id="btnShop" class="menu-item" data-tap-action="shop">Shop</div>
+            <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">Unlocks</div>
+            <div id="btnGraphics" class="menu-item" data-tap-action="settings">Settings</div>
+            <div id="btnProfile" class="menu-item" data-tap-action="profile">Profile</div>
+            <div class="menu-item" data-tap-action="saves">Saves</div>
+            <div class="menu-item" data-tap-action="highscores_menu">High Scores</div>
         </div>
         <div id="savesMenu">
             <div class="pause-title">SAVES</div>
-            <div class="menu-panel">
-                <div class="menu-item" data-tap-action="export">▶ Export Save</div>
-                <div class="menu-item" data-tap-action="import">▶ Import Save</div>
-            </div>
+            <div class="menu-item" data-tap-action="export">Export Save</div>
+            <div class="menu-item" data-tap-action="import">Import Save</div>
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="highscoresMenu">
             <div class="pause-title">HIGH SCORES</div>
-            <div class="menu-panel" id="highscoresList"></div>
+            <div id="highscoresList"></div>
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="profileSelect">
@@ -4452,9 +4559,9 @@
                     btnStardustShopEl.style.display = 'block';
                     if (hasRun) {
                         const runMod = activeProfile.activeRun.modifierId !== 'none' ? ` [${activeProfile.activeRun.modifierId}]` : '';
-                        btnResumeEl.innerHTML = `▶ Resume Run<span class="menu-subtitle">Lv.${activeProfile.activeRun.level}${runMod} — Score ${activeProfile.activeRun.score}</span>`;
+                        btnResumeEl.textContent = `Resume Run — Lv.${activeProfile.activeRun.level}${runMod}`;
                     } else {
-                        btnResumeEl.innerHTML = '▶ Resume Run';
+                        btnResumeEl.textContent = 'Resume Run';
                     }
                 } else {
                     btnStardustShopEl.style.display = 'none';
