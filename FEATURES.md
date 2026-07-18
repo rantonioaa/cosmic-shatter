@@ -232,17 +232,25 @@
 - Back button returns to main menu
 
 ### High Scores Sub-Screen
-- Top 10 scores with rank, modifier, and level
-- Gold highlight for new high scores
+- Arcade-style tabular layout with column headers (RANK, NAME, SCORE, LEVEL, DATE)
+- Grid-aligned rows with consistent column widths
+- Scores formatted with comma separators (e.g., 52,430)
+- Shows profile name (or "GUEST" for guest mode)
+- Gold glow highlight for rank #1
+- Top 3 ranks with progressive brightness
+- Modifier badges: colored dots with legend (cyan=Tiny Ship, red=Speed Demon, purple=Dark Mode, gold=Bullet Storm, white=Glass Cannon)
+- Gold highlight for newly submitted high scores
+- Decorative frame with corner markers
+- Mobile: date column hidden for compact layout
 - Back button returns to main menu
 
 ### Game Over
-- Score and modifier displayed
+- Score (comma-formatted) and modifier displayed
 - Arrow-selectable menu or tap:
   - Restart → modifier select
   - Shop → upgrade shop
   - Quit to Menu
-- High scores list shown
+- High scores list shown with profile names, modifier badges, and dates
 - Clears any active saved run (`activeRun`)
 
 ### Upgrade Shop (Card Grid)

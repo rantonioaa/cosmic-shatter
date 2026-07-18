@@ -342,7 +342,7 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Profile create screen
 - [x] Modifier select with arrow navigation
 - [x] Pause menu with arrow navigation
-- [x] High scores display (per-profile)
+- [x] High scores display (per-profile) — arcade-style table with columns, badges, legend
 - [x] Export/Import profiles
 - [x] Graphics menu with Orientation and Fullscreen (simplified from Resolution/Orientation/Fullscreen)
 - [x] Portrait/Landscape orientation toggle in graphics menu (applies immediately)

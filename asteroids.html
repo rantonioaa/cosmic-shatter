@@ -86,20 +86,66 @@
             margin-top: 15px;
             font-size: 13px;
             opacity: 0.6;
-            max-width: 340px;
+            max-width: 380px;
             margin-left: auto;
             margin-right: auto;
         }
         #highscores .hs-title {
             font-size: 14px;
             opacity: 1;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             letter-spacing: 2px;
+            color: rgba(79, 195, 247, 0.8);
         }
         #highscores .hs-entry {
-            margin: 1px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.06);
+            gap: 8px;
+        }
+        #highscores .hs-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #highscores .hs-rank {
+            opacity: 0.4;
+            font-size: 12px;
+            width: 20px;
+            text-align: right;
+        }
+        #highscores .hs-name {
+            font-size: 11px;
+            opacity: 0.5;
+        }
+        #highscores .hs-score {
+            font-variant-numeric: tabular-nums;
+        }
+        #highscores .hs-mod-badge {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        #highscores .hs-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            opacity: 0.5;
         }
         #highscores .hs-new {
+            color: #ffcc00;
+            opacity: 1;
+        }
+        #highscores .hs-new .hs-rank,
+        #highscores .hs-new .hs-name,
+        #highscores .hs-new .hs-score {
             color: #ffcc00;
             opacity: 1;
         }
@@ -407,7 +453,7 @@
             flex-direction: column;
             align-items: center;
         }
-        #savesMenu .pause-title, #highscoresMenu .pause-title {
+        #savesMenu .pause-title {
             font-size: 20px;
             font-weight: bold;
             letter-spacing: 4px;
@@ -415,33 +461,166 @@
             color: #ffcc00;
             text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
+        #highscoresMenu .hs-title {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
+            color: #ffcc00;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            text-align: center;
+        }
+        #highscoresMenu .hs-frame {
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            padding: 0;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+        }
+        #highscoresMenu .hs-frame::before,
+        #highscoresMenu .hs-frame::after {
+            content: '+';
+            position: absolute;
+            color: rgba(79, 195, 247, 0.3);
+            font-size: 10px;
+        }
+        #highscoresMenu .hs-frame::before { top: -7px; left: -1px; }
+        #highscoresMenu .hs-frame::after { bottom: -7px; right: -1px; }
+        #highscoresMenu .hs-headers {
+            display: grid;
+            grid-template-columns: 36px 1fr auto 52px 70px;
+            gap: 4px;
+            padding: 8px 12px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: rgba(79, 195, 247, 0.4);
+            border-bottom: 1px solid rgba(79, 195, 247, 0.12);
+            text-transform: uppercase;
+        }
+        #highscoresMenu .hs-h-score,
+        #highscoresMenu .hs-h-level {
+            text-align: right;
+        }
+        #highscoresMenu .hs-h-date {
+            text-align: right;
+        }
         #highscoresList {
             text-align: left;
-            padding: 8px 16px;
+            padding: 0;
         }
         #highscoresList .hs-entry {
-            font-size: 14px;
-            padding: 8px 0;
+            display: grid;
+            grid-template-columns: 36px 1fr auto 52px 70px;
+            gap: 4px;
+            font-size: 13px;
+            padding: 7px 12px;
             color: rgba(79, 195, 247, 0.7);
-            border-bottom: 1px solid rgba(79, 195, 247, 0.08);
+            border-bottom: 1px solid rgba(79, 195, 247, 0.06);
+            align-items: center;
+        }
+        #highscoresList .hs-entry:last-child {
+            border-bottom: none;
+        }
+        #highscoresList .hs-rank {
+            font-size: 12px;
+            opacity: 0.45;
+            font-variant-numeric: tabular-nums;
+        }
+        #highscoresList .hs-rank-1 {
+            color: #ffcc00;
+            opacity: 1;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+        }
+        #highscoresList .hs-rank-2 {
+            opacity: 0.7;
+        }
+        #highscoresList .hs-rank-3 {
+            opacity: 0.6;
+        }
+        #highscoresList .hs-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        #highscoresList .hs-score {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-size: 13px;
+        }
+        #highscoresList .hs-level {
+            text-align: right;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+        #highscoresList .hs-date {
+            text-align: right;
+            font-size: 10px;
+            opacity: 0.35;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #highscoresList .hs-mod-badge {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        #highscoresList .hs-mod-label {
+            font-size: 9px;
+            opacity: 0.5;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
         }
         #highscoresList .hs-new {
             color: #ffcc00;
+            opacity: 1;
         }
-        #highscoresList .hs-rank {
-            display: inline-block;
-            width: 28px;
-            opacity: 0.5;
-        }
-        #highscoresList .hs-mod {
+        #highscoresList .hs-new .hs-rank {
             color: #ffcc00;
-            opacity: 0.7;
+            opacity: 1;
+        }
+        #highscoresList .hs-new .hs-name,
+        #highscoresList .hs-new .hs-score {
+            color: #ffcc00;
+        }
+        #highscoresList .hs-new .hs-level,
+        #highscoresList .hs-new .hs-date {
+            color: #ffcc00;
+            opacity: 1;
         }
         #highscoresList .hs-empty {
             text-align: center;
             color: #4fc3f7;
             opacity: 0.3;
-            padding: 20px 0;
+            padding: 24px 0;
+            font-size: 13px;
+        }
+        .hs-mod-legend {
+            margin-top: 10px;
+            font-size: 9px;
+            color: rgba(79, 195, 247, 0.35);
+            text-align: center;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+            max-width: 480px;
+        }
+        .hs-mod-legend .hs-leg-item {
+            display: inline-block;
+            margin: 0 6px;
+        }
+        .hs-mod-legend .hs-leg-dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            margin-right: 3px;
+            vertical-align: middle;
         }
         #pauseMenu {
             display: none;
@@ -1249,6 +1428,25 @@
             #highscores {
                 font-size: 14px !important;
                 opacity: 0.7 !important;
+                max-width: 420px !important;
+            }
+            #highscores .hs-entry {
+                font-size: 14px !important;
+            }
+            #highscoresMenu .hs-frame {
+                max-width: 100%;
+            }
+            #highscoresMenu .hs-headers,
+            #highscoresList .hs-entry {
+                grid-template-columns: 28px 1fr auto 40px 0;
+            }
+            #highscoresMenu .hs-h-date,
+            #highscoresList .hs-date {
+                display: none;
+            }
+            #highscoresMenu .hs-title {
+                font-size: 18px !important;
+                letter-spacing: 4px !important;
             }
             #message {
                 font-size: 18px !important;
@@ -1292,7 +1490,18 @@
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="highscoresMenu">
-            <div id="highscoresList"></div>
+            <div class="hs-title">HIGH SCORES</div>
+            <div class="hs-frame">
+                <div class="hs-headers">
+                    <span class="hs-h-rank">RK</span>
+                    <span class="hs-h-name">NAME</span>
+                    <span class="hs-h-score">SCORE</span>
+                    <span class="hs-h-level">LVL</span>
+                    <span class="hs-h-date">DATE</span>
+                </div>
+                <div id="highscoresList"></div>
+            </div>
+            <div class="hs-mod-legend" id="hsLegend"></div>
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="profileSelect">
@@ -1408,6 +1617,7 @@
         const savesMenuEl = document.getElementById('savesMenu');
         const highscoresMenuEl = document.getElementById('highscoresMenu');
         const highscoresListEl = document.getElementById('highscoresList');
+        const hsLegendEl = document.getElementById('hsLegend');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
@@ -3007,6 +3217,10 @@
                 profile.selectedLoadout = 'standard';
                 changed = true;
             }
+            if (!profile.highScores) {
+                profile.highScores = [];
+                changed = true;
+            }
             // Audio fields (Phase 6)
             if (profile.audioMaster === undefined) {
                 profile.audioMaster = 80;
@@ -3030,7 +3244,7 @@
         }
 
         function getHighScores() {
-            if (activeProfile) return activeProfile.highScores;
+            if (activeProfile && activeProfile.highScores) return activeProfile.highScores;
             return [];
         }
 
@@ -4607,8 +4821,8 @@
                 scoreEl.style.display = 'block';
                 savesMenuEl.style.display = 'flex';
             } else if (gameState === 'highscores_menu') {
-                scoreEl.textContent = 'HIGH SCORES';
-                scoreEl.style.display = 'block';
+                lastHighScoreRank = -1;
+                scoreEl.style.display = 'none';
                 highscoresMenuEl.style.display = 'flex';
                 renderHighscoresMenu();
             } else if (gameState === 'profile_create') {
@@ -4683,6 +4897,19 @@
             if (typeof updateTouchPause === 'function') updateTouchPause();
         }
 
+        function formatScore(n) {
+            return n.toLocaleString();
+        }
+
+        const MOD_BADGE_COLORS = {
+            none: null,
+            tiny_ship: '#4fc3f7',
+            speed_demon: '#ff4444',
+            dark_mode: '#aa66ff',
+            bullet_storm: '#ffcc00',
+            glass_cannon: '#ffffff'
+        };
+
         function renderHighScores() {
             const scores = getHighScores();
             if (scores.length === 0 || highscoresEl.style.display === 'none') {
@@ -4692,9 +4919,11 @@
             let html = '<div class="hs-title">HIGH SCORES</div>';
             scores.slice(0, 8).forEach((entry, i) => {
                 const isNew = i === lastHighScoreRank;
-                const modLabel = entry.modifier && entry.modifier !== 'none' ? ` [${entry.modifier}]` : '';
+                const modBadge = entry.modifier && entry.modifier !== 'none' && MOD_BADGE_COLORS[entry.modifier]
+                    ? `<span class="hs-mod-badge" style="background:${MOD_BADGE_COLORS[entry.modifier]}"></span>` : '';
                 html += `<div class="hs-entry${isNew ? ' hs-new' : ''}">`
-                    + `${i + 1}. ${entry.score}${modLabel} | Lv.${entry.level}`
+                    + `<span class="hs-left"><span class="hs-rank">${i + 1}.</span>${modBadge}<span class="hs-score">${formatScore(entry.score)}</span></span>`
+                    + `<span class="hs-right"><span>Lv.${entry.level}</span><span>${entry.date || ''}</span></span>`
                     + `</div>`;
             });
             highscoresEl.innerHTML = html;
@@ -4704,17 +4933,40 @@
             const scores = getHighScores();
             if (!scores || scores.length === 0) {
                 highscoresListEl.innerHTML = '<div class="hs-empty">No scores yet</div>';
+                hsLegendEl.innerHTML = '';
                 return;
             }
+            const usedMods = new Set();
             let html = '';
             scores.slice(0, 10).forEach((entry, i) => {
-                const modLabel = entry.modifier && entry.modifier !== 'none'
-                    ? ` <span class="hs-mod">[${entry.modifier}]</span>` : '';
-                html += `<div class="hs-entry">`
-                    + `<span class="hs-rank">${i + 1}.</span> ${entry.score}${modLabel} | Lv.${entry.level}`
+                const isNew = i === lastHighScoreRank;
+                const rankClass = i === 0 ? ' hs-rank-1' : i === 1 ? ' hs-rank-2' : i === 2 ? ' hs-rank-3' : '';
+                const modId = entry.modifier || 'none';
+                let modBadge = '';
+                if (modId !== 'none' && MOD_BADGE_COLORS[modId]) {
+                    modBadge = `<span class="hs-mod-badge" style="background:${MOD_BADGE_COLORS[modId]}"></span><span class="hs-mod-label">${modId.replace('_', ' ')}</span>`;
+                    usedMods.add(modId);
+                }
+                html += `<div class="hs-entry${isNew ? ' hs-new' : ''}">`
+                    + `<span class="hs-rank${rankClass}">${String(i + 1).padStart(2, '0')}</span>`
+                    + `<span class="hs-name">${activeProfile ? activeProfile.name : 'GUEST'}</span>`
+                    + `<span class="hs-score">${modBadge}${formatScore(entry.score)}</span>`
+                    + `<span class="hs-level">Lv.${entry.level}</span>`
+                    + `<span class="hs-date">${entry.date || ''}</span>`
                     + `</div>`;
             });
             highscoresListEl.innerHTML = html;
+            if (usedMods.size > 0) {
+                let legHtml = '';
+                usedMods.forEach(modId => {
+                    const mod = MODIFIERS.find(m => m.id === modId);
+                    const label = mod ? mod.label : modId;
+                    legHtml += `<span class="hs-leg-item"><span class="hs-leg-dot" style="background:${MOD_BADGE_COLORS[modId]}"></span>${label}</span>`;
+                });
+                hsLegendEl.innerHTML = legHtml;
+            } else {
+                hsLegendEl.innerHTML = '';
+            }
         }
 
         // Update ship
