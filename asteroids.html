@@ -400,6 +400,9 @@
         #savesMenu, #highscoresMenu {
             display: none;
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #savesMenu .pause-title, #highscoresMenu .pause-title {
             font-size: 20px;
@@ -1280,7 +1283,6 @@
             <div class="menu-item" data-tap-action="highscores_menu">High Scores</div>
         </div>
         <div id="savesMenu">
-            <div class="pause-title">SAVES</div>
             <div class="menu-item" data-tap-action="export">Export Save</div>
             <div class="menu-item" data-tap-action="import">Import Save</div>
             <div class="back-btn" data-tap-action="back">← Back</div>
@@ -1297,7 +1299,7 @@
             <div class="touch-hint">Tap to select</div>
         </div>
         <input id="profileNameInput" type="text" maxlength="12" placeholder="Enter profile name..."><button id="profileNameGo">GO</button>
-        <div class="back-btn" data-tap-action="back">&larr; Back</div>
+        <div id="profileBackBtn" class="back-btn" data-tap-action="back">&larr; Back</div>
         <div id="pauseMenu">
             <div class="pause-title">PAUSED</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Resume</div>
@@ -1396,6 +1398,7 @@
         const profileListEl = document.getElementById('profileList');
         const profileNameInputEl = document.getElementById('profileNameInput');
         const profileNameGoEl = document.getElementById('profileNameGo');
+        const profileBackBtnEl = document.getElementById('profileBackBtn');
         const menuActionsEl = document.getElementById('menuActions');
         const btnResumeEl = document.getElementById('btnResume');
         const btnStartEl = document.getElementById('btnStart');
@@ -4568,6 +4571,7 @@
             stardustShopMenuEl.style.display = 'none';
             comboBarEl.style.display = 'none';
             btnStardustShopEl.style.display = 'none';
+            profileBackBtnEl.style.display = 'none';
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
@@ -4611,6 +4615,7 @@
                 scoreEl.style.display = 'block';
                 profileNameInputEl.style.display = 'inline-block';
                 profileNameGoEl.style.display = 'inline-block';
+                profileBackBtnEl.style.display = 'flex';
                 profileNameInputEl.focus();
             } else if (gameState === 'modifier_select') {
                 scoreEl.textContent = 'SELECT MODIFIER';
