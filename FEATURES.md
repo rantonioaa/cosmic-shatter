@@ -209,39 +209,32 @@
 - Teal/cyan color scheme for secondary items, gold for primary
 - Corner `+` markers via CSS pseudo-elements
 - Bold uppercase text with wide letter-spacing
-- Start Game / Resume Run highlighted as primary (gold background)
+- Start Game / Resume Run highlighted as primary (solid gold background)
 - Saves and High Scores as sub-screens
 
-### Modifier Select
-- Angular panel options matching main menu aesthetic
-- Arrow key navigation or tap to select
-- Score multiplier shown
-- Locked modifiers dimmed
-
-### Graphics Menu
-- Simplified menu with 2 options:
-  - **Orientation** — Landscape / Portrait (applies immediately, resizes canvas on toggle)
-  - **Fullscreen** — Toggle fullscreen mode (⛶/✖ button in top-left corner; also via F key)
-- Arrow key navigation or tap to select
-- Resolution is always auto-detected based on device screen and DPR
-- Saves orientation and fullscreen preference per profile
-
-### Fullscreen Mode
-- Fullscreen button (⛶/✖) in top-left corner during menus; hidden if Fullscreen API not supported
-- Also toggleable via F key in menus and gameplay
-- Uses Fullscreen API (`requestFullscreen`/`exitFullscreen`)
-- Canvas sizing:
-  - Normal: `max-height: calc(100vh - 180px)` (preserves touch control spacing)
-  - Fullscreen: `max-height: 100vh` via `:fullscreen` CSS selector
-- PowerupHud bottom position adjusts in fullscreen
+### Settings Menu (formerly Graphics)
+- Orientation toggle (Landscape/Portrait, applies immediately)
+- Fullscreen toggle (conditional on API support)
+- Audio sliders (Master, SFX, Music)
+- Angular panels matching main menu aesthetic
+- Back button returns to previous state (menu or paused)
 
 ### Pause Menu
 - Semi-transparent angular panels (distinctive overlay feel)
-- Resume highlighted as primary action (gold background)
+- Resume highlighted as primary action (solid gold background)
 - 4 options: Resume, Quit to Menu, Save & Quit, Settings
 - Settings opens Settings menu (returns to pause on exit)
 - Dim overlay on frozen game
-- Same design family as main menu but more transparent
+
+### Saves Sub-Screen
+- Export Save — downloads .sav file
+- Import Save — file picker for .sav files
+- Back button returns to main menu
+
+### High Scores Sub-Screen
+- Top 10 scores with rank, modifier, and level
+- Gold highlight for new high scores
+- Back button returns to main menu
 
 ### Game Over
 - Score and modifier displayed
@@ -320,13 +313,14 @@
 ### Stardust Unlock Shop
 - Accessible from main menu via [U] key
 - Two tabs: Loadouts, Cosmetics
+- **Two-column layout**: Preview (fixed left) + scrollable item list (right)
 - **Select-to-preview UX**: Click/tap an item to preview it (no purchase)
 - **Buy button**: Explicit "BUY — X ✦" button in preview area for confirmation
 - Button states: SELECT AN ITEM (default), BUY — X ✦ (affordable), EQUIP (owned), EQUIPPED (disabled), NEED X MORE (disabled)
-- Keyboard: W/S to browse, ENTER to buy/equip
+- Keyboard: W/S to browse, ENTER to buy/equip, Q/E switch tabs
 - Touch: Tap item to preview, tap BUY button to purchase
 - **SVG previews**: Crisp vector previews for all loadouts and cosmetics
-- **Scrollable list**: Yellow scrollbar, touchpad/mouse wheel supported
+- **Scrollable item list**: Only items scroll, preview stays fixed
 - **Dynamic scaling**: All elements scale with device resolution via `sc()` function
 - Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦)
 - Cosmetics: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
@@ -503,6 +497,13 @@
 - Screen shake didn't affect game objects — moved `ctx.translate()` to wrap ship/asteroids/bullets draws
 - Asteroid hit-flash never triggered — added `triggerHitFlash(a)` on tough asteroid hits, `drawAsteroids()` checks `a.flash`
 - Touch quit didn't stop music — added `stopMusic()` to touch pause handler quit paths
+- Screen shake didn't affect game objects — moved `ctx.translate()` to wrap ship/asteroids/bullets draws
+- Asteroid hit-flash never triggered — added `triggerHitFlash(a)` on tough asteroid hits, `drawAsteroids()` checks `a.flash`
+- Stardust shop overflow — changed to flex column layout, preview fixed, items scroll
+- Stardust shop keyboard nav dead code — moved handler out of nested shop handler
+- Powerup HUD orphaned in settings menu — added to blanket hide in `updateUI()`
+- S key fall-through bug — added `return` statements to menu key handlers
+- Selected item contrast — solid gold background with dark text across all menus
 
 ---
 

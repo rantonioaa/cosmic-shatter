@@ -51,6 +51,7 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `sc(v)` — multiply value by SCALE
 - `dt` — delta time, normalized to 60fps, capped at 3
 - `activeRun` — serialized mid-run save state (or `null`)
+- `graphicsReturnState` — tracks which state to return to from settings (menu or paused)
 
 ### Resolution System
 - Landscape: `LANDSCAPE_RESOLUTIONS` (640x360, 1280x720, 1920x1080)
@@ -72,9 +73,9 @@ menu → modifier_select → playing → gameover → shop → ↑
 - `#touchPause` — fixed top-right pause button (only during `playing` state)
 - Buttons map to same `keys[]` object as keyboard
 - `data-tap-action` + `data-tap-index` attributes on all tappable elements
-- Touch handler at ~line 2550 dispatches based on `gameState` and `action`
+- Touch handler dispatches based on `gameState` and `action`
 - Global click handler (`document.addEventListener('click', ...)`) mirrors touch behavior for desktop mouse
-- Back button (`data-tap-action="back"`) on shop, modifier_select, graphics_menu, profile_create — visible on all platforms, routes to previous state based on `gameState`
+- Back button (`data-tap-action="back"`) on shop, modifier_select, graphics_menu, profile_create, saves_menu, highscores_menu — visible on all platforms, routes to previous state based on `gameState`
 
 ### Delta Time
 - `dt = Math.min((timestamp - lastFrameTime) / (1000/60), 3)`
