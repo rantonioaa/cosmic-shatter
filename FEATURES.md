@@ -206,8 +206,11 @@
 - Game title "COSMIC SHATTER"
 - Profile name and Star Bits display
 - High scores list (top 8)
-- Actions: Export (E), Import (I), Profile (P), Graphics (G), Shop (S)
-- Resume Run option (R) when a saved run exists — shows level and score preview
+- Vertical list layout with sections:
+  - Start Game / Resume Run (with level/score preview)
+  - Shop, Unlocks, Settings, Profile
+  - SAVES section: Export, Import
+- Keyboard shortcuts (R, S, U, G, P, E, I) still work, no visible hints
 
 ### Modifier Select
 - 6 modifiers with descriptions

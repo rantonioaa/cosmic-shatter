@@ -277,47 +277,44 @@
         }
         #menuActions {
             display: none;
-            flex-wrap: nowrap;
-            justify-content: center;
-            align-items: stretch;
-            gap: 3px;
-            margin-top: 10px;
-        }
-        #menuActions span {
-            flex: 0 1 auto;
-            display: inline-flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            font-size: 10px;
-            letter-spacing: 0.5px;
-            padding: 5px 6px;
-            min-height: 32px;
-            line-height: 1.2;
+            gap: 2px;
+            margin-top: 12px;
+        }
+        .menu-item {
+            font-size: 15px;
+            letter-spacing: 1px;
+            padding: 10px 24px;
+            min-height: 44px;
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
             border-radius: 4px;
             cursor: pointer;
             pointer-events: auto;
-            transition: background 0.15s;
+            transition: color 0.15s, background 0.15s;
         }
-        #menuActions span:hover {
-            color: #ffcc00;
+        .menu-item:hover { color: #ffcc00; }
+        .menu-item:active { background: rgba(255, 255, 255, 0.08); }
+        .menu-divider {
+            width: 120px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 6px auto;
         }
-        #menuActions span:active {
-            background: rgba(255, 255, 255, 0.08);
+        .menu-section-label {
+            font-size: 10px;
+            letter-spacing: 3px;
+            opacity: 0.35;
+            text-transform: uppercase;
+            margin-bottom: 2px;
         }
         @media (max-width: 600px) {
-            #menuActions {
-                flex-wrap: wrap;
-                max-width: 360px;
-                margin-left: auto;
-                margin-right: auto;
-                gap: 6px;
-            }
-            #menuActions span {
-                flex: 1 1 30%;
-                font-size: 10px;
-                padding: 8px 4px;
-                min-height: 42px;
+            .menu-item {
+                font-size: 16px;
+                padding: 12px 20px;
+                min-height: 48px;
             }
         }
         #pauseMenu {
@@ -1075,16 +1072,19 @@
         <div id="levelTransition"></div>
         <div id="score">Score: 0</div>
         <div id="comboBar"><div id="comboFill"></div></div>
-        <div id="message" data-tap-action="start">Press SPACE to start</div>
+        <div id="message">Press SPACE to start</div>
         <div id="highscores"></div>
         <div id="menuActions">
-            <span id="btnResume" data-tap-action="resume" style="display:none">[R] Resume Run</span>
-            <span id="btnExport" data-tap-action="export">[E] Export</span>
-            <span id="btnImport" data-tap-action="import">[I] Import</span>
-            <span id="btnProfile" data-tap-action="profile">[P] Profile</span>
-            <span id="btnGraphics" data-tap-action="settings">[G] Settings</span>
-            <span id="btnShop" data-tap-action="shop">[S] Shop</span>
-            <span id="btnStardustShop" data-tap-action="stardust_shop">[U] Unlocks</span>
+            <div id="btnStart" class="menu-item" data-tap-action="start">▶ Start Game</div>
+            <div id="btnResume" class="menu-item" data-tap-action="resume" style="display:none">▶ Resume Run</div>
+            <div id="btnShop" class="menu-item" data-tap-action="shop">▶ Shop</div>
+            <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">▶ Unlocks</div>
+            <div id="btnGraphics" class="menu-item" data-tap-action="settings">▶ Settings</div>
+            <div id="btnProfile" class="menu-item" data-tap-action="profile">▶ Profile</div>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">SAVES</div>
+            <div id="btnExport" class="menu-item" data-tap-action="export">▶ Export</div>
+            <div id="btnImport" class="menu-item" data-tap-action="import">▶ Import</div>
         </div>
         <div id="profileSelect">
             <div class="ps-title">SELECT PROFILE</div>
@@ -1190,6 +1190,7 @@
         const profileNameGoEl = document.getElementById('profileNameGo');
         const menuActionsEl = document.getElementById('menuActions');
         const btnResumeEl = document.getElementById('btnResume');
+        const btnStartEl = document.getElementById('btnStart');
         const pauseMenuEl = document.getElementById('pauseMenu');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
@@ -4356,24 +4357,26 @@
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
+                messageEl.style.display = 'none';
                 if (activeProfile) {
                     scoreEl.textContent = `${activeProfile.name} · ${activeProfile.starBits} ◆ · ${activeProfile.stardust ?? 0} ✦`;
                     scoreEl.style.display = 'block';
                     menuActionsEl.style.display = 'flex';
                     const hasRun = activeProfile.activeRun != null;
-                    btnResumeEl.style.display = hasRun ? 'inline' : 'none';
-                    btnStardustShopEl.style.display = 'inline';
+                    btnStartEl.style.display = hasRun ? 'none' : 'block';
+                    btnResumeEl.style.display = hasRun ? 'block' : 'none';
+                    btnStardustShopEl.style.display = 'block';
                     if (hasRun) {
                         const runMod = activeProfile.activeRun.modifierId !== 'none' ? ` [${activeProfile.activeRun.modifierId}]` : '';
-                        messageEl.textContent = `Resume: Lv.${activeProfile.activeRun.level}${runMod} — Score ${activeProfile.activeRun.score}`;
+                        btnResumeEl.innerHTML = `▶ Resume Run<span class="menu-subtitle">Lv.${activeProfile.activeRun.level}${runMod} — Score ${activeProfile.activeRun.score}</span>`;
                     } else {
-                        messageEl.textContent = 'Press SPACE to start';
+                        btnResumeEl.innerHTML = '▶ Resume Run';
                     }
                 } else {
-                    messageEl.textContent = 'Press SPACE to start';
                     btnStardustShopEl.style.display = 'none';
+                    btnStartEl.style.display = 'block';
+                    btnResumeEl.style.display = 'none';
                 }
-                messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
                 lastHighScoreRank = -1;
             } else if (gameState === 'profile_select') {
