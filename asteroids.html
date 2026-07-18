@@ -1928,14 +1928,6 @@
         }
 
         function drawVisualEffects() {
-            // Screen shake offset
-            if (screenShakeTimer > 0) {
-                ctx.save();
-                const shakeX = (Math.random() - 0.5) * screenShakeIntensity * 2;
-                const shakeY = (Math.random() - 0.5) * screenShakeIntensity * 2;
-                ctx.translate(shakeX, shakeY);
-            }
-            
             // Muzzle flash
             if (muzzleFlashTimer > 0 && typeof ship.x === 'number') {
                 ctx.save();
@@ -1976,11 +1968,6 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
-            
-            // Restore context after screen shake
-            if (screenShakeTimer > 0) {
-                ctx.restore();
-            }
         }
 
         // Heat system
@@ -4732,6 +4719,7 @@
                                         for (let p = 0; p < 3; p++) {
                                             particles.push(createParticle(ea.x, ea.y, '#fff', 2));
                                         }
+                                        triggerHitFlash(ea);
                                     }
                                 }
                             }
@@ -4781,6 +4769,7 @@
                             for (let k = 0; k < 3; k++) {
                                 particles.push(createParticle(a.x, a.y, '#fff', 2));
                             }
+                            triggerHitFlash(a);
                         }
 
                         bullets.splice(i, 1);
@@ -5083,7 +5072,7 @@
                         ctx.lineTo(a.shape[i].x * a.radius, a.shape[i].y * a.radius);
                     }
                     ctx.closePath();
-                    ctx.strokeStyle = a.color ? a.color.hex : '#888';
+                    ctx.strokeStyle = a.flash ? '#ffffff' : (a.color ? a.color.hex : '#888');
                     ctx.lineWidth = sc(2);
                     ctx.stroke();
                 }
@@ -5212,6 +5201,15 @@
                     comboBarEl.style.display = 'none';
                 }
 
+                // Screen shake wraps all game object draws
+                if (screenShakeTimer > 0) {
+                    ctx.save();
+                    ctx.translate(
+                        (Math.random() - 0.5) * screenShakeIntensity * 2,
+                        (Math.random() - 0.5) * screenShakeIntensity * 2
+                    );
+                }
+
                 drawShip();
                 drawHeatBar();
                 drawAsteroids();
@@ -5219,6 +5217,9 @@
                 drawParticles();
                 drawPowerups();
                 drawStarBits();
+
+                if (screenShakeTimer > 0) ctx.restore();
+
                 drawVisualEffects();
 
                 // Dark mode overlay
@@ -5610,6 +5611,7 @@
                             activeProfile.activeRun = serializeRun();
                             saveProfile(activeProfile);
                         }
+                        stopMusic();
                         gameState = 'menu';
                     } else if (pauseMenuIndex === 3) {
                         // Settings
@@ -5621,6 +5623,7 @@
                         updateUI();
                         return;
                     } else {
+                        stopMusic();
                         gameState = 'menu';
                     }
                     updateUI();

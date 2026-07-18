@@ -495,6 +495,9 @@
 - `coolingSystem || 0` used `||` instead of `??` — now uses `??` for correctness
 - Redundant `renderShopList()` calls in keyboard handler — removed, `updateUI()` handles it
 - No audio on Resume Run — `deserializeRun()` now calls `initAudio()`, `resumeAudio()`, `startMusic()`
+- Screen shake didn't affect game objects — moved `ctx.translate()` to wrap ship/asteroids/bullets draws
+- Asteroid hit-flash never triggered — added `triggerHitFlash(a)` on tough asteroid hits, `drawAsteroids()` checks `a.flash`
+- Touch quit didn't stop music — added `stopMusic()` to touch pause handler quit paths
 
 ---
 
