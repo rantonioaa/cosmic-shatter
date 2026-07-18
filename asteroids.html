@@ -3677,6 +3677,7 @@
                     profileSelectIndex = 0;
                     renderProfileList();
                     updateUI();
+                    return;
                 } else if (e.key === 'g' || e.key === 'G') {
                     e.preventDefault();
                     graphicsReturnState = 'menu';
@@ -3686,12 +3687,14 @@
                     graphicsMenuIndex = 0;
                     renderGraphicsList();
                     updateUI();
+                    return;
                 } else if (e.key === 's' || e.key === 'S') {
                     e.preventDefault();
                     gameState = 'shop';
                     shopReturnState = 'menu';
                     shopMenuIndex = 0;
                     updateUI();
+                    return;
                 } else if (e.key === 'f' || e.key === 'F') {
                     e.preventDefault();
                     toggleFullscreen();
@@ -3812,45 +3815,45 @@
                     e.preventDefault();
                     const upg = UPGRADES[shopMenuIndex];
                     if (buyUpgrade(upg.id)) {
+                        renderShopList();
+                    }
+                } else if (e.code === 'Escape') {
+                    e.preventDefault();
+                    gameState = shopReturnState;
+                    updateUI();
+                }
                 renderShopList();
             }
 
             // Stardust Shop
             if (gameState === 'stardust_shop') {
                 if (e.code === 'KeyQ' || e.code === 'ArrowLeft') {
-                    // Switch top tab left
                     e.preventDefault();
                     sdShopTab = (sdShopTab - 1 + 2) % 2;
                     sdShopSlot = 0;
                     sdShopItem = 0;
                 } else if (e.code === 'KeyE' || e.code === 'ArrowRight') {
-                    // Switch top tab right
                     e.preventDefault();
                     sdShopTab = (sdShopTab + 1) % 2;
                     sdShopSlot = 0;
                     sdShopItem = 0;
                 } else if (sdShopTab === 1 && (e.code === 'KeyA' || e.code === 'KeyZ')) {
-                    // Switch cosmetic slot left
                     e.preventDefault();
                     sdShopSlot = (sdShopSlot - 1 + SD_COSMETIC_SLOTS.length) % SD_COSMETIC_SLOTS.length;
                     sdShopItem = 0;
                 } else if (sdShopTab === 1 && (e.code === 'KeyD' || e.code === 'KeyX')) {
-                    // Switch cosmetic slot right
                     e.preventDefault();
                     sdShopSlot = (sdShopSlot + 1) % SD_COSMETIC_SLOTS.length;
                     sdShopItem = 0;
                 } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
-                    // Navigate items up
                     e.preventDefault();
                     const items = sdShopTab === 0 ? SD_LOADOUTS : SD_COSMETIC_SLOTS[sdShopSlot].items;
                     sdShopItem = (sdShopItem - 1 + items.length) % items.length;
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
-                    // Navigate items down
                     e.preventDefault();
                     const items = sdShopTab === 0 ? SD_LOADOUTS : SD_COSMETIC_SLOTS[sdShopSlot].items;
                     sdShopItem = (sdShopItem + 1) % items.length;
                 } else if (e.code === 'Enter' || e.code === 'Space') {
-                    // Buy or equip via buy button
                     e.preventDefault();
                     confirmStardustPurchase();
                 } else if (e.code === 'Escape') {
@@ -3860,13 +3863,6 @@
                     return;
                 }
                 renderStardustShop();
-            }
-                } else if (e.code === 'Escape') {
-                    e.preventDefault();
-                    gameState = shopReturnState;
-                    updateUI();
-                }
-                renderShopList();
             }
 
             // Playing - ESC to pause
@@ -3913,7 +3909,6 @@
                         currentOrientation = activeProfile ? (activeProfile.orientation || 'landscape') : 'landscape';
                         RESOLUTIONS = getResolutions();
                         graphicsMenuIndex = 0;
-                        renderGraphicsList();
                         updateUI();
                         return;
                     } else {
@@ -4572,6 +4567,7 @@
             profileBackBtnEl.style.display = 'none';
             savesMenuEl.style.display = 'none';
             highscoresMenuEl.style.display = 'none';
+            powerupHudEl.style.display = 'none';
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
