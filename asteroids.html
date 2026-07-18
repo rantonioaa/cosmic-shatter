@@ -741,11 +741,14 @@
         /* Stardust Shop */
         #stardustShopMenu {
             display: none;
-            margin-top: 10px;
+            flex-direction: column;
             pointer-events: auto;
+            max-height: calc(100vh - 40px);
         }
         #sdScrollArea {
-            overflow-y: scroll;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: #ffcc00 rgba(255,255,255,0.1);
@@ -1517,18 +1520,16 @@
         const sdPreviewEl = document.getElementById('stardustPreview');
         function updateStardustShopSize() {
             if (!sdScrollAreaEl || !sdPreviewEl || !sdPreviewSvg) return;
-            const vh = window.innerHeight;
-            sdScrollAreaEl.style.maxHeight = (vh - sc(220)) + 'px';
-            sdPreviewEl.style.maxWidth = sc(180) + 'px';
-            sdPreviewEl.style.padding = sc(8) + 'px';
+            sdPreviewEl.style.maxWidth = sc(160) + 'px';
+            sdPreviewEl.style.padding = sc(6) + 'px';
             sdPreviewEl.style.gap = sc(4) + 'px';
-            sdPreviewEl.style.marginBottom = sc(8) + 'px';
-            sdPreviewSvg.setAttribute('width', sc(100));
-            sdPreviewSvg.setAttribute('height', sc(60));
-            document.documentElement.style.setProperty('--sd-item-h', sc(44) + 'px');
-            document.documentElement.style.setProperty('--sd-item-pad', sc(6) + 'px');
-            document.documentElement.style.setProperty('--sd-item-gap', sc(6) + 'px');
-            document.documentElement.style.setProperty('--sd-thumb', sc(28) + 'px');
+            sdPreviewEl.style.marginBottom = sc(6) + 'px';
+            sdPreviewSvg.setAttribute('width', sc(80));
+            sdPreviewSvg.setAttribute('height', sc(50));
+            document.documentElement.style.setProperty('--sd-item-h', sc(38) + 'px');
+            document.documentElement.style.setProperty('--sd-item-pad', sc(5) + 'px');
+            document.documentElement.style.setProperty('--sd-item-gap', sc(5) + 'px');
+            document.documentElement.style.setProperty('--sd-thumb', sc(24) + 'px');
         }
         updateStardustShopSize();
         window.addEventListener('resize', () => { applyScale(); updateStardustShopSize(); });
