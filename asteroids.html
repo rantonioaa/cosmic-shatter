@@ -400,7 +400,6 @@
         #savesMenu, #highscoresMenu {
             display: none;
             margin-top: 20px;
-            display: flex;
             flex-direction: column;
             align-items: center;
         }
@@ -1288,7 +1287,6 @@
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
         <div id="highscoresMenu">
-            <div class="pause-title">HIGH SCORES</div>
             <div id="highscoresList"></div>
             <div class="back-btn" data-tap-action="back">← Back</div>
         </div>
@@ -4572,6 +4570,8 @@
             comboBarEl.style.display = 'none';
             btnStardustShopEl.style.display = 'none';
             profileBackBtnEl.style.display = 'none';
+            savesMenuEl.style.display = 'none';
+            highscoresMenuEl.style.display = 'none';
 
             if (gameState === 'menu') {
                 gameTitleEl.style.display = 'block';
@@ -4604,11 +4604,11 @@
             } else if (gameState === 'saves_menu') {
                 scoreEl.textContent = 'SAVES';
                 scoreEl.style.display = 'block';
-                savesMenuEl.style.display = 'block';
+                savesMenuEl.style.display = 'flex';
             } else if (gameState === 'highscores_menu') {
                 scoreEl.textContent = 'HIGH SCORES';
                 scoreEl.style.display = 'block';
-                highscoresMenuEl.style.display = 'block';
+                highscoresMenuEl.style.display = 'flex';
                 renderHighscoresMenu();
             } else if (gameState === 'profile_create') {
                 scoreEl.textContent = 'NEW PROFILE';
@@ -5850,7 +5850,7 @@
                         sdShopItem = parseInt(idx);
                         renderStardustShop();
                     } else if (action === 'sd_cosmetic' && idx !== null) {
-                        const slot = el.getAttribute('data-tap-slot');
+                        const slot = target.getAttribute('data-tap-slot');
                         sdShopItem = parseInt(idx);
                         renderStardustShop();
                     } else if (action === 'sd_buy') {
