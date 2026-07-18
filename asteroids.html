@@ -746,24 +746,51 @@
             max-height: calc(100vh - 40px);
         }
         #sdScrollArea {
+            display: flex;
+            gap: 12px;
             flex: 1;
             min-height: 0;
+            overflow: hidden;
+        }
+        .sd-preview-col {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 180px;
+        }
+        .sd-list-col {
+            flex: 1;
+            min-width: 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: #ffcc00 rgba(255,255,255,0.1);
         }
-        #sdScrollArea::-webkit-scrollbar {
+        .sd-list-col::-webkit-scrollbar {
             width: 10px;
         }
-        #sdScrollArea::-webkit-scrollbar-track {
+        .sd-list-col::-webkit-scrollbar-track {
             background: rgba(255,255,255,0.08);
             border-radius: 5px;
         }
-        #sdScrollArea::-webkit-scrollbar-thumb {
+        .sd-list-col::-webkit-scrollbar-thumb {
             background: #ffcc00;
             border-radius: 5px;
             border: 2px solid rgba(0,0,0,0.3);
+        }
+        @media (max-width: 600px) {
+            #sdScrollArea {
+                flex-direction: column;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .sd-preview-col {
+                max-width: 100%;
+            }
+            .sd-list-col {
+                overflow-y: visible;
+            }
         }
         .sd-title {
             font-size: 16px;
@@ -834,9 +861,8 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            margin: 0 auto 8px;
             padding: 8px;
-            max-width: 180px;
+            width: 100%;
             border: 1px solid #333;
             border-radius: 4px;
             background: rgba(0, 0, 0, 0.35);
@@ -908,9 +934,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
-            max-width: 440px;
-            margin: 0 auto;
-            padding-right: 4px;
+            width: 100%;
             text-align: left;
             pointer-events: auto;
         }
@@ -1314,24 +1338,28 @@
             </div>
             <div class="sd-slot-tabs" id="stardustSlotTabs"></div>
             <div id="sdScrollArea">
-                <div class="sd-preview" id="stardustPreview">
-                    <svg id="sdPreviewSvg" width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <filter id="svgGlow">
-                                <feGaussianBlur stdDeviation="2" result="blur"/>
-                                <feMerge>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <rect width="120" height="80" fill="#000"/>
-                    </svg>
-                    <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
-                    <div class="sd-preview-action" id="sdPreviewAction"></div>
-                    <div class="sd-buy-btn" id="sdBuyBtn" data-tap-action="sd_buy">SELECT AN ITEM</div>
+                <div class="sd-preview-col">
+                    <div class="sd-preview" id="stardustPreview">
+                        <svg id="sdPreviewSvg" width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="svgGlow">
+                                    <feGaussianBlur stdDeviation="2" result="blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <rect width="120" height="80" fill="#000"/>
+                        </svg>
+                        <div class="sd-preview-label" id="sdPreviewLabel">Select an item</div>
+                        <div class="sd-preview-action" id="sdPreviewAction"></div>
+                        <div class="sd-buy-btn" id="sdBuyBtn" data-tap-action="sd_buy">SELECT AN ITEM</div>
+                    </div>
                 </div>
-                <div class="sd-list" id="stardustList"></div>
+                <div class="sd-list-col">
+                    <div class="sd-list" id="stardustList"></div>
+                </div>
             </div>
             <div class="sd-hint" id="sdHint">W/S browse · Q/E tab · ENTER buy · ESC back</div>
             <div class="touch-hint">Tap item to preview · Tap BUY to unlock</div>
@@ -1519,11 +1547,7 @@
         const sdScrollAreaEl = document.getElementById('sdScrollArea');
         const sdPreviewEl = document.getElementById('stardustPreview');
         function updateStardustShopSize() {
-            if (!sdScrollAreaEl || !sdPreviewEl || !sdPreviewSvg) return;
-            sdPreviewEl.style.maxWidth = sc(160) + 'px';
-            sdPreviewEl.style.padding = sc(6) + 'px';
-            sdPreviewEl.style.gap = sc(4) + 'px';
-            sdPreviewEl.style.marginBottom = sc(6) + 'px';
+            if (!sdPreviewSvg) return;
             sdPreviewSvg.setAttribute('width', sc(80));
             sdPreviewSvg.setAttribute('height', sc(50));
             document.documentElement.style.setProperty('--sd-item-h', sc(38) + 'px');
