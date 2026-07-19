@@ -730,6 +730,92 @@
             letter-spacing: 1px;
             color: #4fc3f7;
         }
+        #restartConfirm {
+            display: none;
+            margin-top: 20px;
+        }
+        #restartConfirm .restart-title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            color: #ff8800;
+            text-shadow: 0 0 20px rgba(255, 136, 0, 0.4);
+        }
+        #restartConfirm .restart-warning {
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: rgba(255, 136, 0, 0.8);
+            text-shadow: 0 0 10px rgba(255, 136, 0, 0.3);
+        }
+        #restartConfirm .restart-option {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            min-height: 44px;
+            margin: 6px auto;
+            max-width: 260px;
+            width: 100%;
+            text-align: center;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            transition: all 0.15s;
+        }
+        #restartConfirm .restart-option::before, #restartConfirm .restart-option::after {
+            content: '+';
+            position: absolute;
+            font-size: 7px;
+            font-weight: normal;
+            color: rgba(79, 195, 247, 0.25);
+            line-height: 1;
+            pointer-events: none;
+        }
+        #restartConfirm .restart-option::before { top: -4px; left: -1px; }
+        #restartConfirm .restart-option::after { bottom: -4px; right: -1px; }
+        #restartConfirm .restart-option.selected {
+            color: #1a1a2e;
+            background: #ff8800;
+            border-color: #ff8800;
+            box-shadow: 0 0 15px rgba(255, 136, 0, 0.3);
+        }
+        #restartConfirm .restart-option.selected::before, #restartConfirm .restart-option.selected::after {
+            color: rgba(255, 136, 0, 0.5);
+        }
+        #restartConfirm .restart-option:active {
+            background: rgba(79, 195, 247, 0.1);
+        }
+        #restartConfirm .restart-option.selected:active {
+            background: #ffa040;
+        }
+        #restartConfirm .restart-arrow {
+            display: none;
+        }
+        #restartConfirm .restart-option.selected .restart-arrow {
+            display: inline;
+        }
+        #restartConfirm .restart-hint {
+            font-size: 11px;
+            opacity: 0.35;
+            margin-top: 16px;
+            letter-spacing: 1px;
+            color: #ff8800;
+        }
+        #restartConfirm .touch-hint {
+            font-size: 11px;
+            opacity: 0.35;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            color: #ff8800;
+        }
         #graphicsMenu {
             display: none;
             margin-top: 20px;
@@ -1516,6 +1602,7 @@
         <div id="menuActions">
             <div id="btnStart" class="menu-item primary" data-tap-action="start">Start Game</div>
             <div id="btnResume" class="menu-item primary" data-tap-action="resume" style="display:none">Resume Run</div>
+            <div id="btnRestart" class="menu-item" data-tap-action="restart" style="display:none">Restart Run</div>
             <div id="btnShop" class="menu-item" data-tap-action="shop">Shop</div>
             <div id="btnStardustShop" class="menu-item" data-tap-action="stardust_shop">Unlocks</div>
             <div id="btnGraphics" class="menu-item" data-tap-action="settings">Settings</div>
@@ -1564,7 +1651,16 @@
             <div class="pause-option" data-tap-action="pause" data-tap-index="1"><span class="pause-arrow">&#9654;</span>Quit to Menu</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="2"><span class="pause-arrow">&#9654;</span>Save & Quit</div>
             <div class="pause-option" data-tap-action="pause" data-tap-index="3"><span class="pause-arrow">&#9654;</span>Settings</div>
+            <div class="pause-option" data-tap-action="pause" data-tap-index="4"><span class="pause-arrow">&#9654;</span>Restart</div>
             <div class="pause-hint">UP/DOWN to browse · ENTER to select · ESC quit</div>
+            <div class="touch-hint">Tap to select</div>
+        </div>
+        <div id="restartConfirm">
+            <div class="restart-title">RESTART RUN?</div>
+            <div class="restart-warning">Your current run will be lost.</div>
+            <div class="restart-option" data-tap-action="restart_confirm" data-tap-index="0"><span class="pause-arrow">&#9654;</span>Restart</div>
+            <div class="restart-option" data-tap-action="restart_confirm" data-tap-index="1"><span class="pause-arrow">&#9654;</span>Cancel</div>
+            <div class="restart-hint">UP/DOWN to browse · ENTER to select · ESC to go back</div>
             <div class="touch-hint">Tap to select</div>
         </div>
         <div id="modifierSelect">
@@ -1659,6 +1755,7 @@
         const profileBackBtnEl = document.getElementById('profileBackBtn');
         const menuActionsEl = document.getElementById('menuActions');
         const btnResumeEl = document.getElementById('btnResume');
+        const btnRestartEl = document.getElementById('btnRestart');
         const btnStartEl = document.getElementById('btnStart');
         const savesMenuEl = document.getElementById('savesMenu');
         const highscoresMenuEl = document.getElementById('highscoresMenu');
@@ -1666,6 +1763,7 @@
         const hsLegendEl = document.getElementById('hsLegend');
         const hsProfileEl = document.getElementById('hsProfile');
         const pauseMenuEl = document.getElementById('pauseMenu');
+        const restartConfirmEl = document.getElementById('restartConfirm');
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
         const shopMenuEl = document.getElementById('shopMenu');
@@ -1759,6 +1857,7 @@
         let shopReturnState = 'menu';
         let graphicsReturnState = 'menu';
         let gameoverMenuIndex = 0;
+        let restartMenuIndex = 0;
 
         canvas.width = currentResolution.width;
         canvas.height = currentResolution.height;
@@ -1878,7 +1977,7 @@
         }
 
         // Game state
-        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop, victory
+        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop, victory, restart_confirm
         let score = 0;
         let lives = 3;
         let level = 1;
@@ -4292,11 +4391,11 @@
             if (gameState === 'paused') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex - 1 + 4) % 4;
+                    pauseMenuIndex = (pauseMenuIndex - 1 + 5) % 5;
                     updateUI();
                 } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
                     e.preventDefault();
-                    pauseMenuIndex = (pauseMenuIndex + 1) % 4;
+                    pauseMenuIndex = (pauseMenuIndex + 1) % 5;
                     updateUI();
                 } else if (e.code === 'Enter' || e.code === 'Space') {
                     e.preventDefault();
@@ -4319,6 +4418,12 @@
                         graphicsMenuIndex = 0;
                         updateUI();
                         return;
+                    } else if (pauseMenuIndex === 4) {
+                        // Restart
+                        gameState = 'restart_confirm';
+                        restartMenuIndex = 0;
+                        updateUI();
+                        return;
                     } else {
                         stopMusic();
                         gameState = 'menu';
@@ -4328,6 +4433,49 @@
                     e.preventDefault();
                     stopMusic();
                     gameState = 'menu';
+                    updateUI();
+                }
+            }
+
+            // Restart confirm
+            if (gameState === 'restart_confirm') {
+                if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+                    e.preventDefault();
+                    restartMenuIndex = 0;
+                    updateUI();
+                } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+                    e.preventDefault();
+                    restartMenuIndex = 1;
+                    updateUI();
+                } else if (e.code === 'Enter' || e.code === 'Space') {
+                    e.preventDefault();
+                    if (restartMenuIndex === 0) {
+                        // Confirm restart
+                        if (activeProfile) {
+                            activeProfile.activeRun = null;
+                            saveProfile(activeProfile);
+                        }
+                        stopMusic();
+                        gameState = 'modifier_select';
+                        modifierSelectIndex = 0;
+                        updateUI();
+                    } else {
+                        // Cancel
+                        if (activeProfile && activeProfile.activeRun) {
+                            gameState = 'paused';
+                        } else {
+                            gameState = 'menu';
+                        }
+                        updateUI();
+                    }
+                } else if (e.code === 'Escape') {
+                    e.preventDefault();
+                    // Cancel
+                    if (activeProfile && activeProfile.activeRun) {
+                        gameState = 'paused';
+                    } else {
+                        gameState = 'menu';
+                    }
                     updateUI();
                 }
             }
@@ -5000,6 +5148,7 @@
                     const hasRun = activeProfile.activeRun != null;
                     btnStartEl.style.display = hasRun ? 'none' : 'block';
                     btnResumeEl.style.display = hasRun ? 'block' : 'none';
+                    btnRestartEl.style.display = hasRun ? 'block' : 'none';
                     btnStardustShopEl.style.display = 'block';
                     if (hasRun) {
                         const runMod = activeProfile.activeRun.modifierId !== 'none' ? ` [${activeProfile.activeRun.modifierId}]` : '';
@@ -5011,6 +5160,7 @@
                     btnStardustShopEl.style.display = 'none';
                     btnStartEl.style.display = 'block';
                     btnResumeEl.style.display = 'none';
+                    btnRestartEl.style.display = 'none';
                 }
             } else if (gameState === 'profile_select') {
                 scoreEl.textContent = 'SELECT PROFILE';
@@ -5093,6 +5243,13 @@
                 const pauseOptions = pauseMenuEl.querySelectorAll('.pause-option');
                 pauseOptions.forEach((opt, i) => {
                     opt.classList.toggle('selected', i === pauseMenuIndex);
+                });
+            } else if (gameState === 'restart_confirm') {
+                scoreEl.style.display = 'none';
+                restartConfirmEl.style.display = 'block';
+                const restartOptions = restartConfirmEl.querySelectorAll('.restart-option');
+                restartOptions.forEach((opt, i) => {
+                    opt.classList.toggle('selected', i === restartMenuIndex);
                 });
             }
             renderHighScores();
@@ -6351,6 +6508,12 @@
                         gameState = 'profile_select';
                     } else if (gameState === 'saves_menu' || gameState === 'highscores_menu') {
                         gameState = 'menu';
+                    } else if (gameState === 'restart_confirm') {
+                        if (activeProfile && activeProfile.activeRun) {
+                            gameState = 'paused';
+                        } else {
+                            gameState = 'menu';
+                        }
                     }
                     updateUI();
                     return;
@@ -6401,6 +6564,10 @@
                             activeProfile.activeRun = null;
                             saveProfile(activeProfile);
                         }
+                    } else if (action === 'restart') {
+                        gameState = 'restart_confirm';
+                        restartMenuIndex = 0;
+                        updateUI();
                     } else if (action === 'shop') {
                         gameState = 'shop';
                         shopReturnState = 'menu';
@@ -6530,11 +6697,38 @@
                         graphicsMenuIndex = 0;
                         updateUI();
                         return;
+                    } else if (pauseMenuIndex === 4) {
+                        // Restart
+                        gameState = 'restart_confirm';
+                        restartMenuIndex = 0;
+                        updateUI();
+                        return;
                     } else {
                         stopMusic();
                         gameState = 'menu';
                     }
                     updateUI();
+                } else if (gameState === 'restart_confirm' && action === 'restart_confirm' && idx !== null) {
+                    const restartIdx = parseInt(idx);
+                    if (restartIdx === 0) {
+                        // Confirm restart
+                        if (activeProfile) {
+                            activeProfile.activeRun = null;
+                            saveProfile(activeProfile);
+                        }
+                        stopMusic();
+                        gameState = 'modifier_select';
+                        modifierSelectIndex = 0;
+                        updateUI();
+                    } else {
+                        // Cancel
+                        if (activeProfile && activeProfile.activeRun) {
+                            gameState = 'paused';
+                        } else {
+                            gameState = 'menu';
+                        }
+                        updateUI();
+                    }
                 } else if (gameState === 'profile_select' && action === 'profile_select' && idx !== null) {
                     if (idx === 'new') {
                         gameState = 'profile_create';
@@ -6585,6 +6779,12 @@
                     gameState = 'profile_select';
                 } else if (gameState === 'saves_menu' || gameState === 'highscores_menu') {
                     gameState = 'menu';
+                } else if (gameState === 'restart_confirm') {
+                    if (activeProfile && activeProfile.activeRun) {
+                        gameState = 'paused';
+                    } else {
+                        gameState = 'menu';
+                    }
                 }
                 updateUI();
                 return;
@@ -6635,6 +6835,10 @@
                         activeProfile.activeRun = null;
                         saveProfile(activeProfile);
                     }
+                } else if (action === 'restart') {
+                    gameState = 'restart_confirm';
+                    restartMenuIndex = 0;
+                    updateUI();
                 } else if (action === 'shop') {
                     gameState = 'shop';
                     shopReturnState = 'menu';
@@ -6763,11 +6967,38 @@
                     graphicsMenuIndex = 0;
                     updateUI();
                     return;
+                } else if (pauseMenuIndex === 4) {
+                    // Restart
+                    gameState = 'restart_confirm';
+                    restartMenuIndex = 0;
+                    updateUI();
+                    return;
                 } else {
                     stopMusic();
                     gameState = 'menu';
                 }
                 updateUI();
+            } else if (gameState === 'restart_confirm' && action === 'restart_confirm' && idx !== null) {
+                const restartIdx = parseInt(idx);
+                if (restartIdx === 0) {
+                    // Confirm restart
+                    if (activeProfile) {
+                        activeProfile.activeRun = null;
+                        saveProfile(activeProfile);
+                    }
+                    stopMusic();
+                    gameState = 'modifier_select';
+                    modifierSelectIndex = 0;
+                    updateUI();
+                } else {
+                    // Cancel
+                    if (activeProfile && activeProfile.activeRun) {
+                        gameState = 'paused';
+                    } else {
+                        gameState = 'menu';
+                    }
+                    updateUI();
+                }
             } else if (gameState === 'profile_select' && action === 'profile_select' && idx !== null) {
                 if (idx === 'new') {
                     gameState = 'profile_create';

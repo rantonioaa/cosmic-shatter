@@ -449,7 +449,7 @@ profile_select → menu → constellation_map → modifier_select → playing �
 - [x] Profile select screen
 - [x] Profile create screen
 - [x] Modifier select with arrow navigation
-- [x] Pause menu with arrow navigation
+- [x] Pause menu with arrow navigation (5 options: Resume, Quit, Save&Quit, Settings, Restart)
 - [x] High scores display (per-profile) — arcade table with medals, SVG mod icons, decorative frame
 - [x] Export/Import profiles
 - [x] Graphics menu with Orientation and Fullscreen (simplified from Resolution/Orientation/Fullscreen)
@@ -457,6 +457,7 @@ profile_select → menu → constellation_map → modifier_select → playing �
 - [x] Auto resolution — always auto-detects device screen size, no manual selection needed
 - [x] Dynamic UI scaling — Stardust shop scales with resolution
 - [x] Fullscreen toggle — Fullscreen API support, F key, ⛶/✖ button, `:fullscreen` CSS
+- [x] Restart Run — main menu button + pause menu option, orange confirmation overlay with warning
 
 ### Gameplay ✅
 - [x] Ship movement (arrows/WASD)

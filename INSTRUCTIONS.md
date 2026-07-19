@@ -37,8 +37,8 @@ menu → constellation_map → modifier_select → playing → gameover → shop
   saves_menu  profile_select  paused → save_quit → settings
   highscores_menu    ↓         ↓
   profile_create  victory     (activeRun saved)
-  settings          ↓
-  resume_run → menu (force-end)
+  settings          ↓         ↓
+  resume_run → menu      restart_confirm → modifier_select
 ```
 
 ### Key Variables

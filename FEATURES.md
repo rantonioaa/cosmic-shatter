@@ -212,6 +212,7 @@
 - Corner `+` markers via CSS pseudo-elements
 - Bold uppercase text with wide letter-spacing
 - Start Game / Resume Run highlighted as primary (solid gold background)
+- Restart Run button (visible when there's an active saved run) — shows confirmation warning
 - Saves and High Scores as sub-screens
 
 ### Settings Menu (formerly Graphics)
@@ -224,9 +225,17 @@
 ### Pause Menu
 - Semi-transparent angular panels (distinctive overlay feel)
 - Resume highlighted as primary action (solid gold background)
-- 4 options: Resume, Quit to Menu, Save & Quit, Settings
+- 5 options: Resume, Quit to Menu, Save & Quit, Settings, Restart
 - Settings opens Settings menu (returns to pause on exit)
+- Restart shows confirmation overlay with orange warning
 - Dim overlay on frozen game
+
+### Restart Confirmation
+- Orange/amber angular overlay with warning text
+- "RESTART RUN?" title with orange glow
+- "Your current run will be lost." warning
+- Two options: Restart (orange) / Cancel
+- Returns to pause menu on cancel (or main menu if opened from main menu)
 
 ### Saves Sub-Screen
 - Export Save — downloads .sav file
