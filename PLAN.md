@@ -202,7 +202,6 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] **Death Effect** (8 items, 4,390 ✦): Standard Burst, Implosion Nova, Shockwave Ring, Screen Shatter, Mini Black Hole, Supernova, Glitch Out, Total Annihilation
 - [x] **Star Bit Skin** (8 items, 3,580 ✦): Golden Star, Blue Crystal, Silver Moon, Red Heart, Green Diamond, Spinning Cube, Comet Fragment, Prismatic Bit
 - [x] **Powerup Visual** (9 items, 4,660 ✦): Standard Diamond, Glowing Orb, Spinning Polygon, Pulsing Ring, Floating Runestone, Holographic Card, Energy Core, Cosmic Egg, Ancient Relic
-- [ ] **Set Bonuses** (Future — not yet implemented): Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync
 - [x] Total cost: ~24,940 ✦ (~50-100 runs to unlock everything)
 
 ### 4E. Golden Lure Asteroids (NEW variant) ✅
@@ -298,7 +297,7 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Screen shake — canvas translate offset on death + big breaks
 - [x] Muzzle flash — brief white cone at ship nose on shoot (2-3 frames)
 - [x] Asteroid hit-flash — white tint for 2-3 frames on damage
-- [ ] Hit-stop — 3-6 frame update pause on player damage
+- [x] Hit-stop — 4-frame update pause on player damage
 - [x] Combo popups — floating score text from kill position
 - [x] Death shockwave — expanding ring on player death
 

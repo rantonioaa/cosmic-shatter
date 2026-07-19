@@ -132,8 +132,6 @@ menu → constellation_map → modifier_select → playing → gameover → shop
 - `webkitfullscreenchange` event also listened for mobile browser compatibility
 
 ### Incomplete / Future Features
-- **Set Bonuses** — listed in PLAN.md Phase 4D but zero code exists (Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync). This is a doc/code mismatch that needs fixing.
-- **Cosmetics behavior** — only color is honored; thruster Twin/Cryo/Rainbow, bullet comet trail, starbit comet tail have no behavior code. Item descriptions overpromise.
 
 ### Magnet Radius
 - `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`

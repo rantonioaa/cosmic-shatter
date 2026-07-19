@@ -2444,6 +2444,7 @@
         let comboPopups = []; // [{x, y, text, color, timer, vy}]
         let explosiveRings = []; // [{x, y, radius, maxRadius, timer, maxTimer}]
         let chainBolts = []; // [{x1, y1, x2, y2, timer, maxTimer, points, forks}]
+        let hitStopTimer = 0;
 
         function triggerScreenShake(duration, intensity) {
             screenShakeTimer = duration;
@@ -2908,6 +2909,11 @@
                 }
             }
             return fallback || '#ffffff';
+        }
+
+        function getCosmeticId(slot) {
+            if (!activeProfile || !activeProfile.stardustUnlocks?.cosmetics) return null;
+            return activeProfile.stardustUnlocks.cosmetics[slot] || null;
         }
 
         function getCosmeticShape(slot) {
@@ -4641,6 +4647,12 @@
             starBits = starBits.filter(sb => {
                 sb.x += sb.velocity.x * dt;
                 sb.y += sb.velocity.y * dt;
+                // Star bit comet trail
+                if (getCosmeticId('starbits') === 'starbit_comet') {
+                    if (Math.random() > 0.7) {
+                        particles.push(createParticle(sb.x, sb.y, '#ffd700', 0.2));
+                    }
+                }
                 sb.pulse += 0.1 * dt;
                 sb.life -= dt;
                 if (sb.x < -sc(10)) sb.x = canvas.width + sc(10);
@@ -5384,12 +5396,23 @@
                 // Thrust particles
                 if (Math.random() > 0.5) {
                     const thrusterColor = getCosmeticColor('thruster', '#ff6600');
-                    particles.push(createParticle(
-                        ship.x - Math.cos(ship.angle) * sc(15),
-                        ship.y - Math.sin(ship.angle) * sc(15),
-                        thrusterColor,
-                        2
-                    ));
+                    const thrusterId = getCosmeticId('thruster');
+                    const baseX = ship.x - Math.cos(ship.angle) * sc(15);
+                    const baseY = ship.y - Math.sin(ship.angle) * sc(15);
+                    if (thrusterId === 'thruster_twin') {
+                        // Two offset streams (perpendicular to ship)
+                        const perpX = -Math.sin(ship.angle) * sc(4);
+                        const perpY = Math.cos(ship.angle) * sc(4);
+                        particles.push(createParticle(baseX + perpX, baseY + perpY, thrusterColor, 2));
+                        particles.push(createParticle(baseX - perpX, baseY - perpY, thrusterColor, 2));
+                    } else if (thrusterId === 'thruster_cryo') {
+                        // Wider cyan mist
+                        const p = createParticle(baseX, baseY, thrusterColor, 2.5);
+                        p.size = sc(Math.random() * 3 + 2);
+                        particles.push(p);
+                    } else {
+                        particles.push(createParticle(baseX, baseY, thrusterColor, 2));
+                    }
                 }
             }
 
@@ -5526,6 +5549,13 @@
 
                 b.x += b.velocity.x * dt;
                 b.y += b.velocity.y * dt;
+                // Bullet comet trail
+                if (!b.isMissile && getCosmeticId('bullets') === 'bullet_comet') {
+                    if (Math.random() > 0.5) {
+                        const trailColor = getCosmeticColor('bullets', '#ffffff');
+                        particles.push(createParticle(b.x, b.y, trailColor, 0.3));
+                    }
+                }
                 b.life -= dt;
                 if (b.x < 0) b.x = canvas.width;
                 if (b.x > canvas.width) b.x = 0;
@@ -5895,6 +5925,7 @@
                         triggerScreenShake(10, sc(5));
                         triggerDeathShockwave(ship.x, ship.y);
                         triggerHitFlash(ship);
+                        hitStopTimer = 4;
                         
                         lives--;
                         // Reset magnet powerup on death
@@ -6190,6 +6221,23 @@
             }
 
             if (gameState === 'playing') {
+                // Hit-stop: freeze updates for a few frames on player damage
+                if (hitStopTimer > 0) {
+                    hitStopTimer -= dt;
+                    drawShip();
+                    drawAsteroids();
+                    drawBullets();
+                    drawParticles();
+                    drawPowerups();
+                    drawStarBits();
+                    drawVisualEffects();
+                    renderPowerupHud();
+                    // Brief white flash during hit-stop
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    requestAnimationFrame(gameLoop);
+                    return;
+                }
                 updateShip(dt);
                 updateBullets(dt);
                 updateHeat(dt);
