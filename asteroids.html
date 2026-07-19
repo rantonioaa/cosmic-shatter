@@ -7271,6 +7271,164 @@
             }
         }
 
+        // Biome background rendering
+        let biomeStaticCanvas = null;
+        let biomeStaticId = null;
+        function drawBiomeBackground(dt) {
+            const biome = getActiveBiome();
+            drawBiomeGradient(biome);
+            drawBiomeStatic(biome);
+            drawBiomeGlow(biome, dt);
+        }
+        function drawBiomeGradient(biome) {
+            const w = canvas.width, h = canvas.height;
+            if (biome.id === 'classic_void') {
+                // Subtle radial glow from center
+                const grd = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.6);
+                grd.addColorStop(0, 'rgba(40, 50, 80, 0.08)');
+                grd.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+            } else if (biome.id === 'rubble_field') {
+                // Warm orange horizon gradient
+                const grd = ctx.createLinearGradient(0, h, 0, 0);
+                grd.addColorStop(0, 'rgba(80, 30, 0, 0.15)');
+                grd.addColorStop(0.5, 'rgba(40, 15, 0, 0.08)');
+                grd.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+            } else if (biome.id === 'drift_expanse') {
+                // Deep blue gradient
+                const grd = ctx.createLinearGradient(0, 0, 0, h);
+                grd.addColorStop(0, 'rgba(0, 10, 40, 0.2)');
+                grd.addColorStop(1, 'rgba(0, 5, 20, 0.1)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+            } else if (biome.id === 'dense_belt') {
+                // Warm radial glow
+                const grd = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.5);
+                grd.addColorStop(0, 'rgba(60, 30, 0, 0.12)');
+                grd.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+            } else if (biome.id === 'mire_wastes') {
+                // Green-purple gradient
+                const grd = ctx.createLinearGradient(0, 0, w, h);
+                grd.addColorStop(0, 'rgba(0, 40, 20, 0.12)');
+                grd.addColorStop(1, 'rgba(20, 0, 40, 0.1)');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+            }
+        }
+        function drawBiomeStatic(biome) {
+            const w = canvas.width, h = canvas.height;
+            const time = Date.now() / 1000;
+            if (biome.id === 'rubble_field') {
+                // Petrova line bands
+                ctx.globalAlpha = 0.06 + Math.sin(time * 0.3) * 0.02;
+                ctx.strokeStyle = '#ff4400';
+                ctx.lineWidth = sc(3);
+                for (let i = 0; i < 3; i++) {
+                    const y = h * (0.2 + i * 0.3) + Math.sin(time * 0.2 + i) * sc(20);
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    for (let x = 0; x < w; x += sc(40)) {
+                        ctx.lineTo(x, y + Math.sin(x * 0.01 + time * 0.5 + i * 2) * sc(8));
+                    }
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+            } else if (biome.id === 'drift_expanse') {
+                // Ice crystal patterns (static, slight parallax)
+                ctx.strokeStyle = 'rgba(100, 180, 255, 0.06)';
+                ctx.lineWidth = sc(1);
+                for (let i = 0; i < 8; i++) {
+                    const cx = (i * 137.508 + i * i * 0.3) % w;
+                    const cy = (i * 97.3 + i * 0.7) % h;
+                    const size = sc(15 + i * 3);
+                    ctx.beginPath();
+                    for (let j = 0; j < 6; j++) {
+                        const a = (j / 6) * Math.PI * 2 + time * 0.05;
+                        const px = cx + Math.cos(a) * size;
+                        const py = cy + Math.sin(a) * size;
+                        if (j === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+                // Aurora bands
+                ctx.globalAlpha = 0.04 + Math.sin(time * 0.4) * 0.02;
+                ctx.strokeStyle = '#88ccff';
+                ctx.lineWidth = sc(2);
+                for (let i = 0; i < 2; i++) {
+                    const y = h * (0.3 + i * 0.4) + Math.sin(time * 0.3 + i * 3) * sc(30);
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    for (let x = 0; x < w; x += sc(30)) {
+                        ctx.lineTo(x, y + Math.sin(x * 0.008 + time * 0.6 + i) * sc(12));
+                    }
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+            } else if (biome.id === 'dense_belt') {
+                // Large asteroid silhouettes (parallax)
+                ctx.fillStyle = 'rgba(30, 15, 0, 0.08)';
+                for (let i = 0; i < 5; i++) {
+                    const sx = (i * 200 + 50) % (w + 100) - 50;
+                    const sy = (i * 150 + 30) % (h + 100) - 50;
+                    const size = sc(30 + i * 10);
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                // Solar flare flashes
+                if (Math.sin(time * 0.7 + 1.2) > 0.95) {
+                    ctx.fillStyle = 'rgba(255, 100, 0, 0.03)';
+                    ctx.fillRect(0, 0, w, h);
+                }
+            }
+        }
+        let biomeGlowTimer = 0;
+        function drawBiomeGlow(biome, dt) {
+            biomeGlowTimer += dt;
+            const w = canvas.width, h = canvas.height;
+            const time = Date.now() / 1000;
+            if (biome.id === 'mire_wastes') {
+                // Bioluminescent pulsing glow
+                const pulse = 0.5 + Math.sin(time * 0.8) * 0.3;
+                ctx.globalAlpha = 0.03 * pulse;
+                ctx.fillStyle = '#00ff66';
+                ctx.beginPath();
+                ctx.arc(w * 0.3, h * 0.4, sc(80), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 0.02 * pulse;
+                ctx.beginPath();
+                ctx.arc(w * 0.7, h * 0.6, sc(60), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 0.025 * (0.5 + Math.sin(time * 1.2 + 2) * 0.3);
+                ctx.beginPath();
+                ctx.arc(w * 0.5, h * 0.2, sc(70), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            } else if (biome.id === 'drift_expanse') {
+                // Blue ambient glow
+                const pulse = 0.5 + Math.sin(time * 0.5) * 0.3;
+                ctx.globalAlpha = 0.02 * pulse;
+                ctx.fillStyle = '#4488ff';
+                ctx.beginPath();
+                ctx.arc(w * 0.4, h * 0.5, sc(120), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            } else if (biome.id === 'rubble_field') {
+                // Orange ambient flash
+                if (Math.sin(time * 1.5 + 0.8) > 0.92) {
+                    ctx.fillStyle = 'rgba(255, 80, 0, 0.02)';
+                    ctx.fillRect(0, 0, w, h);
+                }
+            }
+        }
+
         // Draw functions
         function drawShip() {
             if (!ship.blinkOn && ship.invulnerable) return;
@@ -7472,6 +7630,11 @@
             // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw biome background (gradient + static + glow)
+            if (gameState === 'playing' || gameState === 'paused' || gameState === 'gameover' || gameState === 'victory') {
+                drawBiomeBackground(dt);
+            }
 
             // Draw stars background
             ctx.fillStyle = '#fff';
