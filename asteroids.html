@@ -2342,6 +2342,8 @@
         let hitFlashTargets = []; // [{obj, timer}]
         let deathShockwave = null; // {x, y, radius, maxRadius, timer}
         let comboPopups = []; // [{x, y, text, color, timer, vy}]
+        let explosiveRings = []; // [{x, y, radius, maxRadius, timer, maxTimer}]
+        let chainBolts = []; // [{x1, y1, x2, y2, timer, maxTimer, points, forks}]
 
         function triggerScreenShake(duration, intensity) {
             screenShakeTimer = duration;
@@ -2358,6 +2360,43 @@
 
         function triggerDeathShockwave(x, y) {
             deathShockwave = { x, y, radius: 0, maxRadius: sc(100), timer: 30 };
+        }
+
+        function triggerExplosiveRing(x, y) {
+            explosiveRings.push({ x, y, radius: 0, maxRadius: sc(60), timer: 20, maxTimer: 20 });
+        }
+
+        function triggerChainBolt(x1, y1, x2, y2, delay) {
+            const dx = x2 - x1, dy = y2 - y1;
+            const len = Math.hypot(dx, dy);
+            const angle = Math.atan2(dy, dx);
+            // Generate jagged points along the bolt
+            const numSegs = Math.max(3, Math.floor(len / sc(20)));
+            const points = [{ x: x1, y: y1 }];
+            for (let i = 1; i < numSegs; i++) {
+                const t = i / numSegs;
+                const px = x1 + dx * t;
+                const py = y1 + dy * t;
+                const offset = (Math.random() - 0.5) * sc(15);
+                const perpX = -Math.sin(angle) * offset;
+                const perpY = Math.cos(angle) * offset;
+                points.push({ x: px + perpX, y: py + perpY });
+            }
+            points.push({ x: x2, y: y2 });
+            // Generate forks (2-3 small side branches)
+            const forks = [];
+            const numForks = 2 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < numForks; i++) {
+                const t = 0.2 + (i / numForks) * 0.6;
+                const ptIdx = Math.min(Math.floor(t * points.length), points.length - 1);
+                const base = points[ptIdx];
+                const forkAngle = angle + (Math.random() - 0.5) * 1.5;
+                const forkLen = sc(8) + Math.random() * sc(8);
+                forks.push({ x: base.x, y: base.y, angle: forkAngle, length: forkLen });
+            }
+            const maxTimer = 5;
+            const startDelay = delay || 0;
+            chainBolts.push({ x1, y1, x2, y2, timer: maxTimer + startDelay, maxTimer, points, forks, delay: startDelay });
         }
 
         function triggerComboPopup(x, y, text, r, g, b) {
@@ -2387,6 +2426,19 @@
                 deathShockwave.radius += (deathShockwave.maxRadius / 30) * dt;
                 if (deathShockwave.timer <= 0) deathShockwave = null;
             }
+            
+            // Explosive rings
+            explosiveRings = explosiveRings.filter(r => {
+                r.timer -= dt;
+                r.radius = (1 - r.timer / r.maxTimer) * r.maxRadius;
+                return r.timer > 0;
+            });
+
+            // Chain bolts
+            chainBolts = chainBolts.filter(b => {
+                b.timer -= dt;
+                return b.timer > 0;
+            });
             
             // Combo popups
             comboPopups = comboPopups.filter(p => {
@@ -2427,6 +2479,59 @@
                 ctx.beginPath();
                 ctx.arc(deathShockwave.x, deathShockwave.y, deathShockwave.radius, 0, Math.PI * 2);
                 ctx.stroke();
+            }
+
+            // Explosive rings
+            for (const r of explosiveRings) {
+                const alpha = r.timer / r.maxTimer;
+                // Orange outer ring
+                ctx.strokeStyle = `rgba(255, 136, 0, ${alpha * 0.8})`;
+                ctx.lineWidth = sc(2);
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                // Yellow inner glow
+                ctx.strokeStyle = `rgba(255, 200, 0, ${alpha * 0.4})`;
+                ctx.lineWidth = sc(4);
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius * 0.7, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Chain lightning bolts
+            for (const b of chainBolts) {
+                if (b.timer < b.maxTimer - b.delay) {
+                    const alpha = b.timer / b.maxTimer;
+                    // Draw main jagged bolt (white-yellow core)
+                    ctx.strokeStyle = `rgba(255, 255, 200, ${alpha})`;
+                    ctx.lineWidth = sc(1.5);
+                    ctx.beginPath();
+                    ctx.moveTo(b.points[0].x, b.points[0].y);
+                    for (let i = 1; i < b.points.length; i++) {
+                        ctx.lineTo(b.points[i].x, b.points[i].y);
+                    }
+                    ctx.stroke();
+                    // Cyan glow
+                    ctx.strokeStyle = `rgba(68, 238, 255, ${alpha * 0.5})`;
+                    ctx.lineWidth = sc(3.5);
+                    ctx.beginPath();
+                    ctx.moveTo(b.points[0].x, b.points[0].y);
+                    for (let i = 1; i < b.points.length; i++) {
+                        ctx.lineTo(b.points[i].x, b.points[i].y);
+                    }
+                    ctx.stroke();
+                    // Draw forks
+                    for (const fork of b.forks) {
+                        const fx = fork.x + Math.cos(fork.angle) * fork.length;
+                        const fy = fork.y + Math.sin(fork.angle) * fork.length;
+                        ctx.strokeStyle = `rgba(255, 255, 200, ${alpha * 0.7})`;
+                        ctx.lineWidth = sc(1);
+                        ctx.beginPath();
+                        ctx.moveTo(fork.x, fork.y);
+                        ctx.lineTo(fx, fy);
+                        ctx.stroke();
+                    }
+                }
             }
             
             // Combo popups
@@ -5427,6 +5532,11 @@
 
                         // Explosive bullet: damage nearby asteroids
                         if (b.explosive) {
+                            // Visual explosion ring
+                            triggerExplosiveRing(b.x, b.y);
+                            for (let p = 0; p < 15; p++) {
+                                particles.push(createParticle(b.x, b.y, '#ff8800', 4));
+                            }
                             for (let k = asteroids.length - 1; k >= 0; k--) {
                                 if (k === j) continue;
                                 const ea = asteroids[k];
@@ -5484,7 +5594,7 @@
                             triggerHitFlash(a);
                         }
 
-                        // Chain Lightning: chain to 2 nearest asteroids
+                        // Chain Lightning: chain to 2 nearest asteroids (sequential animation)
                         if (activePowerups.chainlightning > 0) {
                             const chainRange = sc(200);
                             const chainCount = 2;
@@ -5501,13 +5611,16 @@
                                 }
                             }
                             chainTargets.sort((a, b) => a.dist - b.dist);
-                            for (let c = 0; c < Math.min(chainCount, chainTargets.length); c++) {
+                            const hitCount = Math.min(chainCount, chainTargets.length);
+                            // Chain from hit point to target 1, then target 1 to target 2
+                            let lastX = b.x, lastY = b.y;
+                            for (let c = 0; c < hitCount; c++) {
                                 const ct = chainTargets[c];
                                 ct.asteroid.hp -= 1;
-                                // Chain lightning visual
-                                for (let p = 0; p < 5; p++) {
-                                    particles.push(createParticle(ct.asteroid.x, ct.asteroid.y, '#44eeff', 2));
-                                }
+                                // Sequential bolt with delay between each
+                                triggerChainBolt(lastX, lastY, ct.asteroid.x, ct.asteroid.y, c * 3);
+                                lastX = ct.asteroid.x;
+                                lastY = ct.asteroid.y;
                                 triggerHitFlash(ct.asteroid);
                                 if (ct.asteroid.hp <= 0) {
                                     destroyAsteroid(ct.asteroid, ct.index);
