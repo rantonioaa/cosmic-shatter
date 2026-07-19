@@ -2070,6 +2070,7 @@
         const hsLegendEl = document.getElementById('hsLegend');
         const hsProfileEl = document.getElementById('hsProfile');
         const pauseMenuEl = document.getElementById('pauseMenu');
+        const modListEl = document.getElementById('modList');
         const restartConfirmEl = document.getElementById('restartConfirm');
         const constellationMapEl = document.getElementById('constellationMap');
         const constNodesEl = document.getElementById('constNodes');
@@ -2224,11 +2225,14 @@
             canvas.style.height = Math.floor(displayH) + 'px';
         }
         applyCanvasStyle();
-        window.addEventListener('resize', applyCanvasStyle);
+        window.addEventListener('resize', () => {
+            applyCanvasStyle();
+            applyScale();
+            updateStardustShopSize();
+        });
 
         // Stardust shop dynamic sizing
         const sdScrollAreaEl = document.getElementById('sdScrollArea');
-        const sdPreviewEl = document.getElementById('stardustPreview');
         function updateStardustShopSize() {
             if (!sdPreviewSvg) return;
             sdPreviewSvg.setAttribute('width', sc(80));
@@ -2239,7 +2243,6 @@
             document.documentElement.style.setProperty('--sd-thumb', sc(24) + 'px');
         }
         updateStardustShopSize();
-        window.addEventListener('resize', () => { applyScale(); updateStardustShopSize(); });
 
         // Stardust shop buy button
         function updateBuyButton(slot, item, balance) {
@@ -3809,7 +3812,7 @@
                 highScores: [],
                 lastModifier: 'none',
                 unlockedModifiers: ['none'],
-                stardustUnlocks: { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' } },
+                stardustUnlocks: { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' }, ownedCosmetics: [] },
                 selectedLoadout: 'standard',
                 unlockedBiomes: ['classic_void'],
                 selectedBiome: 'classic_void',
@@ -3908,7 +3911,11 @@
                 changed = true;
             }
             if (!profile.stardustUnlocks) {
-                profile.stardustUnlocks = { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' } };
+                profile.stardustUnlocks = { loadouts: ['standard'], cosmetics: { hull: 'hull_spectre', bullets: 'bullet_standard', thruster: 'thruster_standard', death: 'death_standard', starbits: 'starbit_gold', powerups: 'powerup_diamond' }, ownedCosmetics: [] };
+                changed = true;
+            }
+            if (!profile.stardustUnlocks.ownedCosmetics) {
+                profile.stardustUnlocks.ownedCosmetics = [];
                 changed = true;
             }
             if (!profile.selectedLoadout) {
@@ -4410,7 +4417,6 @@
         }
 
         function renderModifierList() {
-            const modListEl = document.getElementById('modList');
             const unlocked = activeProfile ? activeProfile.unlockedModifiers : ['none'];
             let html = '';
             MODIFIERS.forEach((mod, i) => {
@@ -5462,14 +5468,18 @@
                     if (dist < w.radiusInner) e.hp = 0;
                 });
             });
-            // Remove destroyed asteroids from gravity well
-            for (let i = gravityWells.length - 1; i >= 0; i--) {
-                const w = gravityWells[i];
-                for (let j = asteroids.length - 1; j >= 0; j--) {
-                    if (asteroids[j].hp <= 0) {
-                        spawnStarBits(asteroids[j].x, asteroids[j].y, asteroids[j].color || { starBits: 1 });
-                        destroyAsteroid(asteroids[j], j);
-                    }
+            // Process destroyed asteroids (only once, not per gravity well)
+            for (let j = asteroids.length - 1; j >= 0; j--) {
+                if (asteroids[j].hp <= 0) {
+                    spawnStarBits(asteroids[j].x, asteroids[j].y, asteroids[j].color || { starBits: 1 });
+                    destroyAsteroid(asteroids[j], j);
+                }
+            }
+            // Process destroyed enemies
+            for (let j = enemies.length - 1; j >= 0; j--) {
+                if (enemies[j].hp <= 0) {
+                    spawnStarBits(enemies[j].x, enemies[j].y, { starBits: 2 });
+                    enemies.splice(j, 1);
                 }
             }
         }
@@ -6312,7 +6322,7 @@
             } else if (gameState === 'playing') {
                 scoreEl.style.display = 'block';
             } else if (gameState === 'level_transition') {
-                levelTransitionEl.textContent = `LEVEL ${level + 1}`;
+                levelTransitionEl.textContent = level >= 20 ? 'SYSTEM SHATTERED' : `LEVEL ${level + 1}`;
                 levelTransitionEl.style.display = 'block';
                 scoreEl.textContent = `Score: ${score} | Lives: ${lives}`;
                 scoreEl.style.display = 'block';
@@ -7111,6 +7121,10 @@
                                 triggerHitFlash(ct.asteroid);
                                 if (ct.asteroid.hp <= 0) {
                                     destroyAsteroid(ct.asteroid, ct.index);
+                                    // Fix indices for remaining targets
+                                    for (let d = c + 1; d < hitCount; d++) {
+                                        if (chainTargets[d].index > ct.index) chainTargets[d].index--;
+                                    }
                                 }
                             }
                         }
