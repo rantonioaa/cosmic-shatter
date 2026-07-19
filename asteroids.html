@@ -2456,15 +2456,15 @@
 
         // Powerup types
         const POWERUP_TYPES = [
-            { id: 'shield',       label: 'Shield',       color: '#00ffff', duration: 0,    desc: 'Absorbs one hit' },
-            { id: 'multishot',    label: 'Multi-Shot',   color: '#ffff00', duration: 600,  desc: '3-way spread fire' },
-            { id: 'speed',        label: 'Speed Boost',  color: '#00ff00', duration: 480,  desc: '+50% thrust' },
-            { id: 'explosive',    label: 'Explosive',    color: '#ff8800', duration: 600,  desc: 'Area damage bullets' },
-            { id: 'slowtime',     label: 'Slow-Time',    color: '#cc00ff', duration: 360,  desc: 'Asteroids 50% speed' },
-            { id: 'scoremult',    label: 'Score x2',     color: '#ffd700', duration: 480,  desc: 'Double score' },
-            { id: 'magnetboost',  label: 'Magnet Boost', color: '#ff88ff', duration: 600,  desc: 'Doubles magnet radius' },
-            { id: 'starmagnet',   label: 'Star Magnet',  color: '#ffff88', duration: 300,  desc: 'Pulls all items (rare!)' },
-            { id: 'backshot',     label: 'Back Shot',    color: '#88ffff', duration: 600,  desc: 'Shoot front and back' }
+            { id: 'shield',       label: 'Shield',          color: '#00ffff', duration: 0,    desc: 'Absorbs one hit' },
+            { id: 'chainlightning', label: 'Chain Lightning', color: '#ffee44', duration: 600,  desc: 'Bullets chain to 2 nearby asteroids' },
+            { id: 'speed',        label: 'Speed Boost',     color: '#00ff00', duration: 480,  desc: '+50% thrust' },
+            { id: 'explosive',    label: 'Explosive',       color: '#ff8800', duration: 600,  desc: 'Area damage bullets' },
+            { id: 'slowtime',     label: 'Slow-Time',       color: '#cc00ff', duration: 360,  desc: 'Asteroids 50% speed' },
+            { id: 'scoremult',    label: 'Score x2',        color: '#ffd700', duration: 480,  desc: 'Double score' },
+            { id: 'magnetboost',  label: 'Magnet Boost',    color: '#ff88ff', duration: 600,  desc: 'Doubles magnet radius' },
+            { id: 'starmagnet',   label: 'Star Magnet',     color: '#ffff88', duration: 300,  desc: 'Pulls all items (rare!)' },
+            { id: 'backshot',     label: 'Back Shot',       color: '#88ffff', duration: 600,  desc: 'Shoot front and back' }
         ];
         const POWERUP_DROP_CHANCE = 0.15;
         const POWERUP_LIFETIME = 1800; // 30 seconds at 60fps
@@ -2597,12 +2597,21 @@
         // Stardust shop data
         const SD_TAB_NAMES = ['loadouts', 'cosmetics'];
         const SD_LOADOUTS = [
-            { id: 'standard', name: 'Standard', desc: 'Default loadout', cost: 0 },
-            { id: 'spread_shot', name: 'Spread Shot', desc: '3-way spread fire', cost: 800 },
-            { id: 'rapid_fire', name: 'Rapid Fire', desc: '+50% fire rate', cost: 1200 },
-            { id: 'piercing_bolt', name: 'Piercing Bolt', desc: 'Bullets pierce 1 asteroid', cost: 2000 },
-            { id: 'missiles', name: 'Missiles', desc: 'Explosive projectiles', cost: 3500 }
+            { id: 'standard', name: 'Standard', desc: 'Default loadout', cost: 0,
+              type: 'standard', cooldown: 15, damage: 1.0, bulletSpeed: 5.0, heatMult: 1.0, pierce: 0 },
+            { id: 'spread_shot', name: 'Spread Shot', desc: '3-way spread fire (±15°)', cost: 800,
+              type: 'spread', cooldown: 18, damage: 1.0, bulletSpeed: 5.0, heatMult: 1.6, pierce: 0, spread: 0.26 },
+            { id: 'rapid_fire', name: 'Rapid Fire', desc: '+150% fire rate, half damage', cost: 1200,
+              type: 'standard', cooldown: 6, damage: 0.5, bulletSpeed: 6.0, heatMult: 0.6, pierce: 0 },
+            { id: 'piercing_bolt', name: 'Piercing Bolt', desc: 'Bullets pierce 2 asteroids', cost: 2000,
+              type: 'pierce', cooldown: 20, damage: 1.0, bulletSpeed: 4.0, heatMult: 1.2, pierce: 2 },
+            { id: 'missiles', name: 'Missiles', desc: 'Homing missiles w/ AoE + burn', cost: 3500,
+              type: 'missile', cooldown: 25, damage: 2.0, bulletSpeed: 3.5, heatMult: 2.4, pierce: 0, aoeRadius: 40 }
         ];
+        function getActiveLoadout() {
+            const id = activeProfile?.selectedLoadout || 'standard';
+            return SD_LOADOUTS.find(l => l.id === id) || SD_LOADOUTS[0];
+        }
         const SD_COSMETIC_SLOTS = [
             { slot: 'hull', label: 'Ship Hull', items: [
                 { id: 'hull_spectre', name: 'Spectre White', desc: 'Default white wireframe', cost: 0, color: '#ffffff' },
@@ -4257,7 +4266,8 @@
                 color: colorObj,
                 hp: colorObj.health + getLevelHealthBonus(),
                 maxHp: colorObj.health + getLevelHealthBonus(),
-                erraticTimer: 0
+                erraticTimer: 0,
+                burnTimer: 0
             };
         }
 
@@ -4301,7 +4311,8 @@
                 basePoints: GOLDEN_LURE.basePoints,
                 isGoldenLure: true,
                 trailTimer: 0,
-                lurePulse: 0
+                lurePulse: 0,
+                burnTimer: 0
             };
         }
 
@@ -4564,7 +4575,7 @@
                 ctx.font = `bold ${sc(9)}px Courier New`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const labels = { shield: 'S', multishot: 'M', speed: '>', explosive: '!', slowtime: 'T', scoremult: '2x', magnetboost: 'U', starmagnet: '\u2605', backshot: '\u2194' };
+                const labels = { shield: 'S', chainlightning: '⚡', speed: '>', explosive: '!', slowtime: 'T', scoremult: '2x', magnetboost: 'U', starmagnet: '\u2605', backshot: '\u2194' };
                 ctx.fillText(labels[p.type.id], 0, 0);
                 ctx.restore();
             });
@@ -4790,7 +4801,8 @@
                     erraticTimer: a.erraticTimer ?? 0,
                     isGoldenLure: isLure,
                     scoreMult: a.scoreMult, basePoints: a.basePoints,
-                    trailTimer: a.trailTimer ?? 0, lurePulse: a.lurePulse ?? 0
+                    trailTimer: a.trailTimer ?? 0, lurePulse: a.lurePulse ?? 0,
+                    burnTimer: 0
                 };
             });
 
@@ -5145,58 +5157,107 @@
         function shoot() {
             playSfx('shoot');
             triggerMuzzleFlash();
+            const lo = getActiveLoadout();
             const bx = ship.x + Math.cos(ship.angle) * sc(20);
             const by = ship.y + Math.sin(ship.angle) * sc(20);
             const bulletSpeedMult = activeProfile ? 1 + activeProfile.upgrades.bulletSpeed * 0.2 : 1;
-            const bvx = Math.cos(ship.angle) * sc(5) * bulletSpeedMult + ship.velocity.x * 0.5;
-            const bvy = Math.sin(ship.angle) * sc(5) * bulletSpeedMult + ship.velocity.y * 0.5;
+            const speed = lo.bulletSpeed * bulletSpeedMult;
+            const bvx = Math.cos(ship.angle) * sc(speed) + ship.velocity.x * 0.5;
+            const bvy = Math.sin(ship.angle) * sc(speed) + ship.velocity.y * 0.5;
             const explosive = activePowerups.explosive > 0;
-
-            // Overdrive: faster bullet speed
             const overdriveSpeedMult = overdrive ? 1.2 : 1;
+            const isMissile = lo.type === 'missile';
 
-            bullets.push({ x: bx, y: by, velocity: { x: bvx * overdriveSpeedMult, y: bvy * overdriveSpeedMult }, life: 60, explosive });
-
-            // Back shot: fire a bullet backwards too
-            if (activePowerups.backshot > 0) {
+            function spawnBullet(vx, vy, extra) {
                 bullets.push({
-                    x: ship.x - Math.cos(ship.angle) * sc(15),
-                    y: ship.y - Math.sin(ship.angle) * sc(15),
-                    velocity: { x: -bvx, y: -bvy },
-                    life: 60, explosive
+                    x: bx, y: by,
+                    velocity: { x: vx * overdriveSpeedMult, y: vy * overdriveSpeedMult },
+                    life: 60, explosive,
+                    pierceRemaining: lo.pierce,
+                    isMissile,
+                    aoeRadius: isMissile ? sc(40) : 0
                 });
             }
 
-            if (activePowerups.multishot > 0) {
-                const spread = 0.25;
-                bullets.push({
-                    x: bx, y: by,
-                    velocity: { x: Math.cos(ship.angle - spread) * sc(5) * bulletSpeedMult + ship.velocity.x * 0.5, y: Math.sin(ship.angle - spread) * sc(5) * bulletSpeedMult + ship.velocity.y * 0.5 },
-                    life: 60, explosive
-                });
-                bullets.push({
-                    x: bx, y: by,
-                    velocity: { x: Math.cos(ship.angle + spread) * sc(5) * bulletSpeedMult + ship.velocity.x * 0.5, y: Math.sin(ship.angle + spread) * sc(5) * bulletSpeedMult + ship.velocity.y * 0.5 },
-                    life: 60, explosive
-                });
+            if (lo.type === 'spread') {
+                // Spread Shot: 3 bullets at ±15°
+                for (const angOff of [0, -lo.spread, +lo.spread]) {
+                    const avx = Math.cos(ship.angle + angOff) * sc(speed) + ship.velocity.x * 0.5;
+                    const avy = Math.sin(ship.angle + angOff) * sc(speed) + ship.velocity.y * 0.5;
+                    spawnBullet(avx, avy);
+                }
+            } else {
+                // Standard, Pierce, Missile
+                spawnBullet(bvx, bvy);
+            }
+
+            // Back Shot powerup: fire a bullet backwards too
+            if (activePowerups.backshot > 0) {
+                if (lo.type === 'spread') {
+                    for (const angOff of [0, -lo.spread, +lo.spread]) {
+                        const avx = Math.cos(ship.angle + angOff + Math.PI) * sc(speed) + ship.velocity.x * 0.5;
+                        const avy = Math.sin(ship.angle + angOff + Math.PI) * sc(speed) + ship.velocity.y * 0.5;
+                        spawnBullet(avx, avy);
+                    }
+                } else {
+                    spawnBullet(-bvx, -bvy);
+                }
             }
 
             // Add heat
             const heatPerShot = 100 / getHeatLimit();
-            heat = Math.min(100, heat + heatPerShot);
+            heat = Math.min(100, heat + heatPerShot * lo.heatMult);
         }
 
         let shootCooldown = 0;
         function updateBullets(dt) {
+            const lo = getActiveLoadout();
             if (keys['Space'] && shootCooldown <= 0 && gameState === 'playing' && !overheating) {
                 shoot();
                 const fireRateBonus = activeProfile ? activeProfile.upgrades.fireRate : 0;
-                const overdriveFireBonus = overdrive ? 0.7 : 1; // 30% faster in overdrive
-                shootCooldown = Math.max(3, (15 - fireRateBonus) * overdriveFireBonus);
+                const overdriveFireBonus = overdrive ? 0.7 : 1;
+                shootCooldown = Math.max(3, (lo.cooldown - fireRateBonus) * overdriveFireBonus);
             }
             shootCooldown -= dt;
 
             bullets = bullets.filter(b => {
+                // Homing missiles: turn toward nearest asteroid in forward cone
+                if (b.isMissile && asteroids.length > 0) {
+                    const speed = Math.hypot(b.velocity.x, b.velocity.y);
+                    let bestDot = -1;
+                    let bestA = null;
+                    const bAngle = Math.atan2(b.velocity.y, b.velocity.x);
+                    const cosHalf = Math.cos(Math.PI / 6); // 60° forward cone
+                    for (const a of asteroids) {
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < sc(400)) {
+                            const aAngle = Math.atan2(dy, dx);
+                            const dot = Math.cos(aAngle - bAngle);
+                            if (dot > cosHalf && dot > bestDot) {
+                                bestDot = dot;
+                                bestA = a;
+                            }
+                        }
+                    }
+                    if (bestA) {
+                        const turnRate = sc(0.06);
+                        const targetAngle = Math.atan2(bestA.y - b.y, bestA.x - b.x);
+                        let diff = targetAngle - bAngle;
+                        while (diff > Math.PI) diff -= 2 * Math.PI;
+                        while (diff < -Math.PI) diff += 2 * Math.PI;
+                        const clamped = Math.max(-turnRate, Math.min(turnRate, diff));
+                        const newAngle = bAngle + clamped;
+                        b.velocity.x = Math.cos(newAngle) * speed;
+                        b.velocity.y = Math.sin(newAngle) * speed;
+                    }
+                    // Missile smoke trail
+                    if (Math.floor(Math.random() * 8) === 0) {
+                        particles.push(createParticle(b.x, b.y, '#ffaa00', 0.5));
+                    }
+                }
+
                 b.x += b.velocity.x * dt;
                 b.y += b.velocity.y * dt;
                 b.life -= dt;
@@ -5277,7 +5338,29 @@
                 if (a.x > canvas.width + sc(50)) a.x = -sc(50);
                 if (a.y < -sc(50)) a.y = canvas.height + sc(50);
                 if (a.y > canvas.height + sc(50)) a.y = -sc(50);
+
+                // Burn DOT: deal 1 damage every 30 frames while burning
+                if (a.burnTimer > 0) {
+                    a.burnTimer -= dt;
+                    if (Math.floor(a.burnTimer) % 30 === 0 && Math.floor(a.burnTimer + dt) % 30 !== 0) {
+                        a.hp -= 1;
+                        // Burn particle
+                        particles.push(createParticle(
+                            a.x + (Math.random() - 0.5) * a.radius,
+                            a.y + (Math.random() - 0.5) * a.radius,
+                            '#ff6600', 1
+                        ));
+                    }
+                }
             });
+
+            // Process asteroids destroyed by burn DOT
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const a = asteroids[i];
+                if (a.hp <= 0) {
+                    destroyAsteroid(a, i);
+                }
+            }
         }
 
         // Update particles
@@ -5294,6 +5377,34 @@
             }
         }
 
+        // Destroy asteroid helper — used by bullets, chain lightning, missile AoE, burn DOT
+        function destroyAsteroid(a, index) {
+            const scoreMultActive = activePowerups.scoremult > 0;
+            for (let k = 0; k < 10; k++) {
+                particles.push(createParticle(a.x, a.y, a.color ? a.color.hex : '#fff', 3));
+            }
+            const basePoints = a.basePoints || (a.size === 3 ? 20 : a.size === 2 ? 50 : 100);
+            const points = Math.floor(basePoints * (a.scoreMult || 1));
+            const comboMult = 1 + combo * 0.5;
+            score += Math.floor(points * comboMult * (scoreMultActive ? 2 : 1));
+            playSfx('explosion', { size: a.size >= 2 ? 'large' : 'small' });
+            if (a.size >= 2) triggerScreenShake(5, sc(3));
+            if (combo >= 2) triggerComboPopup(a.x, a.y - sc(20), `x${(1 + combo * 0.5).toFixed(1)}`, 255, 204, 0);
+            combo = Math.min(5, combo + 1);
+            comboTimer = COMBO_TIMEOUT;
+            runAsteroidsDestroyed++;
+            if (a.size === 1 && a.color) spawnStarBits(a.x, a.y, a.color);
+            if (currentModifier.id !== 'glass_cannon') {
+                if (a.size > 1) {
+                    for (let s = 0; s < 2; s++) {
+                        asteroids.push(createAsteroid(a.x, a.y, a.size - 1));
+                    }
+                }
+            }
+            rollPowerup(a.x, a.y, a.size);
+            asteroids.splice(index, 1);
+        }
+
         // Check collisions
         function checkCollisions() {
             const explosiveRadius = sc(60);
@@ -5301,6 +5412,8 @@
             const overdriveDamageBonus = overdrive ? 1.5 : 1;
             const baseBulletDamage = currentModifier.id === 'tiny_ship' ? 0.5 : 1;
             const bulletDamage = baseBulletDamage * overdriveDamageBonus;
+
+            const lo = getActiveLoadout();
 
             // Bullets vs asteroids
             for (let i = bullets.length - 1; i >= 0; i--) {
@@ -5322,27 +5435,9 @@
                                 if (Math.sqrt(edx * edx + edy * edy) < explosiveRadius) {
                                     ea.hp -= bulletDamage;
                                     if (ea.hp <= 0) {
-                                        for (let p = 0; p < 10; p++) {
-                                            particles.push(createParticle(ea.x, ea.y, ea.color ? ea.color.hex : '#fff', 3));
-                                        }
-                                        const eBasePoints = ea.basePoints || (ea.size === 3 ? 20 : ea.size === 2 ? 50 : 100);
-                                        const ePoints = Math.floor(eBasePoints * (ea.scoreMult || 1));
-                                        const eComboMult = 1 + combo * 0.5;
-                                        score += Math.floor(ePoints * eComboMult * (scoreMultActive ? 2 : 1));
-                                        combo = Math.min(5, combo + 1);
-                                        comboTimer = COMBO_TIMEOUT;
-                                        runAsteroidsDestroyed++;
-                                        if (ea.size === 1 && ea.color) spawnStarBits(ea.x, ea.y, ea.color);
-                                        if (ea.size > 1) {
-                                            for (let s = 0; s < 2; s++) {
-                                                asteroids.push(createAsteroid(ea.x, ea.y, ea.size - 1));
-                                            }
-                                        }
-                                        rollPowerup(ea.x, ea.y, ea.size);
-                                        asteroids.splice(k, 1);
+                                        destroyAsteroid(ea, k);
                                         if (k < j) j--;
                                     } else {
-                                        // Hit spark for tough asteroids
                                         for (let p = 0; p < 3; p++) {
                                             particles.push(createParticle(ea.x, ea.y, '#fff', 2));
                                         }
@@ -5352,57 +5447,81 @@
                             }
                         }
 
-                        // Damage main asteroid
-                        a.hp -= bulletDamage;
-                        if (a.hp <= 0) {
-                            // Destroy asteroid
-                            for (let k = 0; k < 10; k++) {
-                                particles.push(createParticle(a.x, a.y, a.color ? a.color.hex : '#fff', 3));
-                            }
-
-                            // Score based on size with combo and overdrive bonus
-                            const basePoints = a.basePoints || (a.size === 3 ? 20 : a.size === 2 ? 50 : 100);
-                            const points = Math.floor(basePoints * (a.scoreMult || 1));
-                            const comboMult = 1 + combo * 0.5;
-                            score += Math.floor(points * comboMult * (scoreMultActive ? 2 : 1));
-
-                            // Audio & VFX
-                            playSfx('explosion', { size: a.size >= 2 ? 'large' : 'small' });
-                            if (a.size >= 2) triggerScreenShake(5, sc(3));
-                            if (combo >= 2) triggerComboPopup(a.x, a.y - sc(20), `x${(1 + combo * 0.5).toFixed(1)}`, 255, 204, 0);
-
-                            // Build combo
-                            combo = Math.min(5, combo + 1);
-                            comboTimer = COMBO_TIMEOUT;
-
-                            // Track stats
-                            runAsteroidsDestroyed++;
-
-                            // Spawn star bits from small asteroids
-                            if (a.size === 1 && a.color) {
-                                spawnStarBits(a.x, a.y, a.color);
-                            }
-
-                            // Split asteroid (unless glass cannon or size 1)
-                            if (currentModifier.id !== 'glass_cannon') {
-                                if (a.size > 1) {
-                                    for (let k = 0; k < 2; k++) {
-                                        asteroids.push(createAsteroid(a.x, a.y, a.size - 1));
+                        // Missile AoE: 40px splash + burn
+                        if (b.aoeRadius > 0) {
+                            for (let k = asteroids.length - 1; k >= 0; k--) {
+                                if (k === j) continue;
+                                const ea = asteroids[k];
+                                const edx = b.x - ea.x;
+                                const edy = b.y - ea.y;
+                                if (Math.sqrt(edx * edx + edy * edy) < b.aoeRadius) {
+                                    const splashDmg = bulletDamage * 0.5;
+                                    ea.hp -= splashDmg;
+                                    ea.burnTimer = 180; // 3s burn
+                                    if (ea.hp <= 0) {
+                                        destroyAsteroid(ea, k);
+                                        if (k < j) j--;
+                                    } else {
+                                        for (let p = 0; p < 3; p++) {
+                                            particles.push(createParticle(ea.x, ea.y, '#ff6600', 2));
+                                        }
+                                        triggerHitFlash(ea);
                                     }
                                 }
                             }
+                            // Apply burn to direct hit asteroid too
+                            a.burnTimer = 180;
+                        }
 
-                            rollPowerup(a.x, a.y, a.size);
-                            asteroids.splice(j, 1);
+                        // Damage main asteroid
+                        a.hp -= bulletDamage;
+                        if (a.hp <= 0) {
+                            destroyAsteroid(a, j);
                         } else {
-                            // Hit spark for tough asteroids
                             for (let k = 0; k < 3; k++) {
                                 particles.push(createParticle(a.x, a.y, '#fff', 2));
                             }
                             triggerHitFlash(a);
                         }
 
-                        bullets.splice(i, 1);
+                        // Chain Lightning: chain to 2 nearest asteroids
+                        if (activePowerups.chainlightning > 0) {
+                            const chainRange = sc(200);
+                            const chainCount = 2;
+                            let chainTargets = [];
+                            for (let k = 0; k < asteroids.length; k++) {
+                                if (k === j) continue;
+                                const ca = asteroids[k];
+                                if (ca.hp <= 0) continue;
+                                const cdx = b.x - ca.x;
+                                const cdy = b.y - ca.y;
+                                const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+                                if (cdist < chainRange) {
+                                    chainTargets.push({ asteroid: ca, index: k, dist: cdist });
+                                }
+                            }
+                            chainTargets.sort((a, b) => a.dist - b.dist);
+                            for (let c = 0; c < Math.min(chainCount, chainTargets.length); c++) {
+                                const ct = chainTargets[c];
+                                ct.asteroid.hp -= 1;
+                                // Chain lightning visual
+                                for (let p = 0; p < 5; p++) {
+                                    particles.push(createParticle(ct.asteroid.x, ct.asteroid.y, '#44eeff', 2));
+                                }
+                                triggerHitFlash(ct.asteroid);
+                                if (ct.asteroid.hp <= 0) {
+                                    destroyAsteroid(ct.asteroid, ct.index);
+                                }
+                            }
+                        }
+
+                        // Handle piercing
+                        if (b.pierceRemaining > 0) {
+                            b.pierceRemaining--;
+                            // Don't splice this bullet — it continues
+                        } else {
+                            bullets.splice(i, 1);
+                        }
                         updateUI();
                         break;
                     }
@@ -5725,31 +5844,43 @@
         function drawBullets() {
             const bulletColor = getCosmeticColor('bullets', '#ffffff');
             const bulletShape = getCosmeticShape('bullets');
-            ctx.fillStyle = bulletColor;
             bullets.forEach(b => {
+                const isMissile = b.isMissile;
+                const isPierce = b.pierceRemaining > 0;
+                const scale = isMissile ? 1.4 : isPierce ? 1.3 : 1;
+                const color = isMissile ? '#ffaa00' : isPierce ? '#66eeff' : bulletColor;
+                ctx.fillStyle = color;
                 ctx.beginPath();
-                if (bulletShape === 'diamond') {
-                    ctx.moveTo(b.x, b.y - sc(3));
-                    ctx.lineTo(b.x + sc(2), b.y);
-                    ctx.lineTo(b.x, b.y + sc(3));
-                    ctx.lineTo(b.x - sc(2), b.y);
+                if (isMissile) {
+                    // Missile: larger diamond
+                    ctx.moveTo(b.x, b.y - sc(4));
+                    ctx.lineTo(b.x + sc(3), b.y);
+                    ctx.lineTo(b.x, b.y + sc(4));
+                    ctx.lineTo(b.x - sc(3), b.y);
+                    ctx.closePath();
+                } else if (bulletShape === 'diamond') {
+                    ctx.moveTo(b.x, b.y - sc(3) * scale);
+                    ctx.lineTo(b.x + sc(2) * scale, b.y);
+                    ctx.lineTo(b.x, b.y + sc(3) * scale);
+                    ctx.lineTo(b.x - sc(2) * scale, b.y);
                     ctx.closePath();
                 } else if (bulletShape === 'triangle') {
-                    ctx.moveTo(b.x, b.y - sc(3));
-                    ctx.lineTo(b.x + sc(3), b.y + sc(2));
-                    ctx.lineTo(b.x - sc(3), b.y + sc(2));
+                    ctx.moveTo(b.x, b.y - sc(3) * scale);
+                    ctx.lineTo(b.x + sc(3) * scale, b.y + sc(2) * scale);
+                    ctx.lineTo(b.x - sc(3) * scale, b.y + sc(2) * scale);
                     ctx.closePath();
                 } else if (bulletShape === 'square') {
-                    ctx.rect(b.x - sc(2), b.y - sc(2), sc(4), sc(4));
+                    const sz = sc(2) * scale;
+                    ctx.rect(b.x - sz, b.y - sz, sz * 2, sz * 2);
                 } else if (bulletShape === 'star') {
                     for (let i = 0; i < 5; i++) {
                         const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-                        const r = sc(3);
+                        const r = sc(3) * scale;
                         ctx.lineTo(b.x + Math.cos(angle) * r, b.y + Math.sin(angle) * r);
                     }
                     ctx.closePath();
                 } else {
-                    ctx.arc(b.x, b.y, sc(2), 0, Math.PI * 2);
+                    ctx.arc(b.x, b.y, sc(2) * scale, 0, Math.PI * 2);
                 }
                 ctx.fill();
             });

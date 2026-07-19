@@ -84,8 +84,8 @@
 
 | Power-up | Color | Duration | Effect |
 |---|---|---|---|
-| Shield | Cyan | Until hit | Absorbs 1 hit per charge (max 5) |
-| Multi-Shot | Yellow | 10s | 3-way spread fire |
+| Shield | Cyan | Until hit | Absorbs 1 hit per charge (max 3) |
+| Chain Lightning | Yellow | 10s | Bullets chain to 2 nearest asteroids on hit |
 | Speed Boost | Green | 8s | +50% thrust |
 | Explosive | Orange | 10s | 60px area damage on hit |
 | Slow-Time | Purple | 6s | Asteroids 50% speed |
@@ -343,9 +343,23 @@
 - **SVG previews**: Crisp vector previews for all loadouts and cosmetics
 - **Scrollable item list**: Only items scroll, preview stays fixed
 - **Dynamic scaling**: All elements scale with device resolution via `sc()` function
-- Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦) — **unlock preview only, gameplay behavior coming in Phase 8**
-- Cosmetics: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
+- **Cosmetics**: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
 - Total cost to unlock everything: ~24,940 ✦
+
+### Loadouts (5 types)
+
+| Loadout | Cooldown | Damage | Bullet Speed | Heat/shot | Special | Cost |
+|---|---|---|---|---|---|---|
+| **Standard** | 15f | 1.0 | 5.0 | 5% | Baseline | Free |
+| **Spread Shot** | 18f | 1.0 | 5.0 | 8% | 3 bullets ±15° | 800✦ |
+| **Rapid Fire** | 6f | 0.5 | 6.0 | 3% | Machine gun, half damage | 1200✦ |
+| **Piercing Bolt** | 20f | 1.0 | 4.0 | 6% | Bullets pierce 2 asteroids | 2000✦ |
+| **Missiles** | 25f | 2.0 | 3.5 | 12% | Homing + 40px AoE + burn DOT | 3500✦ |
+
+- Loadout chosen between runs via Stardust Shop (can't change mid-run)
+- All multipliers stack: loadout × modifier × powerups
+- Missiles: 60° forward cone targeting, 1 dmg/30f burn for 3s on direct + splash targets
+- Pierce: bullets continue through 2 additional asteroids before despawning
 
 ---
 

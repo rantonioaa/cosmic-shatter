@@ -338,13 +338,19 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
-## Phase 8: Ship Loadouts ⬜
+## Phase 8: Ship Loadouts ✅
 
-- [ ] Choose starting weapon type after modifier select
-- [ ] 5 loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
-- [ ] Each modifies bullet creation, damage, and behavior
-- [ ] Unlock new loadouts via progression
-- [ ] Different bullet colors/shapes per loadout
+- [x] Choose starting weapon type after modifier select (between runs via Stardust Shop)
+- [x] 5 loadouts: Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles
+- [x] Each modifies bullet creation, damage, cooldown, speed, heat, and behavior
+- [x] Unlock new loadouts via Stardust purchases
+- [x] Different bullet colors/shapes per loadout (piercing = cyan, missile = gold)
+- [x] Spread Shot: 3 bullets ±15° spread
+- [x] Rapid Fire: 0.5× damage, 6f cooldown
+- [x] Piercing Bolt: bullets pierce 2 asteroids
+- [x] Missiles: homing (60° forward cone), 40px AoE, 3s burn DOT
+- [x] All multipliers stack: loadout × modifier × powerups
+- [x] Removed Multi-Shot powerup → replaced with Chain Lightning (2 chains at sc(200))
 
 ---
 
@@ -547,6 +553,22 @@ profile_select → menu → constellation_map → modifier_select → playing �
 - [x] Prevent pull-to-refresh and bounce
 - [x] Mobile UI/UX standards (44px+ touch targets, active states, legible font sizes)
 - [x] Hover effects on menu items for desktop
+
+### Ship Loadouts ✅
+- [x] 5 loadout types with distinct gameplay behavior
+- [x] Standard: baseline (15f cooldown, 1.0× dmg, 5.0 speed)
+- [x] Spread Shot: 3 bullets ±15° (18f cooldown, 1.0× dmg)
+- [x] Rapid Fire: machine gun (6f cooldown, 0.5× dmg)
+- [x] Piercing Bolt: bullets pierce 2 asteroids (20f cooldown)
+- [x] Missiles: homing + 40px AoE + burn DOT (25f cooldown, 2.0× dmg)
+- [x] All multipliers stack: loadout × modifier × powerups
+- [x] Loadout chosen between runs via Stardust Shop
+- [x] `getActiveLoadout()` helper for loadout stats lookup
+- [x] `destroyAsteroid()` helper for shared destroy logic
+
+### Power-ups ✅ (Updated)
+- [x] Chain Lightning — bullets chain to 2 nearest asteroids (replaced Multi-Shot)
+- [x] Shield, Speed Boost, Explosive, Slow-Time, Score x2, Magnet Boost, Star Magnet, Back Shot
 
 ### Anti-Tamper ✅
 - [x] XOR encryption for exports

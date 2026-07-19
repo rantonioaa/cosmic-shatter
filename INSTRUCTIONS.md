@@ -52,6 +52,9 @@ menu → constellation_map → modifier_select → playing → gameover → shop
 - `dt` — delta time, normalized to 60fps, capped at 3
 - `activeRun` — serialized mid-run save state (or `null`)
 - `graphicsReturnState` — tracks which state to return to from settings (menu or paused)
+- `getActiveLoadout()` — returns current loadout stats from `SD_LOADOUTS` based on `activeProfile.selectedLoadout`
+- `runAsteroidsDestroyed` — counter for asteroid kills in current run (for stats tracking)
+- `destroyAsteroid(a, index)` — shared destroy logic for bullets, chain lightning, missile AoE, burn DOT
 
 ### Resolution System
 - Landscape: `LANDSCAPE_RESOLUTIONS` (640x360, 1280x720, 1920x1080)
@@ -129,12 +132,8 @@ menu → constellation_map → modifier_select → playing → gameover → shop
 - `webkitfullscreenchange` event also listened for mobile browser compatibility
 
 ### Incomplete / Future Features
-- **Set Bonuses** — listed in PLAN.md Phase 4D as `[x]` but zero code exists (Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync). This is a doc/code mismatch that needs fixing.
-- **Loadouts gameplay** — `selectedLoadout` is saved and previewed but `shoot()`/`updateBullets()` ignore it. All 5 loadouts (Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles) behave identically in gameplay. Phase 8 is ⬜.
-- **Stats tracking** — `profile.stats.gamesPlayed`, `totalScore`, `highestLevel`, `bestPerModifier`, `totalAsteroidsDestroyed`, `totalPowerupsCollected` are declared in `createDefaultProfile` but never incremented. Always shows "0 games".
+- **Set Bonuses** — listed in PLAN.md Phase 4D but zero code exists (Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync). This is a doc/code mismatch that needs fixing.
 - **Cosmetics behavior** — only color is honored; thruster Twin/Cryo/Rainbow, bullet comet trail, starbit comet tail have no behavior code. Item descriptions overpromise.
-- **Golden Lure mid-run save** — `isGoldenLure`, `scoreMult`, `basePoints`, `trailTimer` are dropped on serialize; deserialized lures become gray asteroids.
-- **`bullet_storm` desc** — says "2x asteroids, faster spawn" but only count is doubled. Fixed to "2x asteroid count".
 
 ### Magnet Radius
 - `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`
