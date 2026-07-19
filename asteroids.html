@@ -4748,7 +4748,7 @@
         document.addEventListener('keydown', (e) => {
             keys[e.code] = true;
 
-            // Profile select
+            // --- Profile Select ---
             if (gameState === 'profile_select') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
@@ -4868,7 +4868,7 @@
                 }
             }
 
-            // Gameover menu
+            // --- Gameover menu ---
             if (gameState === 'gameover') {
                 const gameoverOptions = ['Restart', 'Shop', 'Quit to Menu'];
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -4968,7 +4968,7 @@
                 }
             }
 
-            // Constellation map
+            // --- Constellation map ---
             if (gameState === 'constellation_map') {
                 const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
                 if (!constMapBriefing) {
@@ -5015,7 +5015,7 @@
                 }
             }
 
-            // Modifier select
+            // --- Modifier select ---
             if (gameState === 'modifier_select') {
                 const unlocked = activeProfile ? activeProfile.unlockedModifiers : ['none'];
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -5050,7 +5050,7 @@
                 }
             }
 
-            // Graphics menu
+            // --- Graphics menu ---
             if (gameState === 'graphics_menu') {
                 const totalItems = (document.fullscreenEnabled || document.webkitFullscreenEnabled) ? 2 : 1;
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -5179,7 +5179,7 @@
                 renderStardustShop();
             }
 
-            // Playing - ESC to pause
+            // --- Playing: ESC to pause / F for fullscreen ---
             if (gameState === 'playing' && e.code === 'Escape') {
                 e.preventDefault();
                 pauseMenuIndex = 0;
@@ -5194,7 +5194,7 @@
                 toggleFullscreen();
             }
 
-            // Paused
+            // --- Paused menu ---
             if (gameState === 'paused') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
@@ -5244,7 +5244,7 @@
                 }
             }
 
-            // Restart confirm
+            // --- Restart confirm ---
             if (gameState === 'restart_confirm') {
                 if (e.code === 'ArrowUp' || e.code === 'KeyW') {
                     e.preventDefault();
