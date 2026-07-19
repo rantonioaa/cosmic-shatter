@@ -7272,8 +7272,6 @@
         }
 
         // Biome background rendering
-        let biomeStaticCanvas = null;
-        let biomeStaticId = null;
         function drawBiomeBackground(dt) {
             const biome = getActiveBiome();
             drawBiomeGradient(biome);
@@ -7281,6 +7279,7 @@
             drawBiomeGlow(biome, dt);
         }
         function drawBiomeGradient(biome) {
+            ctx.save();
             const w = canvas.width, h = canvas.height;
             if (biome.id === 'classic_void') {
                 // Subtle radial glow from center
@@ -7319,8 +7318,10 @@
                 ctx.fillStyle = grd;
                 ctx.fillRect(0, 0, w, h);
             }
+            ctx.restore();
         }
         function drawBiomeStatic(biome) {
+            ctx.save();
             const w = canvas.width, h = canvas.height;
             const time = Date.now() / 1000;
             if (biome.id === 'rubble_field') {
@@ -7388,10 +7389,9 @@
                     ctx.fillRect(0, 0, w, h);
                 }
             }
+            ctx.restore();
         }
-        let biomeGlowTimer = 0;
         function drawBiomeGlow(biome, dt) {
-            biomeGlowTimer += dt;
             const w = canvas.width, h = canvas.height;
             const time = Date.now() / 1000;
             if (biome.id === 'mire_wastes') {
@@ -7427,6 +7427,7 @@
                     ctx.fillRect(0, 0, w, h);
                 }
             }
+            ctx.restore();
         }
 
         // Draw functions
@@ -7632,7 +7633,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw biome background (gradient + static + glow)
-            if (gameState === 'playing' || gameState === 'paused' || gameState === 'gameover' || gameState === 'victory') {
+            if (gameState === 'playing' || gameState === 'paused' || gameState === 'gameover' || gameState === 'victory' || gameState === 'level_transition') {
                 drawBiomeBackground(dt);
             }
 
