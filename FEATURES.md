@@ -85,7 +85,7 @@
 | Power-up | Color | Duration | Effect |
 |---|---|---|---|
 | Shield | Cyan | Until hit | Absorbs 1 hit per charge (max 3) |
-| Chain Lightning | Yellow | 10s | Bullets chain to 2 nearest asteroids on hit |
+| Chain Lightning | Yellow | 10s | Bullets chain to 2 nearest asteroids on hit — sequential jagged bolt animation |
 | Speed Boost | Green | 8s | +50% thrust |
 | Explosive | Orange | 10s | 60px area damage on hit |
 | Slow-Time | Purple | 6s | Asteroids 50% speed |
@@ -496,6 +496,8 @@
 - **Muzzle flash** — brief white cone at ship nose on every shot (2-3 frames)
 - **Hit-flash** — asteroids flash white briefly on bullet hit (2-3 frames)
 - **Death shockwave** — expanding ring on player death
+- **Explosive ring** — expanding orange ring on explosive bullet impact (20 frames, 60px)
+- **Chain Lightning bolts** — sequential jagged lightning bolts with 2-3 forks, white-yellow core with cyan glow, 3-frame delay between chains
 - **Combo popups** — floating score text from kill position on combo milestones
 
 ### Mobile UI/UX Standards
