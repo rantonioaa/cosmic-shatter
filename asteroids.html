@@ -1878,7 +1878,7 @@
         }
 
         // Game state
-        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop
+        let gameState = 'menu'; // menu, profile_select, profile_create, modifier_select, playing, level_transition, gameover, stardust_shop, victory
         let score = 0;
         let lives = 3;
         let level = 1;
@@ -1887,6 +1887,7 @@
         let lastLevel = 1;
         let lastStardustEarned = 0;
         let levelTransitionTimer = 0;
+        let runAsteroidsDestroyed = 0;
 
         // Audio system (Pink Floyd-inspired)
         let audioCtx = null;
@@ -2500,9 +2501,10 @@
         function getLevelHealthBonus() { return Math.floor((getLevelCap() - 1) / 5); }
         function getLevelSafeZone() { return Math.max(sc(90), sc(150) - (level - 1) * sc(3)); }
         function getLevelAsteroidCount() {
-            if (level <= 5) return level + 3;
-            if (level <= 10) return level + 5;
-            return level + 8;
+            const capped = getLevelCap();
+            if (capped <= 5) return capped + 3;
+            if (capped <= 10) return capped + 5;
+            return capped + 8;
         }
         function getLevelColorWeights() {
             const t = getLevelCap() / 20;
@@ -2528,7 +2530,7 @@
             { id: 'tiny_ship',     label: 'Tiny Ship',     mult: 1.5,  desc: 'Half size, less thrust, 2x bullet damage needed' },
             { id: 'speed_demon',   label: 'Speed Demon',   mult: 1.5,  desc: 'Asteroids 1.5x faster' },
             { id: 'dark_mode',     label: 'Dark Mode',     mult: 1.75, desc: 'Limited vision radius' },
-            { id: 'bullet_storm',  label: 'Bullet Storm',  mult: 2,    desc: '2x asteroids, faster spawn' },
+            { id: 'bullet_storm',  label: 'Bullet Storm',  mult: 2,    desc: '2x asteroid count' },
             { id: 'glass_cannon',  label: 'Glass Cannon',  mult: 2.5,  desc: 'Instant split, 1 hit = death' }
         ];
 
@@ -3161,7 +3163,7 @@
                 stardust: 0,
                 totalStardustEarned: 0,
                 upgrades: { extraLife: 0, thrustPower: 0, fireRate: 0, startShield: 0, powerupLuck: 0, bulletSpeed: 0, magnetRange: 0, coolingSystem: 0 },
-                stats: { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0 },
+                stats: { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0, victories: 0 },
                 highScores: [],
                 lastModifier: 'none',
                 unlockedModifiers: ['none'],
@@ -3237,7 +3239,11 @@
                 }
             }
             if (!profile.stats) {
-                profile.stats = { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0 };
+                profile.stats = { gamesPlayed: 0, totalScore: 0, highestLevel: 0, bestPerModifier: {}, totalAsteroidsDestroyed: 0, totalPowerupsCollected: 0, victories: 0 };
+                changed = true;
+            }
+            if (profile.stats.victories === undefined) {
+                profile.stats.victories = 0;
                 changed = true;
             }
             if (profile.totalStarBitsEarned === undefined) {
@@ -3426,12 +3432,23 @@
                 activeProfile.stardust = (activeProfile.stardust ?? 0) + earnedDust;
                 activeProfile.totalStardustEarned = (activeProfile.totalStardustEarned ?? 0) + earnedDust;
                 activeProfile.activeRun = null;
+                // Update stats
+                activeProfile.stats.gamesPlayed = (activeProfile.stats.gamesPlayed ?? 0) + 1;
+                activeProfile.stats.totalScore = (activeProfile.stats.totalScore ?? 0) + lastScore;
+                activeProfile.stats.highestLevel = Math.max(activeProfile.stats.highestLevel ?? 0, lastLevel);
+                activeProfile.stats.totalAsteroidsDestroyed = (activeProfile.stats.totalAsteroidsDestroyed ?? 0) + runAsteroidsDestroyed;
+                if (!activeProfile.stats.bestPerModifier) activeProfile.stats.bestPerModifier = {};
+                const prevBest = activeProfile.stats.bestPerModifier[currentModifier.id] ?? 0;
+                activeProfile.stats.bestPerModifier[currentModifier.id] = Math.max(prevBest, lastScore);
+                if (lastLevel >= 20) {
+                    activeProfile.stats.victories = (activeProfile.stats.victories ?? 0) + 1;
+                }
                 saveProfile(activeProfile);
             } else {
                 lastStardustEarned = 0;
             }
             gameoverMenuIndex = 0;
-            gameState = 'gameover';
+            gameState = (lastLevel >= 20) ? 'victory' : 'gameover';
             updateUI();
         }
 
@@ -3912,6 +3929,16 @@
                 return;
             }
 
+            // Victory menu
+            if (gameState === 'victory') {
+                if (e.code === 'Enter' || e.code === 'Space') {
+                    e.preventDefault();
+                    gameState = 'menu';
+                    updateUI();
+                }
+                return;
+            }
+
             // Menu actions
             if (gameState === 'menu') {
                 if (e.key === 'e' || e.key === 'E') {
@@ -4292,6 +4319,7 @@
                 size: sc(Math.random() * 2 + 1)
             };
         }
+        const MAX_PARTICLES = 300;
 
         // Create powerup
         function createPowerup(x, y, type) {
@@ -4624,6 +4652,7 @@
             powerups = [];
             starBits = [];
             runStarBits = 0;
+            runAsteroidsDestroyed = 0;
             heat = 0;
             overheating = false;
             overheatTimer = 0;
@@ -4661,7 +4690,10 @@
                     velocity: { x: a.velocity.x, y: a.velocity.y },
                     rotation: a.rotation, rotSpeed: a.rotSpeed,
                     size: a.size, hp: a.hp, maxHp: a.maxHp,
-                    colorId: a.color.id, erraticTimer: a.erraticTimer
+                    colorId: a.color.id, erraticTimer: a.erraticTimer,
+                    isGoldenLure: a.isGoldenLure || false,
+                    scoreMult: a.scoreMult, basePoints: a.basePoints,
+                    trailTimer: a.trailTimer, lurePulse: a.lurePulse
                 })),
                 bullets: bullets.map(b => ({
                     x: b.x, y: b.y,
@@ -4747,14 +4779,18 @@
                     const radius = 0.8 + Math.random() * 0.4;
                     shape.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
                 }
+                const isLure = a.isGoldenLure === true;
                 return {
                     x: a.x * physicsScale, y: a.y * physicsScale,
                     velocity: { x: a.velocity.x * physicsScale, y: a.velocity.y * physicsScale },
                     rotation: a.rotation, rotSpeed: a.rotSpeed,
-                    size: a.size, radius: sc(a.size * 15),
-                    shape, color: colorObj,
+                    size: a.size, radius: isLure ? sc(15 * GOLDEN_LURE.radiusMult) : sc(a.size * 15),
+                    shape, color: isLure ? GOLDEN_LURE : colorObj,
                     hp: a.hp, maxHp: a.maxHp,
-                    erraticTimer: a.erraticTimer ?? 0
+                    erraticTimer: a.erraticTimer ?? 0,
+                    isGoldenLure: isLure,
+                    scoreMult: a.scoreMult, basePoints: a.basePoints,
+                    trailTimer: a.trailTimer ?? 0, lurePulse: a.lurePulse ?? 0
                 };
             });
 
@@ -4922,6 +4958,17 @@
                 messageEl.textContent = msg.trim();
                 messageEl.style.display = 'block';
                 highscoresEl.style.display = 'block';
+            } else if (gameState === 'victory') {
+                const modLabel = currentModifier.id !== 'none' ? ` [${currentModifier.label}]` : '';
+                scoreEl.textContent = `SYSTEM SHATTERED`;
+                scoreEl.style.display = 'block';
+                let msg = `Score: ${formatScore(lastScore)}${modLabel}`;
+                if (lastStardustEarned > 0) {
+                    msg += ` · +${lastStardustEarned} ✦ Stardust`;
+                }
+                messageEl.textContent = msg;
+                messageEl.style.display = 'block';
+                highscoresEl.style.display = 'block';
             } else if (gameState === 'paused') {
                 scoreEl.textContent = `Score: ${score} | Lives: ${lives}`;
                 scoreEl.style.display = 'block';
@@ -4941,6 +4988,15 @@
                     goHtml += `<div class="pause-option${sel}" data-tap-action="gameover" data-tap-index="${i}"><span class="pause-arrow">&#9654;</span>${opt}</div>`;
                 });
                 highscoresEl.innerHTML = goHtml + highscoresEl.innerHTML;
+            }
+            if (gameState === 'victory') {
+                const victoryOptions = ['Quit to Menu'];
+                let vicHtml = '';
+                victoryOptions.forEach((opt, i) => {
+                    const sel = i === gameoverMenuIndex ? ' selected' : '';
+                    vicHtml += `<div class="pause-option${sel}" data-tap-action="victory" data-tap-index="${i}"><span class="pause-arrow">&#9654;</span>${opt}</div>`;
+                });
+                highscoresEl.innerHTML = vicHtml + highscoresEl.innerHTML;
             }
             if (typeof updateTouchPause === 'function') updateTouchPause();
         }
@@ -5232,6 +5288,10 @@
                 p.life -= p.decay * dt;
                 return p.life > 0;
             });
+            // Enforce particle cap
+            if (particles.length > MAX_PARTICLES) {
+                particles = particles.slice(particles.length - MAX_PARTICLES);
+            }
         }
 
         // Check collisions
@@ -5271,6 +5331,7 @@
                                         score += Math.floor(ePoints * eComboMult * (scoreMultActive ? 2 : 1));
                                         combo = Math.min(5, combo + 1);
                                         comboTimer = COMBO_TIMEOUT;
+                                        runAsteroidsDestroyed++;
                                         if (ea.size === 1 && ea.color) spawnStarBits(ea.x, ea.y, ea.color);
                                         if (ea.size > 1) {
                                             for (let s = 0; s < 2; s++) {
@@ -5313,6 +5374,9 @@
                             // Build combo
                             combo = Math.min(5, combo + 1);
                             comboTimer = COMBO_TIMEOUT;
+
+                            // Track stats
+                            runAsteroidsDestroyed++;
 
                             // Spawn star bits from small asteroids
                             if (a.size === 1 && a.color) {
@@ -5487,6 +5551,10 @@
                         particles.push(createParticle(p.x, p.y, p.type.color, 2));
                     }
                     powerups.splice(i, 1);
+                    // Track stats
+                    if (activeProfile) {
+                        activeProfile.stats.totalPowerupsCollected = (activeProfile.stats.totalPowerupsCollected ?? 0) + 1;
+                    }
                 }
             }
 
@@ -5804,11 +5872,20 @@
                 // Level transition: countdown and spawn new level
                 levelTransitionTimer -= dt;
                 if (levelTransitionTimer <= 0) {
-                    level++;
-                    playSfx('levelup');
-                    spawnAsteroids();
-                    gameState = 'playing';
-                    updateUI();
+                    // Victory: Level 20 cleared
+                    if (level >= 20) {
+                        lastScore = score;
+                        lastLevel = level;
+                        playSfx('levelup');
+                        stopMusic();
+                        submitScore();
+                    } else {
+                        level++;
+                        playSfx('levelup');
+                        spawnAsteroids();
+                        gameState = 'playing';
+                        updateUI();
+                    }
                 }
                 // Draw frozen ship
                 drawShip();
@@ -5835,6 +5912,10 @@
                 updateParticles(dt);
                 drawParticles();
                 drawAsteroids();
+                powerupHudEl.style.display = 'none';
+            } else if (gameState === 'victory') {
+                updateParticles(dt);
+                drawParticles();
                 powerupHudEl.style.display = 'none';
             } else if (gameState === 'paused') {
                 // Draw frozen game state (no updates)
@@ -6150,6 +6231,9 @@
                         gameState = 'menu';
                         updateUI();
                     }
+                } else if (gameState === 'victory' && action === 'victory') {
+                    gameState = 'menu';
+                    updateUI();
                 } else if (gameState === 'shop' && idx !== null) {
                     shopMenuIndex = parseInt(idx);
                     const upg = UPGRADES[shopMenuIndex];
@@ -6375,6 +6459,9 @@
                     gameState = 'menu';
                     updateUI();
                 }
+            } else if (gameState === 'victory' && action === 'victory') {
+                gameState = 'menu';
+                updateUI();
             } else if (gameState === 'shop' && idx !== null) {
                 shopMenuIndex = parseInt(idx);
                 const upg = UPGRADES[shopMenuIndex];

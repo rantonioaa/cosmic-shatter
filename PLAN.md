@@ -202,7 +202,7 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] **Death Effect** (8 items, 4,390 ✦): Standard Burst, Implosion Nova, Shockwave Ring, Screen Shatter, Mini Black Hole, Supernova, Glitch Out, Total Annihilation
 - [x] **Star Bit Skin** (8 items, 3,580 ✦): Golden Star, Blue Crystal, Silver Moon, Red Heart, Green Diamond, Spinning Cube, Comet Fragment, Prismatic Bit
 - [x] **Powerup Visual** (9 items, 4,660 ✦): Standard Diamond, Glowing Orb, Spinning Polygon, Pulsing Ring, Floating Runestone, Holographic Card, Energy Core, Cosmic Egg, Ancient Relic
-- [x] **Set Bonuses** (visual only): Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync
+- [ ] **Set Bonuses** (Future — not yet implemented): Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync
 - [x] Total cost: ~24,940 ✦ (~50-100 runs to unlock everything)
 
 ### 4E. Golden Lure Asteroids (NEW variant) ✅
@@ -218,6 +218,45 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Add stardust, totalStardustEarned, cosmetics, selectedLoadout fields
 - [x] Existing profiles get defaults (0 Stardust, all defaults equipped)
 - [x] Existing unlockedModifiers preserved (level-based system unchanged)
+
+---
+
+## Phase 4.5: Honesty Pass + Victory Screen ✅
+
+### 4.5A. Golden Lure Save Fix
+- [x] Serialize `isGoldenLure`, `scoreMult`, `basePoints`, `trailTimer` in `serializeRun()`
+- [x] Restore these fields in `deserializeRun()` to prevent lure→gray asteroid fallback
+
+### 4.5B. Profile Stats Tracking
+- [x] Increment `stats.gamesPlayed` on `submitScore()`
+- [x] Increment `stats.totalScore` on `submitScore()`
+- [x] Update `stats.highestLevel` on `submitScore()`
+- [x] Update `stats.bestPerModifier` on `submitScore()`
+- [x] Increment `stats.totalAsteroidsDestroyed` in `checkCollisions()` (add run counter cleared in `startGame`)
+- [x] Increment `stats.totalPowerupsCollected` in powerup pickup code
+- [x] Show real game count in profile select list
+- [x] Add `stats.victories` field, increment on Level 20 clear
+
+### 4.5C. Level-20 Victory Screen
+- [x] Hard-cap asteroid count past Level 20 (apply `getLevelCap()` to `getLevelAsteroidCount`)
+- [x] On Level 20 clear: transition to new `gameState = 'victory'` instead of continuing
+- [x] Victory screen: "SYSTEM SHATTERED" title, score + modifier + Stardust earned
+- [x] Two options: "Quit to Menu" (force-end run), no endless mode
+- [x] Call `submitScore()` on victory (awards high score + Stardust + modifier unlock)
+
+### 4.5D. Doc Sync
+- [x] FEATURES.md: mark Set Bonuses as "Future" (not implemented)
+- [x] FEATURES.md: note Loadouts are "unlock preview only" (Phase 8)
+- [x] FEATURES.md: update difficulty scaling to mention Victory at Level 20
+- [x] PLAN.md: convert Set Bonuses `[x]` to `[ ]` and move to Deferred section
+- [x] PLAN.md: remove "faster spawn" from Bullet Storm modifier description
+- [x] INSTRUCTIONS.md: update game states diagram with `victory` state
+
+### 4.5E. Cleanup
+- [x] Remove dead `#message` element (never shown in menu state) — text hidden by updateUI
+- [x] Add particle cap (max 300) to prevent unbounded array growth
+- [x] Fix `bullet_storm` description to "2x asteroid count"
+- [x] Add `victories` field to profile stats with migration
 
 ---
 
@@ -324,12 +363,75 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 
 ---
 
+## Phase 10: Biome Progression — Phase 1 (Data-only) ⬜
+
+### 10A. Biome Data Table
+- [ ] `BIOMES` constant: 5 entries (Classic Void, Rubble Field, Drift Expanse, Dense Belt, Mire Wastes)
+- [ ] Each biome: `{ id, name, scoreMult, friction, countMult, speedMult, safeZoneMult, hpBonus, powerupLuckBonus, starBitMult, rotMult, magnetMult, palette }`
+- [ ] `getActiveBiome()` helper (null-safe, defaults to Classic Void)
+
+### 10B. Engine Integration
+- [ ] `getLevelSpeedMult` reads `biome.speedMult`
+- [ ] `getLevelAsteroidCount` reads `biome.countMult`
+- [ ] `getLevelSafeZone` reads `biome.safeZoneMult`
+- [ ] `getLevelHealthBonus` adds `biome.hpBonus`
+- [ ] `rollPowerup` adds `biome.powerupLuckBonus`
+- [ ] `spawnStarBits` applies `biome.starBitMult`
+- [ ] `updateShip` uses `biome.friction`
+- [ ] `updateAsteroids` applies `biome.rotMult` to rotation
+- [ ] `getMagnetRadius` applies `biome.magnetMult`
+
+### 10C. Constellation Map
+- [ ] New `constellation_map` game state
+- [ ] Canvas-rendered starfield with 5 nodes connected by unlock lines
+- [ ] Each node: biome name, score mult, best score, lock/equip status
+- [ ] Keyboard + touch navigation
+- [ ] Main menu entry: `[C] Constellation` (replaces direct Start Game → modifier flow)
+- [ ] Flow: `menu → constellation_map → modifier_select → playing`
+
+### 10D. Profile + Unlock Logic
+- [ ] New profile fields: `unlockedBiomes`, `selectedBiome`, `biomeBestScores`
+- [ ] Default: only `classic_void` unlocked
+- [ ] Unlock chain: clearing Level 20 in biome N unlocks biome N+1
+- [ ] Per-biome best score tracked in profile
+
+### 10E. Palette System
+- [ ] CSS variables: `--biome-accent`, `--biome-bg-tint`
+- [ ] Applied to HUD accent color + background star tint
+- [ ] No gameplay effect, just visual identity
+
+---
+
+## Phase 11: Biome Progression — Phase 2 (Heavy Physics) ⬜
+
+- [ ] Pulsar Field: gravity-point system, pulsar shockwave pulse
+- [ ] Solar Forge: directional flare sweep every 6–8s
+- [ ] Frozen Expanse: ice patches freeze ship controls
+- [ ] Mirror Realm: inverted horizontal controls + bullet bounce
+- [ ] Quantum Shroud: asteroid phase in/out + bullets split on hit
+- [ ] Singularity Core: central black hole with inverse-square gravity
+
+---
+
+## Phase 12: Galaxy Layer ⬜
+
+- [ ] 1 Galaxy = full Phase 1 + Phase 2 constellation
+- [ ] Beat all biomes → unlock next galaxy
+- [ ] 3 galaxies planned (24 biomes total)
+- [ ] Galaxy selection screen with visual theming per galaxy
+
+---
+
 ## Full Game Flow (After All Phases)
 
 ```
-profile_select → menu → challenge_select → modifier_select → playing → gameover → shop → ↑
-                  ↓
-              stardust_shop (unlock modifiers, loadouts, cosmetics)
+profile_select → menu → constellation_map → modifier_select → playing → gameover → shop → ↑
+                     |                        ↑                      |
+                     |                        |                      +--→ victory → menu
+                     ↓
+               stardust_shop
+                     ↓
+               challenge_select (optional modifier)
 ```
 
 ---
@@ -361,6 +463,8 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Multi-hit asteroids (Blue: 2, Green: 3)
 - [x] Erratic asteroid movement (Purple)
 - [x] Delta time normalization (consistent speed at any frame rate)
+- [x] Level-20 Victory screen — "SYSTEM SHATTERED" + force-end run
+- [x] Asteroid count capped at Level 20 (no endless)
 
 ### Scoring ✅
 - [x] Large asteroid: 20 pts
@@ -408,12 +512,13 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Create/select profiles
 - [x] Guest mode (no saving)
 - [x] Per-profile high scores
-- [x] Per-profile stats tracking
+- [x] Per-profile stats tracking (gamesPlayed, totalScore, highestLevel, bestPerModifier, asteroidsDestroyed, powerupsCollected, victories)
 - [x] Export profile as encrypted .sav file
 - [x] Import profile from .sav file
 - [x] Migration from old high score format
 - [x] Per-profile orientation and resolution settings
 - [x] Mid-run save/resume (Save & Quit, Resume on main menu)
+- [x] Golden Lure mid-run save state preserved (isGoldenLure, scoreMult, basePoints, trailTimer)
 
 ### UI/UX ✅
 - [x] Clean menu screens with selective element visibility
@@ -466,3 +571,6 @@ profile_select → menu → challenge_select → modifier_select → playing →
 - [x] Combo timer stopped ticking during overheat — moved decay to game loop
 - [x] Combo bar DOM lookups every frame — cached at init
 - [x] Combo bar width not resolution-scaled — now uses `sc(200)`
+- [x] Golden Lure mid-run save state lost on resume — serialized/restored isGoldenLure, scoreMult, basePoints, trailTimer
+- [x] Asteroid count uncapped past Level 20 — now uses `getLevelCap()` in `getLevelAsteroidCount()`
+- [x] Particle array unbounded — capped at 300 particles

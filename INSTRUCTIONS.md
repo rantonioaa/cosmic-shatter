@@ -32,13 +32,13 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 
 ### Game States
 ```
-menu → modifier_select → playing → gameover → shop → ↑
-  ↓    ↓         ↑              ↑
+menu → constellation_map → modifier_select → playing → gameover → shop → ↑
+  ↓    ↓         ↑              ↑                        ↑
   saves_menu  profile_select  paused → save_quit → settings
-  highscores_menu                 ↓
-  profile_create            (activeRun saved)
-  settings
-  resume_run → playing
+  highscores_menu    ↓         ↓
+  profile_create  victory     (activeRun saved)
+  settings          ↓
+  resume_run → menu (force-end)
 ```
 
 ### Key Variables
@@ -127,6 +127,14 @@ menu → modifier_select → playing → gameover → shop → ↑
 - F key toggles fullscreen in menus and gameplay
 - ESC key pauses the game (does NOT exit fullscreen) — exiting fullscreen auto-pauses via `fullscreenchange` listener
 - `webkitfullscreenchange` event also listened for mobile browser compatibility
+
+### Incomplete / Future Features
+- **Set Bonuses** — listed in PLAN.md Phase 4D as `[x]` but zero code exists (Crimson Dawn, Abyss Walker, Solar Flare, Void Touched, Prismatic Sync). This is a doc/code mismatch that needs fixing.
+- **Loadouts gameplay** — `selectedLoadout` is saved and previewed but `shoot()`/`updateBullets()` ignore it. All 5 loadouts (Standard, Spread Shot, Rapid Fire, Piercing Bolt, Missiles) behave identically in gameplay. Phase 8 is ⬜.
+- **Stats tracking** — `profile.stats.gamesPlayed`, `totalScore`, `highestLevel`, `bestPerModifier`, `totalAsteroidsDestroyed`, `totalPowerupsCollected` are declared in `createDefaultProfile` but never incremented. Always shows "0 games".
+- **Cosmetics behavior** — only color is honored; thruster Twin/Cryo/Rainbow, bullet comet trail, starbit comet tail have no behavior code. Item descriptions overpromise.
+- **Golden Lure mid-run save** — `isGoldenLure`, `scoreMult`, `basePoints`, `trailTimer` are dropped on serialize; deserialized lures become gray asteroids.
+- **`bullet_storm` desc** — says "2x asteroids, faster spawn" but only count is doubled. Fixed to "2x asteroid count".
 
 ### Magnet Radius
 - `MAGNET_BASE_RADIUS` is NOT a const — it calls `sc(70)` dynamically in `getMagnetRadius()`

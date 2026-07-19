@@ -54,7 +54,7 @@
 - Level counter increments
 - 2-second pause between levels with "LEVEL X" display
 
-### Difficulty Scaling (Capped at Level 20)
+### Difficulty Scaling (Victory at Level 20)
 
 | Mechanic | Scaling | Cap |
 |---|---|---|
@@ -63,6 +63,8 @@
 | Asteroid count | Formula varies by level range | 28 asteroids at level 20 |
 | Safe zone | -3px per level | 90px minimum |
 | Rare color spawn | Gray decreases, Gold/Red increase | Shifted at level 20 |
+
+**Victory:** Clearing Level 20 triggers a Victory screen — the run ends (force-quit). No endless mode.
 
 **Level Transitions:**
 - 2-second pause between levels
@@ -333,7 +335,7 @@
 - **SVG previews**: Crisp vector previews for all loadouts and cosmetics
 - **Scrollable item list**: Only items scroll, preview stays fixed
 - **Dynamic scaling**: All elements scale with device resolution via `sc()` function
-- Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦)
+- Loadouts: Standard (free), Spread Shot (800✦), Rapid Fire (1200✦), Piercing Bolt (2000✦), Missiles (3500✦) — **unlock preview only, gameplay behavior coming in Phase 8**
 - Cosmetics: 50 items across 6 slots (hull, bullets, thruster, death, starbits, powerups)
 - Total cost to unlock everything: ~24,940 ✦
 
