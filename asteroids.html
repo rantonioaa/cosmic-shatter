@@ -6699,7 +6699,7 @@
         // Update enemies
         function updateEnemies(dt) {
             const speedMult = activePowerups.slowtime > 0 ? 0.5 : (currentModifier.id === 'speed_demon' ? 1.5 : 1);
-            enemies = enemies.filter(e => {
+            enemies = enemies.filter((e, i) => {
                 if (e.type === 'drift_mine') {
                     e.pulse += 0.1 * dt;
                     if (e.armTimer > 0) e.armTimer -= dt;
@@ -7548,6 +7548,7 @@
             ctx.restore();
         }
         function drawBiomeGlow(biome, dt) {
+            ctx.save();
             const w = canvas.width, h = canvas.height;
             const time = Date.now() / 1000;
             if (biome.id === 'mire_wastes') {
