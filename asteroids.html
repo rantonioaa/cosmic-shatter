@@ -3802,6 +3802,18 @@
             return newUnlock;
         }
 
+        function checkBiomeUnlocks() {
+            if (!activeProfile) return;
+            if (!activeProfile.unlockedBiomes) activeProfile.unlockedBiomes = ['classic_void'];
+            for (const [biomeId, req] of Object.entries(BIOME_UNLOCK_CHAIN)) {
+                if (!req) continue;
+                if (activeProfile.unlockedBiomes.includes(biomeId)) continue;
+                if (activeProfile.unlockedBiomes.includes(req)) {
+                    activeProfile.unlockedBiomes.push(biomeId);
+                }
+            }
+        }
+
         // Stardust conversion: piecewise diminishing rate
         function convertScoreToStardust(score) {
             if (score <= 0) return 0;
@@ -3837,7 +3849,13 @@
                 activeProfile.stats.bestPerModifier[currentModifier.id] = Math.max(prevBest, lastScore);
                 if (lastLevel >= 20) {
                     activeProfile.stats.victories = (activeProfile.stats.victories ?? 0) + 1;
+                    // Unlock biomes on victory
+                    checkBiomeUnlocks();
                 }
+                // Update biome best score
+                const biomeId = getActiveBiome().id;
+                if (!activeProfile.biomeBestScores) activeProfile.biomeBestScores = {};
+                activeProfile.biomeBestScores[biomeId] = Math.max(activeProfile.biomeBestScores[biomeId] ?? 0, lastScore);
                 saveProfile(activeProfile);
             } else {
                 lastStardustEarned = 0;
@@ -4441,7 +4459,7 @@
                 } else if (e.code === 'Enter' || e.code === 'Space') {
                     e.preventDefault();
                     const biome = BIOMES[constMapIndex];
-                    if (unlocked.includes(biome.id)) {
+                    if (unlocked.includes(biome.id) && activeProfile) {
                         activeProfile.selectedBiome = biome.id;
                         saveProfile(activeProfile);
                         gameState = 'modifier_select';
@@ -4981,6 +4999,7 @@
         }
         function updateVoidCaches(dt) {
             gravityWells.forEach(w => {
+                if (w.type !== 'void_cache') return;
                 if (!w.active) {
                     w.telegraphTimer -= dt;
                     if (w.telegraphTimer <= 0) w.active = true;
@@ -4995,7 +5014,7 @@
                         // Enter void cache
                         voidCacheActive = true;
                         voidCacheTimer = 900; // 15 seconds
-                        voidCacheReturnState = { ...ship, score, level, asteroids: [...asteroids], enemies: [...enemies] };
+                        voidCacheReturnState = { ...ship, velocity: { x: ship.velocity.x, y: ship.velocity.y }, score, level, asteroids: [...asteroids], enemies: [...enemies] };
                         // Clear arena and spawn rewards
                         asteroids = [];
                         enemies = [];
@@ -5474,7 +5493,27 @@
                     x: s.x, y: s.y,
                     velocity: { x: s.velocity.x, y: s.velocity.y },
                     amount: s.amount, pulse: s.pulse, life: s.life
-                }))
+                })),
+                enemies: enemies.map(e => ({
+                    type: e.type, x: e.x, y: e.y,
+                    velocity: { x: e.velocity.x, y: e.velocity.y },
+                    radius: e.radius, hp: e.hp, maxHp: e.maxHp,
+                    rotation: e.rotation || 0, fireTimer: e.fireTimer || 0,
+                    pulse: e.pulse || 0, armTimer: e.armTimer || 0,
+                    color: e.color, basePoints: e.basePoints, scoreMult: e.scoreMult, starBits: e.starBits
+                })),
+                enemyBullets: enemyBullets.map(b => ({
+                    x: b.x, y: b.y,
+                    velocity: { x: b.velocity.x, y: b.velocity.y },
+                    life: b.life, radius: b.radius
+                })),
+                gravityWells: gravityWells.map(w => ({
+                    type: w.type || 'gravity_well', x: w.x, y: w.y,
+                    radiusInner: w.radiusInner, radiusOuter: w.radiusOuter,
+                    mass: w.mass || 0.08, active: w.active,
+                    telegraphTimer: w.telegraphTimer, pulse: w.pulse, radius: w.radius
+                })),
+                voidCacheActive, voidCacheTimer
             };
         }
 
@@ -5585,6 +5624,33 @@
                 amount: s.amount, radius: sc(6),
                 pulse: s.pulse, life: s.life
             }));
+
+            // Restore enemies
+            enemies = (data.enemies || []).map(e => ({
+                type: e.type, x: e.x * physicsScale, y: e.y * physicsScale,
+                velocity: { x: e.velocity.x * physicsScale, y: e.velocity.y * physicsScale },
+                radius: e.radius, hp: e.hp, maxHp: e.maxHp,
+                rotation: e.rotation || 0, fireTimer: e.fireTimer || 0,
+                pulse: e.pulse || 0, armTimer: e.armTimer || 0,
+                color: e.color, basePoints: e.basePoints, scoreMult: e.scoreMult, starBits: e.starBits
+            }));
+
+            // Restore enemy bullets
+            enemyBullets = (data.enemyBullets || []).map(b => ({
+                x: b.x * physicsScale, y: b.y * physicsScale,
+                velocity: { x: b.velocity.x * physicsScale, y: b.velocity.y * physicsScale },
+                life: b.life, radius: b.radius
+            }));
+
+            // Restore gravity wells / void caches
+            gravityWells = (data.gravityWells || []).map(w => ({
+                type: w.type || 'gravity_well', x: w.x * physicsScale, y: w.y * physicsScale,
+                radiusInner: w.radiusInner, radiusOuter: w.radiusOuter,
+                mass: w.mass || 0.08, active: w.active,
+                telegraphTimer: w.telegraphTimer, pulse: w.pulse, radius: w.radius
+            }));
+            voidCacheActive = data.voidCacheActive || false;
+            voidCacheTimer = data.voidCacheTimer || 0;
 
             particles = [];
 
@@ -6386,6 +6452,7 @@
             const overdriveDamageBonus = overdrive ? 1.5 : 1;
             const baseBulletDamage = currentModifier.id === 'tiny_ship' ? 0.5 : 1;
             const bulletDamage = baseBulletDamage * overdriveDamageBonus;
+            const biome = getActiveBiome();
 
             const lo = getActiveLoadout();
 
@@ -7138,6 +7205,7 @@
                     } else {
                         level++;
                         playSfx('levelup');
+                        gravityWells = [];
                         spawnAsteroids();
                         gameState = 'playing';
                         updateUI();
@@ -7465,7 +7533,7 @@
                     constMapIndex = parseInt(idx);
                     const biome = BIOMES[constMapIndex];
                     const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
-                    if (unlocked.includes(biome.id)) {
+                    if (unlocked.includes(biome.id) && activeProfile) {
                         activeProfile.selectedBiome = biome.id;
                         saveProfile(activeProfile);
                         gameState = 'modifier_select';
@@ -7751,7 +7819,7 @@
                 constMapIndex = parseInt(idx);
                 const biome = BIOMES[constMapIndex];
                 const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
-                if (unlocked.includes(biome.id)) {
+                if (unlocked.includes(biome.id) && activeProfile) {
                     activeProfile.selectedBiome = biome.id;
                     saveProfile(activeProfile);
                     gameState = 'modifier_select';
