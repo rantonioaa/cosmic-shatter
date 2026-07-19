@@ -796,10 +796,10 @@
         #restartConfirm .restart-option.selected:active {
             background: #ffa040;
         }
-        #restartConfirm .restart-arrow {
+        #restartConfirm .pause-arrow {
             display: none;
         }
-        #restartConfirm .restart-option.selected .restart-arrow {
+        #restartConfirm .restart-option.selected .pause-arrow {
             display: inline;
         }
         #restartConfirm .restart-hint {
@@ -1858,6 +1858,7 @@
         let graphicsReturnState = 'menu';
         let gameoverMenuIndex = 0;
         let restartMenuIndex = 0;
+        let savedPauseMenuIndex = 0;
 
         canvas.width = currentResolution.width;
         canvas.height = currentResolution.height;
@@ -4462,6 +4463,7 @@
                     } else {
                         // Cancel
                         if (activeProfile && activeProfile.activeRun) {
+                            pauseMenuIndex = savedPauseMenuIndex;
                             gameState = 'paused';
                         } else {
                             gameState = 'menu';
@@ -4472,6 +4474,7 @@
                     e.preventDefault();
                     // Cancel
                     if (activeProfile && activeProfile.activeRun) {
+                        pauseMenuIndex = savedPauseMenuIndex;
                         gameState = 'paused';
                     } else {
                         gameState = 'menu';
@@ -5127,6 +5130,7 @@
             profileNameGoEl.style.display = 'none';
             menuActionsEl.style.display = 'none';
             pauseMenuEl.style.display = 'none';
+            restartConfirmEl.style.display = 'none';
             graphicsMenuEl.style.display = 'none';
             shopMenuEl.style.display = 'none';
             stardustShopMenuEl.style.display = 'none';
@@ -6699,6 +6703,7 @@
                         return;
                     } else if (pauseMenuIndex === 4) {
                         // Restart
+                        savedPauseMenuIndex = pauseMenuIndex;
                         gameState = 'restart_confirm';
                         restartMenuIndex = 0;
                         updateUI();
@@ -6967,14 +6972,15 @@
                     graphicsMenuIndex = 0;
                     updateUI();
                     return;
-                } else if (pauseMenuIndex === 4) {
-                    // Restart
-                    gameState = 'restart_confirm';
-                    restartMenuIndex = 0;
-                    updateUI();
-                    return;
-                } else {
-                    stopMusic();
+                    } else if (pauseMenuIndex === 4) {
+                        // Restart
+                        savedPauseMenuIndex = pauseMenuIndex;
+                        gameState = 'restart_confirm';
+                        restartMenuIndex = 0;
+                        updateUI();
+                        return;
+                    } else {
+                        stopMusic();
                     gameState = 'menu';
                 }
                 updateUI();
@@ -6990,14 +6996,15 @@
                     gameState = 'modifier_select';
                     modifierSelectIndex = 0;
                     updateUI();
-                } else {
-                    // Cancel
-                    if (activeProfile && activeProfile.activeRun) {
-                        gameState = 'paused';
                     } else {
-                        gameState = 'menu';
-                    }
-                    updateUI();
+                        // Cancel
+                        if (activeProfile && activeProfile.activeRun) {
+                            pauseMenuIndex = savedPauseMenuIndex;
+                            gameState = 'paused';
+                        } else {
+                            gameState = 'menu';
+                        }
+                        updateUI();
                 }
             } else if (gameState === 'profile_select' && action === 'profile_select' && idx !== null) {
                 if (idx === 'new') {
