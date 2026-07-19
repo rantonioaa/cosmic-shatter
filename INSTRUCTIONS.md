@@ -1,7 +1,7 @@
 # Cosmic Shatter — Agent Instructions
 
 ## Project Overview
-Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canvas-based rendering with wireframe neon aesthetic. Fully playable on desktop and mobile.
+HTML5 Asteroids roguelite game. Multi-file architecture: HTML entry point + CSS stylesheets + JS modules. Canvas-based rendering with wireframe neon aesthetic. Fully playable on desktop and mobile.
 
 ## Repository
 - GitHub: `rantonioaa/cosmic-shatter`
@@ -12,10 +12,27 @@ Single-file HTML5 Asteroids roguelite game (`asteroids.html`, ~2830 lines). Canv
 ## File Structure
 | File | Purpose |
 |------|---------|
-| `asteroids.html` | Game source (HTML + CSS + JS, all in one file) |
+| `asteroids.html` | HTML entry point (loads CSS + JS) |
+| `css/styles.css` | All CSS styles (1,861 lines) |
+| `js/constants.js` | DOM references, canvas setup |
+| `js/audio.js` | Audio system, SFX, music |
+| `js/effects.js` | Visual effects (shake, flash, rings) |
+| `js/game-constants.js` | Game constants, biomes, upgrades |
+| `js/cosmetics.js` | SVG rendering helpers |
+| `js/profile.js` | Profile system, save/load |
+| `js/menus.js` | Menu rendering |
+| `js/entities.js` | Entity factory (asteroids, enemies, particles) |
+| `js/logic.js` | Game logic (start, serialize, destroy) |
+| `js/ui.js` | UI update, high scores |
+| `js/update.js` | Update functions (ship, bullets, asteroids) |
+| `js/collisions.js` | Collision detection |
+| `js/draw.js` | Draw functions |
+| `js/loop.js` | Game loop |
+| `js/init.js` | Bootstrap, event listeners |
+| `js/input.js` | Keyboard, touch, click handlers |
 | `FEATURES.md` | Complete feature documentation |
 | `PLAN.md` | Development roadmap and completed features |
-| `AGENTS.md` | This file — agent instructions |
+| `INSTRUCTIONS.md` | This file — agent instructions |
 | `.gitignore` | Ignores `.sav` files |
 | `cosmicshatter_master_file.sav` | Test save with everything unlocked |
 | `cosmicshatter_BODE.sav` | Another test save |

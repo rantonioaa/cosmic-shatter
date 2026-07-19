@@ -1,6 +1,6 @@
 # Cosmic Shatter
 
-A single-file HTML5 Asteroids roguelite with a wireframe neon aesthetic. Fully playable on desktop and mobile.
+A HTML5 Asteroids roguelite with a wireframe neon aesthetic. Fully playable on desktop and mobile.
 
 **Play it live:** [rantonioaa.github.io/cosmic-shatter](https://rantonioaa.github.io/cosmic-shatter/)
 
@@ -91,7 +91,7 @@ Tap the on-screen buttons to rotate, thrust, and shoot. Use the pause button (to
 
 ## Technical Details
 
-- **Single file**: All HTML, CSS, and JavaScript in `asteroids.html` (~3000 lines)
+- **Multi-file architecture**: HTML entry point + CSS stylesheets + JS modules
 - **No dependencies**: Pure vanilla JS, no frameworks or libraries
 - **Canvas-based rendering**: Wireframe neon aesthetic
 - **localStorage**: Profile data and save states stored client-side
@@ -101,17 +101,33 @@ Tap the on-screen buttons to rotate, thrust, and shoot. Use the pause button (to
 
 ## Development
 
-The game is a single HTML file. Open `asteroids.html` in any modern browser to play.
+Open `asteroids.html` in any modern browser to play. The game loads CSS and JS from separate files.
 
 ### Project Files
 
 | File | Purpose |
 |------|---------|
-| `asteroids.html` | Game source (HTML + CSS + JS) |
+| `asteroids.html` | HTML entry point (loads CSS + JS) |
+| `css/styles.css` | All CSS styles |
+| `js/constants.js` | DOM references, canvas setup |
+| `js/audio.js` | Audio system, SFX, music |
+| `js/effects.js` | Visual effects (shake, flash, rings) |
+| `js/game-constants.js` | Game constants, biomes, upgrades |
+| `js/cosmetics.js` | SVG rendering helpers |
+| `js/profile.js` | Profile system, save/load |
+| `js/menus.js` | Menu rendering |
+| `js/entities.js` | Entity factory (asteroids, enemies, particles) |
+| `js/logic.js` | Game logic (start, serialize, destroy) |
+| `js/ui.js` | UI update, high scores |
+| `js/update.js` | Update functions (ship, bullets, asteroids) |
+| `js/collisions.js` | Collision detection |
+| `js/draw.js` | Draw functions |
+| `js/loop.js` | Game loop |
+| `js/init.js` | Bootstrap, event listeners |
+| `js/input.js` | Keyboard, touch, click handlers |
 | `FEATURES.md` | Complete feature documentation |
 | `PLAN.md` | Development roadmap |
 | `INSTRUCTIONS.md` | Agent instructions for AI contributors |
-| `.sav` files | Test save files |
 
 ---
 
