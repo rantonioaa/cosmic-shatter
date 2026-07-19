@@ -920,6 +920,169 @@
             text-align: center;
             margin-top: 12px;
         }
+        /* Briefing panel */
+        .const-briefing {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .briefing-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .briefing-name {
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #ffcc00;
+            text-shadow: 0 0 12px rgba(255, 204, 0, 0.3);
+        }
+        .briefing-threat {
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .briefing-threat.low { background: rgba(68, 204, 68, 0.2); color: #44cc44; border: 1px solid rgba(68, 204, 68, 0.3); }
+        .briefing-threat.medium { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.3); }
+        .briefing-threat.high { background: rgba(255, 68, 68, 0.2); color: #ff4444; border: 1px solid rgba(255, 68, 68, 0.3); }
+        .briefing-desc {
+            font-size: 12px;
+            color: rgba(79, 195, 247, 0.7);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .briefing-columns {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .briefing-stats {
+            flex: 1;
+            min-width: 0;
+        }
+        .briefing-preview {
+            width: 160px;
+            height: 100px;
+            flex-shrink: 0;
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .briefing-preview canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .briefing-stat-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+        .briefing-stat-label {
+            width: 60px;
+            color: rgba(79, 195, 247, 0.6);
+            flex-shrink: 0;
+        }
+        .briefing-stat-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(79, 195, 247, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 8px;
+        }
+        .briefing-stat-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        .briefing-stat-val {
+            width: 40px;
+            text-align: right;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        .briefing-enemy, .briefing-special {
+            font-size: 11px;
+            color: rgba(79, 195, 247, 0.6);
+            margin-bottom: 4px;
+        }
+        .briefing-enemy span, .briefing-special span {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .briefing-best {
+            font-size: 12px;
+            color: rgba(255, 204, 0, 0.6);
+            margin-bottom: 12px;
+        }
+        .briefing-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .briefing-start {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #1a1a2e;
+            background: #ffcc00;
+            border: 1px solid #ffcc00;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.15s;
+        }
+        .briefing-start:active { background: #ffd54f; }
+        .briefing-back {
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: rgba(79, 195, 247, 0.6);
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+            clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.15s;
+        }
+        .briefing-back:active { background: rgba(79, 195, 247, 0.1); }
+        .briefing-hint {
+            font-size: 11px;
+            opacity: 0.35;
+            text-align: center;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            color: #4fc3f7;
+        }
+        .briefing-touch-hint {
+            font-size: 11px;
+            opacity: 0.35;
+            text-align: center;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            color: #4fc3f7;
+        }
+        @media (max-width: 600px) {
+            .briefing-columns {
+                flex-direction: column;
+            }
+            .briefing-preview {
+                width: 100%;
+                height: 80px;
+            }
+        }
         #graphicsMenu {
             display: none;
             margin-top: 20px;
@@ -1768,12 +1931,33 @@
             <div class="touch-hint">Tap to select</div>
         </div>
         <div id="constellationMap">
-            <div class="const-title">CONSTELLATION</div>
+            <div class="const-title">SELECT BIOME</div>
+            <!-- Node grid (shown first) -->
             <div class="const-nodes" id="constNodes"></div>
             <div class="const-info" id="constInfo"></div>
-            <div class="const-hint">ARROWS to move · ENTER to select · ESC back</div>
-            <div class="touch-hint">Tap a node to select · Tap Confirm to start</div>
-            <div class="back-btn" data-tap-action="back">&larr; Back</div>
+            <div class="const-hint">ARROWS to move · ENTER to view details</div>
+            <div class="touch-hint">Tap a biome to view details</div>
+            <!-- Briefing panel (shown after node selection) -->
+            <div class="const-briefing" id="constBriefing" style="display:none">
+                <div class="briefing-header">
+                    <div class="briefing-name" id="briefingName"></div>
+                    <div class="briefing-threat" id="briefingThreat"></div>
+                </div>
+                <div class="briefing-desc" id="briefingDesc"></div>
+                <div class="briefing-columns">
+                    <div class="briefing-stats" id="briefingStats"></div>
+                    <div class="briefing-preview">
+                        <canvas id="briefingCanvas" width="160" height="100"></canvas>
+                    </div>
+                </div>
+                <div class="briefing-best" id="briefingBest"></div>
+                <div class="briefing-actions">
+                    <div class="briefing-start" data-tap-action="const_start">START RUN</div>
+                    <div class="briefing-back" data-tap-action="const_back">&larr; BACK</div>
+                </div>
+                <div class="briefing-hint">ENTER to start · ESC to go back</div>
+                <div class="touch-hint">Tap START RUN to begin</div>
+            </div>
         </div>
         <div id="modifierSelect">
             <div class="mod-title">SELECT MODIFIER</div>
@@ -1879,6 +2063,14 @@
         const constellationMapEl = document.getElementById('constellationMap');
         const constNodesEl = document.getElementById('constNodes');
         const constInfoEl = document.getElementById('constInfo');
+        const constBriefingEl = document.getElementById('constBriefing');
+        const briefingNameEl = document.getElementById('briefingName');
+        const briefingThreatEl = document.getElementById('briefingThreat');
+        const briefingDescEl = document.getElementById('briefingDesc');
+        const briefingStatsEl = document.getElementById('briefingStats');
+        const briefingBestEl = document.getElementById('briefingBest');
+        const briefingCanvasEl = document.getElementById('briefingCanvas');
+        const briefingCanvasCtx = briefingCanvasEl ? briefingCanvasEl.getContext('2d') : null;
         const graphicsMenuEl = document.getElementById('graphicsMenu');
         const gfxListEl = document.getElementById('gfxList');
         const shopMenuEl = document.getElementById('shopMenu');
@@ -1975,6 +2167,8 @@
         let restartMenuIndex = 0;
         let savedPauseMenuIndex = 0;
         let constMapIndex = 0;
+        let constMapBriefing = false;
+        let constBriefingAnim = null;
 
         canvas.width = currentResolution.width;
         canvas.height = currentResolution.height;
@@ -2561,6 +2755,7 @@
         let explosiveRings = []; // [{x, y, radius, maxRadius, timer, maxTimer}]
         let chainBolts = []; // [{x1, y1, x2, y2, timer, maxTimer, points, forks}]
         let hitStopTimer = 0;
+        let biomeParticles = [];
 
         function triggerScreenShake(duration, intensity) {
             screenShakeTimer = duration;
@@ -2618,6 +2813,37 @@
 
         function triggerComboPopup(x, y, text, r, g, b) {
             comboPopups.push({ x, y, text, r, g, b, timer: 60, vy: -1.5 });
+        }
+
+        // Biome background particles
+        function updateBiomeParticles(dt) {
+            const biome = getActiveBiome();
+            if (!biome.palette.particles) { biomeParticles = []; return; }
+            // Spawn new particles
+            if (Math.random() > 0.85) {
+                const px = Math.random() * canvas.width;
+                const py = biome.palette.particles === 'embers' ? canvas.height + 10 : Math.random() * canvas.height;
+                biomeParticles.push({ x: px, y: py, life: 1, color: biome.palette.accent, size: sc(1 + Math.random() * 2) });
+            }
+            // Cap particles
+            if (biomeParticles.length > 50) biomeParticles = biomeParticles.slice(-50);
+            // Update
+            biomeParticles = biomeParticles.filter(p => {
+                p.life -= 0.008 * dt;
+                if (biome.palette.particles === 'streaks') { p.y += 1.5 * dt; p.x += 0.3 * dt; }
+                else if (biome.palette.particles === 'embers') { p.y -= 0.8 * dt; p.x += (Math.random() - 0.5) * 0.3 * dt; }
+                else if (biome.palette.particles === 'spores') { p.y += 0.3 * dt; p.x += (Math.random() - 0.5) * 0.5 * dt; }
+                else if (biome.palette.particles === 'sparks') { p.y += 0.2 * dt; p.x += (Math.random() - 0.5) * 0.8 * dt; }
+                return p.life > 0;
+            });
+        }
+        function drawBiomeParticles() {
+            biomeParticles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life * 0.5;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            });
+            ctx.globalAlpha = 1;
         }
 
         function updateVisualEffects(dt) {
@@ -2874,23 +3100,47 @@
             { id: 'classic_void', name: 'Classic Void', scoreMult: 1.0, friction: 0.99,
               countMult: 1, speedMult: 1, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
               starBitMult: 1, rotMult: 1, magnetMult: 1, enemyType: null, specialObject: 'void_cache', specialChance: 0.03,
-              desc: 'Standard space. The baseline.', palette: { accent: '#4fc3f7', bg: '#000000' } },
+              desc: 'The baseline. Standard space with no special hazards. Perfect for learning the ropes.',
+              enemyDesc: 'None', specialDesc: 'Void Cache — rare reward portal',
+              threat: 'low', threatColor: '#44cc44',
+              stats: { speed: 1.0, count: 1.0, friction: 1.0, magnet: 1.0 },
+              palette: { accent: '#4fc3f7', bg: '#000000', particles: null } },
             { id: 'rubble_field', name: 'Rubble Field', scoreMult: 1.2, friction: 0.99,
               countMult: 1.5, speedMult: 1, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
-              starBitMult: 1.2, rotMult: 1, magnetMult: 1, enemyType: 'drift_mine', specialObject: null, specialChance: 0,
-              desc: 'Dense debris. Mines drift among the rocks.', palette: { accent: '#ff6644', bg: '#0a0000' } },
-            { id: 'drift_expanse', name: 'Drift Expanse', scoreMult: 1.3, friction: 0.998,
+              starBitMult: 1.2, rotMult: 1, magnetMult: 1, enemyType: 'drift_mine', specialObject: 'gravity_well', specialChance: 0.05,
+              desc: 'Dense debris fields with drift mines hidden among the rocks. Gravity wells pull everything together.',
+              enemyDesc: 'Drift Mines — pulsing mines that explode on proximity, chain-reacting with asteroids',
+              specialDesc: 'Gravity Well — pulls ship, bullets, and asteroids inward',
+              threat: 'high', threatColor: '#ff4444',
+              stats: { speed: 1.0, count: 1.5, friction: 1.0, magnet: 1.0 },
+              palette: { accent: '#ff6644', bg: '#0a0000', particles: 'sparks' } },
+            { id: 'drift_expanse', name: 'Drift Expanse', scoreMult: 1.3, friction: 0.90,
               countMult: 1, speedMult: 1, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
-              starBitMult: 1.5, rotMult: 1, magnetMult: 1, enemyType: 'comet', specialObject: 'void_cache', specialChance: 0.03,
-              desc: 'Slippery ice. Comets streak through the void.', palette: { accent: '#88ddff', bg: '#000810' } },
+              starBitMult: 1.5, rotMult: 1, magnetMult: 1, enemyType: 'comet', specialObject: 'void_cache', specialChance: 0.05,
+              desc: 'Slippery ice fields where comets streak through the void. Movement is slippery — master the drift.',
+              enemyDesc: 'Comets — fast screen-crossers that drop bonus star bits',
+              specialDesc: 'Void Cache — rare reward portal',
+              threat: 'medium', threatColor: '#ffaa00',
+              stats: { speed: 1.0, count: 1.0, friction: 0.9, magnet: 1.0 },
+              palette: { accent: '#88ddff', bg: '#000810', particles: 'streaks' } },
             { id: 'dense_belt', name: 'Dense Belt', scoreMult: 1.5, friction: 0.99,
-              countMult: 1, speedMult: 1.25, safeZoneMult: 0.6, hpBonus: 1, powerupLuckBonus: 0.1,
-              starBitMult: 1, rotMult: 1, magnetMult: 1, enemyType: 'turret', specialObject: 'gravity_well', specialChance: 0.05,
-              desc: 'Fast and tight. Turrets guard the belt.', palette: { accent: '#ffaa00', bg: '#080400' } },
+              countMult: 1, speedMult: 1.3, safeZoneMult: 0.55, hpBonus: 1, powerupLuckBonus: 0.1,
+              starBitMult: 1, rotMult: 1, magnetMult: 1, enemyType: 'turret', specialObject: 'gravity_well', specialChance: 0.08,
+              desc: 'Fast and tight. Turrets guard the belt while gravity wells warp the field.',
+              enemyDesc: 'Turrets — stationary hexagons that fire slow projectiles at the ship',
+              specialDesc: 'Gravity Well — pulls ship, bullets, and asteroids inward',
+              threat: 'high', threatColor: '#ff4444',
+              stats: { speed: 1.3, count: 1.0, friction: 1.0, magnet: 1.0 },
+              palette: { accent: '#ffaa00', bg: '#080400', particles: 'embers' } },
             { id: 'mire_wastes', name: 'Mire Wastes', scoreMult: 1.4, friction: 0.99,
               countMult: 1, speedMult: 1, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
-              starBitMult: 1, rotMult: 0.5, magnetMult: 0.7, enemyType: 'swarmer', specialObject: 'gravity_well', specialChance: 0.05,
-              desc: 'Sticky and slow. Swarms lurk in the mire.', palette: { accent: '#66cc66', bg: '#000a00' } }
+              starBitMult: 1, rotMult: 0.5, magnetMult: 0.65, enemyType: 'swarmer', specialObject: 'gravity_well', specialChance: 0.08,
+              desc: 'Thick and sluggish. Swarms lurk in the mire while gravity wells warp the field.',
+              enemyDesc: 'Swarmers — tiny triangles that slowly chase the ship',
+              specialDesc: 'Gravity Well — pulls ship, bullets, and asteroids inward',
+              threat: 'medium', threatColor: '#ffaa00',
+              stats: { speed: 1.0, count: 1.0, friction: 1.0, magnet: 0.65 },
+              palette: { accent: '#66cc66', bg: '#000a00', particles: 'spores' } }
         ];
         const BIOME_UNLOCK_CHAIN = {
             classic_void: null,
@@ -3890,36 +4140,140 @@
         function renderConstellationMap() {
             const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
             const selected = activeProfile ? activeProfile.selectedBiome : 'classic_void';
-            let html = '';
-            BIOMES.forEach((biome, i) => {
-                const isUnlocked = unlocked.includes(biome.id);
-                const isSelected = i === constMapIndex;
-                const isEquipped = biome.id === selected;
-                const lockClass = isUnlocked ? '' : ' locked';
-                const selClass = isSelected ? ' selected' : '';
-                const eqClass = isEquipped ? ' equipped' : '';
+            if (constMapBriefing) {
+                // Show briefing panel
+                constNodesEl.style.display = 'none';
+                constInfoEl.style.display = 'none';
+                constBriefingEl.style.display = 'block';
+                const biome = BIOMES[constMapIndex];
                 const best = activeProfile?.biomeBestScores?.[biome.id] || 0;
-                html += `<div class="const-node${selClass}${lockClass}${eqClass}" data-tap-action="const_node" data-tap-index="${i}">`
-                    + `<span class="node-name">${biome.name}</span>`
-                    + `<span class="node-mult">${biome.scoreMult}×</span>`
-                    + (isUnlocked ? (best > 0 ? `<span class="node-mult">${best.toLocaleString()}</span>` : '') : '<span class="node-lock">&#128274;</span>')
-                    + `</div>`;
-            });
-            constNodesEl.innerHTML = html;
-            // Info panel
-            const biome = BIOMES[constMapIndex];
-            const isUnlocked = unlocked.includes(biome.id);
-            if (isUnlocked) {
-                const best = activeProfile?.biomeBestScores?.[biome.id] || 0;
-                constInfoEl.innerHTML = `<div class="info-name">${biome.name} · ${biome.scoreMult}×</div>`
-                    + `<div class="info-desc">${biome.desc}</div>`
-                    + (best > 0 ? `<div class="info-desc">Best: ${best.toLocaleString()}</div>` : '');
+                briefingNameEl.textContent = biome.name;
+                briefingThreatEl.textContent = biome.threat;
+                briefingThreatEl.className = 'briefing-threat ' + biome.threat;
+                briefingDescEl.textContent = biome.desc;
+                // Stats
+                const baseline = BIOMES[0].stats;
+                const statColors = { speed: '#4fc3f7', count: '#ff6644', friction: '#88ddff', magnet: '#ff88ff' };
+                let statsHtml = '';
+                for (const [key, val] of Object.entries(biome.stats)) {
+                    const baseVal = baseline[key] || 1;
+                    const ratio = Math.min(val / (baseVal * 2), 1);
+                    const label = key.charAt(0).toUpperCase() + key.slice(1);
+                    const displayVal = key === 'friction' ? (1 - val).toFixed(2) + ' slide' : val + '×';
+                    statsHtml += `<div class="briefing-stat-row">`
+                        + `<span class="briefing-stat-label">${label}</span>`
+                        + `<div class="briefing-stat-bar"><div class="briefing-stat-fill" style="width:${ratio * 100}%;background:${statColors[key] || '#4fc3f7'}"></div></div>`
+                        + `<span class="briefing-stat-val">${displayVal}</span>`
+                        + `</div>`;
+                }
+                statsHtml += `<div class="briefing-enemy">Enemy: <span>${biome.enemyDesc}</span></div>`;
+                statsHtml += `<div class="briefing-special">Special: <span>${biome.specialDesc}</span></div>`;
+                statsHtml += `<div class="briefing-stat-row"><span class="briefing-stat-label">Score</span><span class="briefing-stat-val">${biome.scoreMult}×</span></div>`;
+                statsHtml += `<div class="briefing-stat-row"><span class="briefing-stat-label">Star Bits</span><span class="briefing-stat-val">${biome.starBitMult}×</span></div>`;
+                briefingStatsEl.innerHTML = statsHtml;
+                briefingBestEl.textContent = best > 0 ? `Best: ${best.toLocaleString()}` : '';
+                // Start preview animation
+                startBiomePreview(biome);
             } else {
-                const req = BIOME_UNLOCK_CHAIN[biome.id];
-                const reqBiome = BIOMES.find(b => b.id === req);
-                constInfoEl.innerHTML = `<div class="info-name">${biome.name} · ${biome.scoreMult}×</div>`
-                    + `<div class="info-desc">Locked — Clear ${reqBiome?.name || req} Level 20</div>`;
+                // Show node grid
+                constNodesEl.style.display = 'flex';
+                constInfoEl.style.display = 'block';
+                constBriefingEl.style.display = 'none';
+                stopBiomePreview();
+                let html = '';
+                BIOMES.forEach((biome, i) => {
+                    const isUnlocked = unlocked.includes(biome.id);
+                    const isSelected = i === constMapIndex;
+                    const isEquipped = biome.id === selected;
+                    const lockClass = isUnlocked ? '' : ' locked';
+                    const selClass = isSelected ? ' selected' : '';
+                    const eqClass = isEquipped ? ' equipped' : '';
+                    const best = activeProfile?.biomeBestScores?.[biome.id] || 0;
+                    html += `<div class="const-node${selClass}${lockClass}${eqClass}" data-tap-action="const_node" data-tap-index="${i}">`
+                        + `<span class="node-name">${biome.name}</span>`
+                        + `<span class="node-mult">${biome.scoreMult}×</span>`
+                        + (isUnlocked ? (best > 0 ? `<span class="node-mult">${best.toLocaleString()}</span>` : '') : '<span class="node-lock">&#128274;</span>')
+                        + `</div>`;
+                });
+                constNodesEl.innerHTML = html;
+                const biome = BIOMES[constMapIndex];
+                const isUnlocked = unlocked.includes(biome.id);
+                if (isUnlocked) {
+                    const best = activeProfile?.biomeBestScores?.[biome.id] || 0;
+                    constInfoEl.innerHTML = `<div class="info-name">${biome.name} · ${biome.scoreMult}×</div>`
+                        + `<div class="info-desc">${biome.desc}</div>`
+                        + (best > 0 ? `<div class="info-desc">Best: ${best.toLocaleString()}</div>` : '');
+                } else {
+                    const req = BIOME_UNLOCK_CHAIN[biome.id];
+                    const reqBiome = BIOMES.find(b => b.id === req);
+                    constInfoEl.innerHTML = `<div class="info-name">${biome.name} · ${biome.scoreMult}×</div>`
+                        + `<div class="info-desc">Locked — Clear ${reqBiome?.name || req} Level 20</div>`;
+                }
             }
+        }
+
+        // Biome preview animation
+        let previewAsteroids = [];
+        let previewParticles = [];
+        let previewAnimFrame = null;
+        function startBiomePreview(biome) {
+            if (!briefingCanvasCtx) return;
+            stopBiomePreview();
+            previewAsteroids = [];
+            previewParticles = [];
+            // Spawn 5 asteroids
+            for (let i = 0; i < 5; i++) {
+                previewAsteroids.push({
+                    x: Math.random() * 160, y: Math.random() * 100,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                    size: 4 + Math.random() * 6, rotation: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.02, color: biome.palette.accent
+                });
+            }
+            function animatePreview() {
+                briefingCanvasCtx.fillStyle = biome.palette.bg;
+                briefingCanvasCtx.fillRect(0, 0, 160, 100);
+                // Update and draw asteroids
+                previewAsteroids.forEach(a => {
+                    a.x += a.vx; a.y += a.vy; a.rotation += a.rotSpeed;
+                    if (a.x < -10) a.x = 170; if (a.x > 170) a.x = -10;
+                    if (a.y < -10) a.y = 110; if (a.y > 110) a.y = -10;
+                    briefingCanvasCtx.save();
+                    briefingCanvasCtx.translate(a.x, a.y);
+                    briefingCanvasCtx.rotate(a.rotation);
+                    briefingCanvasCtx.strokeStyle = a.color;
+                    briefingCanvasCtx.lineWidth = 1;
+                    briefingCanvasCtx.beginPath();
+                    briefingCanvasCtx.arc(0, 0, a.size, 0, Math.PI * 2);
+                    briefingCanvasCtx.stroke();
+                    briefingCanvasCtx.restore();
+                });
+                // Spawn biome particles
+                if (biome.palette.particles && Math.random() > 0.7) {
+                    const px = Math.random() * 160;
+                    const py = biome.palette.particles === 'embers' ? 100 : Math.random() * 100;
+                    previewParticles.push({ x: px, y: py, life: 1, color: biome.palette.accent });
+                }
+                // Update and draw particles
+                previewParticles = previewParticles.filter(p => {
+                    p.life -= 0.02;
+                    if (biome.palette.particles === 'streaks') { p.y += 1.5; p.x += 0.3; }
+                    else if (biome.palette.particles === 'embers') { p.y -= 0.8; p.x += (Math.random() - 0.5) * 0.3; }
+                    else if (biome.palette.particles === 'spores') { p.y += 0.3; p.x += (Math.random() - 0.5) * 0.5; }
+                    else if (biome.palette.particles === 'sparks') { p.y += 0.2; p.x += (Math.random() - 0.5) * 0.8; }
+                    briefingCanvasCtx.fillStyle = p.color;
+                    briefingCanvasCtx.globalAlpha = p.life;
+                    briefingCanvasCtx.fillRect(p.x, p.y, 2, 2);
+                    briefingCanvasCtx.globalAlpha = 1;
+                    return p.life > 0;
+                });
+                previewAnimFrame = requestAnimationFrame(animatePreview);
+            }
+            animatePreview();
+        }
+        function stopBiomePreview() {
+            if (previewAnimFrame) { cancelAnimationFrame(previewAnimFrame); previewAnimFrame = null; }
+            previewAsteroids = []; previewParticles = [];
         }
 
         function renderModifierList() {
@@ -4448,29 +4802,47 @@
             // Constellation map
             if (gameState === 'constellation_map') {
                 const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
-                if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-                    e.preventDefault();
-                    constMapIndex = (constMapIndex - 1 + BIOMES.length) % BIOMES.length;
-                    updateUI();
-                } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-                    e.preventDefault();
-                    constMapIndex = (constMapIndex + 1) % BIOMES.length;
-                    updateUI();
-                } else if (e.code === 'Enter' || e.code === 'Space') {
-                    e.preventDefault();
-                    const biome = BIOMES[constMapIndex];
-                    if (unlocked.includes(biome.id) && activeProfile) {
-                        activeProfile.selectedBiome = biome.id;
-                        saveProfile(activeProfile);
-                        gameState = 'modifier_select';
-                        modifierSelectIndex = 0;
-                        currentModifier = MODIFIERS[0];
+                if (!constMapBriefing) {
+                    // Node grid mode
+                    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                        e.preventDefault();
+                        constMapIndex = (constMapIndex - 1 + BIOMES.length) % BIOMES.length;
+                        updateUI();
+                    } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                        e.preventDefault();
+                        constMapIndex = (constMapIndex + 1) % BIOMES.length;
+                        updateUI();
+                    } else if (e.code === 'Enter' || e.code === 'Space') {
+                        e.preventDefault();
+                        const biome = BIOMES[constMapIndex];
+                        if (unlocked.includes(biome.id)) {
+                            constMapBriefing = true;
+                            updateUI();
+                        }
+                    } else if (e.code === 'Escape') {
+                        e.preventDefault();
+                        gameState = 'menu';
                         updateUI();
                     }
-                } else if (e.code === 'Escape') {
-                    e.preventDefault();
-                    gameState = 'menu';
-                    updateUI();
+                } else {
+                    // Briefing mode
+                    if (e.code === 'Enter' || e.code === 'Space') {
+                        e.preventDefault();
+                        const biome = BIOMES[constMapIndex];
+                        if (unlocked.includes(biome.id) && activeProfile) {
+                            activeProfile.selectedBiome = biome.id;
+                            saveProfile(activeProfile);
+                            gameState = 'modifier_select';
+                            modifierSelectIndex = 0;
+                            currentModifier = MODIFIERS[0];
+                            constMapBriefing = false;
+                            updateUI();
+                        }
+                    } else if (e.code === 'Escape') {
+                        e.preventDefault();
+                        constMapBriefing = false;
+                        updateUI();
+                    }
                 }
             }
 
@@ -4878,7 +5250,8 @@
         function spawnEnemies() {
             const biome = getActiveBiome();
             if (!biome.enemyType) return;
-            const count = biome.enemyType === 'swarmer' ? 4 : 3;
+            // Grace period: first 2 levels have weaker enemies
+            const count = level <= 2 ? 1 : (biome.enemyType === 'swarmer' ? 4 : 3);
             for (let i = 0; i < count; i++) {
                 let x, y;
                 do {
@@ -5682,14 +6055,19 @@
             // Spawn biome enemies
             spawnEnemies();
             // Spawn special objects (gravity wells / void caches)
+            // Guaranteed every 2-4 levels (random window), starting from level 3
             const biome = getActiveBiome();
-            if (biome.specialObject && biome.specialChance > 0 && Math.random() < biome.specialChance) {
-                if (biome.specialObject === 'gravity_well') {
-                    gravityWells.push(createGravityWell());
-                } else if (biome.specialObject === 'void_cache') {
-                    const vc = createVoidCache();
-                    vc.type = 'void_cache';
-                    gravityWells.push(vc);
+            if (biome.specialObject) {
+                const guaranteed = level >= 3 && (level % 3 === 0 || level % 3 === 1);
+                const randomChance = Math.random() < biome.specialChance;
+                if (guaranteed || randomChance) {
+                    if (biome.specialObject === 'gravity_well') {
+                        gravityWells.push(createGravityWell());
+                    } else if (biome.specialObject === 'void_cache') {
+                        const vc = createVoidCache();
+                        vc.type = 'void_cache';
+                        gravityWells.push(vc);
+                    }
                 }
             }
         }
@@ -5766,6 +6144,8 @@
                 profileBackBtnEl.style.display = 'flex';
                 profileNameInputEl.focus();
             } else if (gameState === 'constellation_map') {
+                // Always start with node grid when entering this state
+                constMapBriefing = false;
                 scoreEl.textContent = 'SELECT BIOME';
                 scoreEl.style.display = 'block';
                 constellationMapEl.style.display = 'block';
@@ -7116,6 +7496,7 @@
                 updateMagnet(dt);
                 checkCollisions();
                 updateVisualEffects(dt);
+                updateBiomeParticles(dt);
                 updateMusic(dt);
 
                 // Combo decay (runs every frame regardless of heat state)
@@ -7178,6 +7559,7 @@
                 if (screenShakeTimer > 0) ctx.restore();
 
                 drawVisualEffects();
+                drawBiomeParticles();
 
                 // Dark mode overlay
                 if (currentModifier.id === 'dark_mode') {
@@ -7206,6 +7588,7 @@
                         level++;
                         playSfx('levelup');
                         gravityWells = [];
+                        biomeParticles = [];
                         spawnAsteroids();
                         gameState = 'playing';
                         updateUI();
@@ -7533,13 +7916,24 @@
                     constMapIndex = parseInt(idx);
                     const biome = BIOMES[constMapIndex];
                     const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
+                    if (unlocked.includes(biome.id)) {
+                        constMapBriefing = true;
+                    }
+                    updateUI();
+                } else if (gameState === 'constellation_map' && action === 'const_start') {
+                    const biome = BIOMES[constMapIndex];
+                    const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
                     if (unlocked.includes(biome.id) && activeProfile) {
                         activeProfile.selectedBiome = biome.id;
                         saveProfile(activeProfile);
                         gameState = 'modifier_select';
                         modifierSelectIndex = 0;
                         currentModifier = MODIFIERS[0];
+                        constMapBriefing = false;
                     }
+                    updateUI();
+                } else if (gameState === 'constellation_map' && action === 'const_back') {
+                    constMapBriefing = false;
                     updateUI();
                 } else if (gameState === 'modifier_select' && idx !== null) {
                     modifierSelectIndex = parseInt(idx);
@@ -7819,13 +8213,24 @@
                 constMapIndex = parseInt(idx);
                 const biome = BIOMES[constMapIndex];
                 const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
+                if (unlocked.includes(biome.id)) {
+                    constMapBriefing = true;
+                }
+                updateUI();
+            } else if (gameState === 'constellation_map' && action === 'const_start') {
+                const biome = BIOMES[constMapIndex];
+                const unlocked = activeProfile ? activeProfile.unlockedBiomes : ['classic_void'];
                 if (unlocked.includes(biome.id) && activeProfile) {
                     activeProfile.selectedBiome = biome.id;
                     saveProfile(activeProfile);
                     gameState = 'modifier_select';
                     modifierSelectIndex = 0;
                     currentModifier = MODIFIERS[0];
+                    constMapBriefing = false;
                 }
+                updateUI();
+            } else if (gameState === 'constellation_map' && action === 'const_back') {
+                constMapBriefing = false;
                 updateUI();
             } else if (gameState === 'modifier_select' && idx !== null) {
                 modifierSelectIndex = parseInt(idx);

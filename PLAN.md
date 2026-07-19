@@ -415,8 +415,19 @@ A test save file with all features unlocked is included: `cosmicshatter_master_f
 - [x] Enemy death VFX and stat tracking
 
 ### 10G. Special Objects ✅
-- [x] Gravity Wells (Dense Belt, Mire Wastes): pull ship/bullets/asteroids, event horizon destroys
+- [x] Gravity Wells (Rubble Field, Dense Belt, Mire Wastes): pull ship/bullets/asteroids, event horizon destroys
 - [x] Void Caches (Classic Void, Drift Expanse): 15s reward interlude, invulnerable, collect star bits + powerup
+
+### 10H. Constellation Map Redesign ✅
+- [x] Two-step selection: tap node → briefing panel → START RUN
+- [x] Two-column briefing panel: stats (left) + animated preview canvas (right)
+- [x] Stat bars comparing to Classic Void baseline
+- [x] Threat badge (Low/Medium/High) per biome
+- [x] Responsive layout: side-by-side landscape, stacked portrait
+- [x] Enhanced biome physics (dramatic but balanced)
+- [x] Guaranteed encounters: at least 1 enemy per level, 1 special object every 2-3 levels
+- [x] Grace period: first 2 levels have weaker enemies
+- [x] Background particles per biome (sparks, streaks, embers, spores)
 
 ---
 
