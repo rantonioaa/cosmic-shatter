@@ -6356,6 +6356,34 @@
                     return;
                 }
 
+                // Saves menu export/import
+                if (gameState === 'saves_menu') {
+                    if (action === 'export') {
+                        if (activeProfile) exportProfile(activeProfile);
+                    } else if (action === 'import') {
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = '.sav';
+                        fileInput.onchange = (ev) => {
+                            const file = ev.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (re) => {
+                                const imported = importProfile(re.target.result);
+                                if (imported) {
+                                    saveProfile(imported);
+                                    activeProfile = imported;
+                                    setActiveProfileName(imported.name);
+                                    updateUI();
+                                }
+                            };
+                            reader.readAsText(file);
+                        };
+                        fileInput.click();
+                    }
+                    return;
+                }
+
                 if (gameState === 'menu') {
                     if (action === 'start') {
                         if (activeProfile && activeProfile.activeRun) {
@@ -6384,28 +6412,6 @@
                     sdShopSlot = 0;
                     sdShopItem = 0;
                     updateUI();
-                    } else if (action === 'export') {
-                        if (activeProfile) exportProfile(activeProfile);
-                    } else if (action === 'import') {
-                        const fileInput = document.createElement('input');
-                        fileInput.type = 'file';
-                        fileInput.accept = '.sav';
-                        fileInput.onchange = (ev) => {
-                            const file = ev.target.files[0];
-                            if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = (re) => {
-                                const imported = importProfile(re.target.result);
-                                if (imported) {
-                                    saveProfile(imported);
-                                    activeProfile = imported;
-                                    setActiveProfileName(imported.name);
-                                    updateUI();
-                                }
-                            };
-                            reader.readAsText(file);
-                        };
-                        fileInput.click();
                     } else if (action === 'profile') {
                         gameState = 'profile_select';
                         profileSelectIndex = 0;
@@ -6584,6 +6590,34 @@
                 return;
             }
 
+            // Saves menu export/import
+            if (gameState === 'saves_menu') {
+                if (action === 'export') {
+                    if (activeProfile) exportProfile(activeProfile);
+                } else if (action === 'import') {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = '.sav';
+                    fileInput.onchange = (ev) => {
+                        const file = ev.target.files[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (re) => {
+                            const imported = importProfile(re.target.result);
+                            if (imported) {
+                                saveProfile(imported);
+                                activeProfile = imported;
+                                setActiveProfileName(imported.name);
+                                updateUI();
+                            }
+                        };
+                        reader.readAsText(file);
+                    };
+                    fileInput.click();
+                }
+                return;
+            }
+
             if (gameState === 'menu') {
                 if (action === 'start') {
                     if (activeProfile && activeProfile.activeRun) {
@@ -6612,28 +6646,6 @@
                     sdShopSlot = 0;
                     sdShopItem = 0;
                     updateUI();
-                } else if (action === 'export') {
-                    if (activeProfile) exportProfile(activeProfile);
-                } else if (action === 'import') {
-                    const fileInput = document.createElement('input');
-                    fileInput.type = 'file';
-                    fileInput.accept = '.sav';
-                    fileInput.onchange = (ev) => {
-                        const file = ev.target.files[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = (re) => {
-                            const imported = importProfile(re.target.result);
-                            if (imported) {
-                                saveProfile(imported);
-                                activeProfile = imported;
-                                setActiveProfileName(imported.name);
-                                updateUI();
-                            }
-                        };
-                        reader.readAsText(file);
-                    };
-                    fileInput.click();
                 } else if (action === 'profile') {
                     gameState = 'profile_select';
                     profileSelectIndex = 0;
