@@ -258,6 +258,14 @@
 - High scores list shown with medal icons, modifier SVG icons, and levels
 - Clears any active saved run (`activeRun`)
 
+### Victory Screen
+- Triggered when clearing Level 20 (the run is force-ended)
+- Title: "SYSTEM SHATTERED" with gold glow
+- Score + modifier + Stardust earned displayed
+- High scores table shown
+- Single option: "Quit to Menu"
+- Profile stats.victories incremented on victory
+
 ### Upgrade Shop (Card Grid)
 - 2x4 card grid layout
 - SVG wireframe icons per upgrade:
