@@ -2046,6 +2046,10 @@
     </div>
     <div id="fullscreenBtn" data-tap-action="fullscreen">&#x26F6;</div>
     <script>
+        // ============================================================================
+        // SECTION 1: DOM REFERENCES & CANVAS SETUP
+        // ============================================================================
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gameTitleEl = document.getElementById('gameTitle');
@@ -2311,6 +2315,10 @@
         let lastStardustEarned = 0;
         let levelTransitionTimer = 0;
         let runAsteroidsDestroyed = 0;
+
+        // ============================================================================
+        // SECTION 2: AUDIO SYSTEM — Pink Floyd-inspired procedural audio
+        // ============================================================================
 
         // Audio system (Pink Floyd-inspired)
         let audioCtx = null;
@@ -2758,6 +2766,10 @@
         let lowHealthTimer = 0;
         const LOW_HEALTH_INTERVAL = 36; // 0.6 seconds at 60fps
 
+        // ============================================================================
+        // SECTION 3: VISUAL EFFECTS SYSTEM — Shake, flash, rings, bolts, popups
+        // ============================================================================
+
         // Visual effects system
         let screenShakeTimer = 0;
         let screenShakeIntensity = 0;
@@ -2999,6 +3011,10 @@
                 ctx.fillText(p.text, p.x, p.y);
             });
         }
+
+        // ============================================================================
+        // SECTION 4: GAME CONSTANTS — Heat, combo, powerups, asteroids, biomes, upgrades
+        // ============================================================================
 
         // Heat system
         let heat = 0;
@@ -3353,6 +3369,10 @@
         }
 
         // Preview drawing helpers
+        // ============================================================================
+        // SECTION 6: SVG COSMETIC RENDERING — Ship, bullet, thruster, death previews
+        // ============================================================================
+
         function cosmeticColor(item) {
             if (!item || !item.color) return '#ffffff';
             if (item.color === 'prismatic') {
@@ -3787,6 +3807,10 @@
         let voidCacheTimer = 0;
         let voidCacheReturnState = null;
 
+        // ============================================================================
+        // SECTION 5: PROFILE SYSTEM — Persistence, save/load, export/import
+        // ============================================================================
+
         // Profile system
         const PROFILES_KEY = 'cosmicshatter_profiles';
         const ACTIVE_KEY = 'cosmicshatter_active';
@@ -4133,6 +4157,10 @@
             gameState = (lastLevel >= 20) ? 'victory' : 'gameover';
             updateUI();
         }
+
+        // ============================================================================
+        // SECTION 7: MENU RENDERING — Profile list, modifier select, shop, stardust shop
+        // ============================================================================
 
         function renderProfileList() {
             profileList = getProfileList();
@@ -5267,6 +5295,10 @@
         });
 
         // Create asteroid
+        // ============================================================================
+        // SECTION 9: ENTITY FACTORY — Create asteroids, enemies, gravity wells, particles
+        // ============================================================================
+
         function createAsteroid(x, y, size, colorObj) {
             const vertices = Math.floor(Math.random() * 5) + 7;
             const shape = [];
@@ -5915,6 +5947,10 @@
         }
 
         // Start game
+        // ============================================================================
+        // SECTION 8: GAME LOGIC — Start game, serialize/deserialize, destroy asteroid
+        // ============================================================================
+
         function startGame() {
             initAudio();
             resumeAudio();
@@ -6224,6 +6260,10 @@
         }
 
         // Update UI
+        // ============================================================================
+        // SECTION 13: UI UPDATE — DOM manipulation, state-based display toggling
+        // ============================================================================
+
         function updateUI() {
             modifierSelectEl.style.display = 'none';
             gameTitleEl.style.display = 'none';
@@ -6480,6 +6520,10 @@
                 hsLegendEl.innerHTML = '';
             }
         }
+
+        // ============================================================================
+        // SECTION 10: UPDATE FUNCTIONS — Ship, bullets, heat, asteroids, enemies, particles
+        // ============================================================================
 
         // Update ship
         function updateShip(dt) {
@@ -7007,6 +7051,10 @@
         }
 
         // Check collisions
+        // ============================================================================
+        // SECTION 11: COLLISION DETECTION — Bullets, ship, enemies, powerups, star bits
+        // ============================================================================
+
         function checkCollisions() {
             const explosiveRadius = sc(60);
             const scoreMultActive = activePowerups.scoremult > 0;
@@ -7609,6 +7657,10 @@
             ctx.restore();
         }
 
+        // ============================================================================
+        // SECTION 12: DRAW FUNCTIONS — Ship, asteroids, enemies, bullets, particles
+        // ============================================================================
+
         // Draw functions
         function drawShip() {
             if (!ship.blinkOn && ship.invulnerable) return;
@@ -7803,6 +7855,10 @@
 
         // Main game loop
         let lastFrameTime = 0;
+        // ============================================================================
+        // SECTION 14: GAME LOOP — Frame update, state machine, rendering pipeline
+        // ============================================================================
+
         function gameLoop(timestamp) {
             // Delta time (normalized to 60fps, capped to prevent spiral of death)
             const dt = timestamp ? Math.min((timestamp - lastFrameTime) / (1000 / 60), 3) : 1;
@@ -8024,6 +8080,10 @@
             requestAnimationFrame(gameLoop);
         }
 
+        // ============================================================================
+        // SECTION 16: INIT & BOOTSTRAP — Event listeners, initial setup
+        // ============================================================================
+
         // Start
         // Migrate old high scores if needed
         migrateOldHighScores();
@@ -8084,6 +8144,10 @@
             e.stopPropagation();
             toggleFullscreen();
         });
+
+        // ============================================================================
+        // SECTION 15: INPUT HANDLING — Keyboard, touch, mouse dispatch
+        // ============================================================================
 
         // === MOBILE TOUCH CONTROLS ===
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
