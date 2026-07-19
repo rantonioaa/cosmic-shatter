@@ -3143,14 +3143,14 @@
               threat: 'high', threatColor: '#ff4444',
               stats: { speed: 1.35, count: 1.0, friction: 1.0, magnet: 1.0, rotation: 1.0 },
               palette: { accent: '#ffaa00', bg: '#080400', particles: 'embers' } },
-            { id: 'mire_wastes', name: 'Mire Wastes', scoreMult: 1.40, friction: 0.980,
-              countMult: 1, speedMult: 1, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
+            { id: 'mire_wastes', name: 'Mire Wastes', scoreMult: 1.40, friction: 0.985,
+              countMult: 1, speedMult: 0.95, safeZoneMult: 1, hpBonus: 0, powerupLuckBonus: 0,
               starBitMult: 1, rotMult: 0.55, magnetMult: 0.55, enemyType: 'swarmer', specialObject: 'gravity_well', specialChance: 0.08,
               desc: 'Thick and sluggish. Swarms lurk in the mire while gravity wells warp the field.',
               enemyDesc: 'Swarmers — tiny triangles that clump together and chase the ship',
               specialDesc: 'Gravity Well — pulls ship, bullets, and asteroids inward',
               threat: 'medium', threatColor: '#ffaa00',
-              stats: { speed: 1.0, count: 1.0, friction: 0.98, magnet: 0.55, rotation: 0.55 },
+              stats: { speed: 0.95, count: 1.0, friction: 0.985, magnet: 0.55, rotation: 0.55 },
               palette: { accent: '#66cc66', bg: '#000a00', particles: 'spores' } }
         ];
         const BIOME_UNLOCK_CHAIN = {
@@ -4171,7 +4171,7 @@
                     const baseVal = baseline[key] || 1;
                     const ratio = Math.min(val / (baseVal * 2), 1);
                     const label = key.charAt(0).toUpperCase() + key.slice(1);
-                    const displayVal = key === 'friction' ? (1 - val).toFixed(2) + ' slide' : val + '×';
+                    const displayVal = key === 'friction' ? (1 - val).toFixed(2) + ' resistance' : val + '×';
                     statsHtml += `<div class="briefing-stat-row">`
                         + `<span class="briefing-stat-label">${label}</span>`
                         + `<div class="briefing-stat-bar"><div class="briefing-stat-fill" style="width:${ratio * 100}%;background:${statColors[key] || '#4fc3f7'}"></div></div>`
